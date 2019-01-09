@@ -76,9 +76,14 @@ class AE_CF(object):
         self.outputs = tf.matmul(h, w)
 
         self.preds = tf.gather_nd(self.outputs, inputs.indices)
-        pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
-        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - 1)) * 80
-        self.loss = tf.add_n([pref_diff_ones, pref_diff_zero]) / (self.height * self.width)
+        # pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
+        # pref_diff_ones = tf.reduce_sum(tf.square(self.preds - 1)) * 80
+        pref_diff_zero = (self.outputs - 0) * (1 - tf.sparse.to_dense(inputs))
+        pref_diff_ones = (self.outputs - 1) * tf.sparse.to_dense(inputs)
+        self.loss = tf.reduce_mean(tf.square(pref_diff_ones) * 80 + tf.square(pref_diff_zero))
+
+
+        # self.loss = tf.add_n([pref_diff_ones, pref_diff_zero]) / (self.height * self.width)
         self.loss = tf.identity(self.loss, name='loss')
 
         all_var = [var for var in tf.trainable_variables() ]
