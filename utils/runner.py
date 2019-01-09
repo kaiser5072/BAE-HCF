@@ -121,8 +121,7 @@ def validate(infer_func, params):
         eval_result = est.evaluate(
             input_fn = input_func)
 
-        print('\n [*] RMSE_TRAIN: %.4f' % np.sqrt(eval_result['rmse_train']))
-        print(' [*] RMSE_VAL  : %.4f' % np.sqrt(eval_result['rmse_val']))
+        print('\n [*] RECALL: %.4f' % eval_result['recall'])
         return np.sqrt(eval_result['rmse_val'])
     except KeyboardInterrupt:
         print("Keyboard interrupt")
