@@ -38,7 +38,7 @@ def parse_data(inputs):
             value      = value.astype(np.float32)
             value_v    = value_v.astype(np.float32)
             contents_t = contents_t.astype(np.int8)
-            mask       = mask.astype(np.int8)
+            # mask       = mask.astype(np.int8)
 
             example_train = tf.train.Example(features=tf.train.Features(feature={
                 'column'    : data._byte_feature(column.tostring()),
@@ -46,8 +46,8 @@ def parse_data(inputs):
                 'column_v'  : data._byte_feature(column_v.tostring()),
                 'value_v'   : data._byte_feature(value_v.tostring()),
                 'feature_t' : data._byte_feature(feature_t.tostring()),
-                'contents_t': data._byte_feature(contents_t.tostring()),
-                'mask'      : data._byte_feature(mask.tostring())
+                'contents_t': data._byte_feature(contents_t.tostring())
+                # 'mask'      : data._byte_feature(mask.tostring())
             }))
             train_writer.write(example_train.SerializeToString())
             pbar.update(1)
