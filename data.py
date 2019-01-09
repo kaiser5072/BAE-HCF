@@ -37,7 +37,7 @@ def parse_data(inputs):
             num_val   += len(value_v)
             value      = value.astype(np.float32)
             value_v    = value_v.astype(np.float32)
-            contents_t = contents_t.astpye(np.int8)
+            contents_t = contents_t.astype(np.int8)
 
             example_train = tf.train.Example(features=tf.train.Features(feature={
                 'column'    : data._byte_feature(column.tostring()),
