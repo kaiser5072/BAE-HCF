@@ -78,7 +78,7 @@ class AE_CF(object):
         self.preds = tf.gather_nd(self.outputs, inputs.indices)
         pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
         pref_diff_ones = tf.reduce_sum(tf.square(self.preds - 1)) * 80
-        self.loss = tf.add_n([pref_diff_ones, pref_diff_zero])
+        self.loss = tf.add_n([pref_diff_ones, pref_diff_zero]) / (self.height * self.width)
         self.loss = tf.identity(self.loss, name='loss')
 
         all_var = [var for var in tf.trainable_variables() ]
@@ -101,6 +101,8 @@ class AE_CF(object):
 
 
     def _BAE_model_fn(self, features, labels, mode, params):
+        self.height = params['height']
+        self.width  = params['width']
 
         self.lr = tf.train.piecewise_constant(
             tf.train.get_global_step(),
