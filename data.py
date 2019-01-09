@@ -164,6 +164,7 @@ class Data(object):
         divider = np.random.uniform(0, 1, [self.height, self.width])
         mask = np.zeros_like(divider)
         mask[divider < train_ratio] = 1
+        print(mask)
 
         train = pref.multiply(1 - mask)
         val   = pref.multiply(mask)
