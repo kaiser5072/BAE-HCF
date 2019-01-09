@@ -30,7 +30,7 @@ class AE_CF(object):
         self.n_layer = len(self.dims) - 1
 
     def builder(self, inputs):
-        w_init = tf.contrib.layers.xavier_initializer()
+        w_init = tf.contrib.layers.variance_scaling_initializer()
         b_init = tf.constant_initializer(0.)
         h = inputs
         prev_dim = self.dims[0]
@@ -145,7 +145,9 @@ class AE_CF(object):
                 target = labels.values
 
                 recall = tf.metrics.recall_at_k(
-                    labels=labels, predictions=self.outputs, k=100)
+                    labels=labels, predictions=self.outputs, k=100,
+                    weights=tf.sparse_to_dense(labels.indices, labels.dense_shape, labels.values,
+                                               validate_indices=False))
                 # rmse_train = tf.metrics.mean_squared_error(
                 #     labels=inputs.values, predictions=self.preds)
 
