@@ -143,7 +143,7 @@ class AE_CF(object):
                 labels = tf.cast(labels, tf.float32)
                 preds = tf.gather_nd(self.outputs, labels.indices)
                 target = labels.values
-                preds = self.outputs * labels + (-100) * (1 + (-1) * labels)
+                preds = self.outputs * tf.sparse.to_dense(labels)
                 recall = tf.metrics.recall_at_k(
                     labels=tf.cast(labels, tf.int64), predictions=preds, k=100)
                 # rmse_train = tf.metrics.mean_squared_error(
