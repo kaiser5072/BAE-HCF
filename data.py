@@ -113,7 +113,7 @@ class Data(object):
 
         os.makedirs(out_dir)
 
-        row, columns, rating, item, feature, contents = self.load_data(data_dir, 'user')
+        row, columns, rating, item, feature, contents = self.load_data(data_dir, 'item')
         chunk_offsets = self._split_data(row, opt.chunk_size)
         num_chunks = len(chunk_offsets)
         self.logger.info('split data into %d chunks' % (num_chunks))
