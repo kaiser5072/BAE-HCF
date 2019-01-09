@@ -20,11 +20,10 @@ def parse_data(inputs):
     data = Data()
     train_path = os.path.join(out_dir, 'train.%s.tfrecords' % cidx)
     train_writer = tf.python_io.TFRecordWriter(train_path)
-    print(mask[0, :])
 
     num_train, num_val = 0, 0
     with tqdm.tqdm(total=end-begin) as pbar:
-        for column, value, column_v, value_v, feature_t, contents_t, mask in data.generate(row_t,
+        for column, value, column_v, value_v, feature_t, contents_t in data.generate(row_t,
                                                                                      col_t,
                                                                                      rating_t,
                                                                                      row_v,
@@ -85,7 +84,7 @@ class Data(object):
 
         return row, column, pref, item, feature, contents
 
-    def generate(self, row_t, col_t, rating_t, row_v, col_v, rating_v, mask, item, feature, contents, begin, end):
+    def generate(self, row_t, col_t, rating_t, row_v, col_v, rating_v, item, feature, contents, begin, end):
 
 
         for i in range(begin, end):
@@ -108,7 +107,7 @@ class Data(object):
             # column_v = val[i, :].indices
             # value_v  = val[i, :].data
 
-            yield column_t, value_t, column_v, value_v, feature_t, contents_t, mask[i, :]
+            yield column_t, value_t, column_v, value_v, feature_t, contents_t
 
 
     def make_db(self, data_dir, out_dir, train_ratio):
