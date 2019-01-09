@@ -108,9 +108,9 @@ class AE_CF(object):
 
         # TODO: Better way instead of tf.identity
 
-        indices = tf.identity(features.indices)
-        values = tf.identity(features.values)
-        dense_shape = tf.identity(features.dense_shape)
+        indices     = tf.identity(features['pref'].indices)
+        values      = tf.identity(features['pref'].values)
+        dense_shape = tf.identity(features['pref'].dense_shape)
 
         is_training = (mode == tf.estimator.ModeKeys.TRAIN)
         if is_training:

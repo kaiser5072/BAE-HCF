@@ -4,43 +4,56 @@ import os
 def _deserialize_data_record(record, mode):
     if mode == 'train':
         feature_map = {
-            'column'  : tf.FixedLenFeature([], tf.string, ''),
-            'value'   : tf.FixedLenFeature([], tf.string, '')}
-
+            'column'    : tf.FixedLenFeature([], tf.string, ''),
+            'value'     : tf.FixedLenFeature([], tf.string, ''),
+            'feature_t' : tf.FixedLenFeature([], tf.string, ''),
+            'contents_t': tf.FixedLenFeature([], tf.string, '')
+        }
         with tf.name_scope('deserialize_image_record'):
             obj = tf.parse_single_example(record, feature_map)
 
-            item  = obj['column']
-            value = obj['value']
+            item     = obj['column']
+            value    = obj['value']
+            feature  = obj['feature_t']
+            contents = obj['contents_t']
 
-            return item, value, None, None
+            return item, value, feature, contents, None, None
     else:
         feature_map = {
             'column'   : tf.FixedLenFeature([], tf.string, ''),
             'value'    : tf.FixedLenFeature([], tf.string, ''),
             'column_v' : tf.FixedLenFeature([], tf.string, ''),
-            'value_v'  : tf.FixedLenFeature([], tf.string, '')}
+            'value_v'  : tf.FixedLenFeature([], tf.string, ''),
+            'feature_t': tf.FixedLenFeature([], tf.string, ''),
+            'contents_t': tf.FixedLenFeature([], tf.string, '')
+        }
 
         with tf.name_scope('deserialize_image_record'):
             obj = tf.parse_single_example(record, feature_map)
 
-            item, value     = obj['column'], obj['value']
-            item_v, value_v = obj['column_v'], obj['value_v']
+            item, value       = obj['column'], obj['value']
+            item_v, value_v   = obj['column_v'], obj['value_v']
+            feature, contents = obj['feature_t'], obj['contents_t']
 
-            return item, value, item_v, value_v
+            return item, value, feature, contents, item_v, value_v
 
 def _parse_and_preprocess_record(record, width, mode):
 
-    item, value, item_v, value_v = _deserialize_data_record(record, mode)
+    item, value, feature, content, item_v, value_v = _deserialize_data_record(record, mode)
 
     item  = tf.decode_raw(item, out_type=tf.int32)
     value = tf.decode_raw(value, out_type=tf.float32)
+    feature = tf.decode_raw(feature, out_type=tf.int32)
+    content = tf.decode_raw(content, out_type=tf.int8)
 
     item = tf.cast(item, tf.int64)
+    feature = tf.cast(feature, tf.int64)
 
     inputs = tf.SparseTensor(tf.reshape(item, [-1, 1]), value, [width])
+    sides = tf.SparseTensor(tf.reshape(feature, [-1, 1]), content, [8000])
 
     if mode == 'train':
+        inputs = {'pref': inputs, 'sides': sides}
         return inputs
 
     else:
@@ -50,6 +63,8 @@ def _parse_and_preprocess_record(record, width, mode):
         item_v = tf.cast(item_v, tf.int64)
 
         labels = tf.SparseTensor(tf.reshape(item_v, [-1, 1]), value_v, [width])
+
+        inputs = {'pref': inputs, 'sides': sides}
 
         return inputs, labels
 
