@@ -67,7 +67,7 @@ def _parse_and_preprocess_record(record, width, mode):
 
         labels = tf.SparseTensor(tf.reshape(item_v, [-1, 1]), value_v, [width])
 
-        inputs = {'pref': inputs, 'sides': sides, 'mask': mask}
+        inputs = {'pref': inputs, 'sides': sides, 'mask': mask, 'label': labels}
 
         return inputs, labels
 
