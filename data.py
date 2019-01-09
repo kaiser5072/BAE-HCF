@@ -163,7 +163,7 @@ class Data(object):
         pref = coo_matrix((rating, (row, column)), shape=(self.height, self.width))
         divider = np.random.uniform(0, 1, [self.height, self.width])
         mask = np.zeros_like(divider)
-        mask[divider < train_ratio] = 1
+        mask[divider > train_ratio] = 1
         print(mask)
 
         train = pref.multiply(1 - mask)
