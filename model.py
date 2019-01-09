@@ -122,7 +122,7 @@ class AE_CF(object):
         # pref_diff_ones = tf.reduce_sum(tf.square(self.preds - 1)) * 80
         pref_diff_zero = (self.outputs - 0) * (1 - tf.sparse.to_dense(inputs))
         pref_diff_ones = (self.outputs - 1) * tf.sparse.to_dense(inputs)
-        self.loss = tf.reduce_mean(tf.square(pref_diff_ones) * 80 + tf.square(pref_diff_zero))
+        self.loss = tf.reduce_mean(tf.square(pref_diff_ones * 80 + pref_diff_zero))
 
 
         # self.loss = tf.add_n([pref_diff_ones, pref_diff_zero]) / (self.height * self.width)
