@@ -168,9 +168,8 @@ class Data(object):
         train = pref.multiply(1 - mask)
         val   = pref.multiply(mask)
 
-        print(train.data, val.data, train.nonzero()[1])
-        return (train.nonzero()[1], train.nonzero()[0], train.data,
-                val.nonzero()[1], val.nonzero()[0], val.data, mask)
+        return (train.nonzero()[1], train.nonzero()[0], train.toarray()[train.nonzero()],
+                val.nonzero()[1], val.nonzero()[0], val.toarray()[train.nonzero()], mask)
 
 
     def _split_data(self, row, chunk_size):
