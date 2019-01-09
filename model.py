@@ -73,6 +73,8 @@ class AE_CF(object):
                                 initializer=w_init,
                                 dtype=self.dtype)
 
+            self.outputs = tf.matmul(h, w)
+
         # reg_losses = tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES)
         # self.loss = tf.add_n([self.loss] + reg_losses, name='total_loss')
 
@@ -114,8 +116,6 @@ class AE_CF(object):
         with tf.device(self.device):
             inputs = tf.cast(inputs, self.dtype)
             self.builder(inputs)
-
-        self.outputs = tf.matmul(h, w)
 
         self.preds = tf.gather_nd(self.outputs, inputs.indices)
         # pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
