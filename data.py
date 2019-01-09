@@ -29,7 +29,6 @@ def parse_data(inputs):
                                                                                      row_v,
                                                                                      col_v,
                                                                                      rating_v,
-                                                                                     mask,
                                                                                      item,
                                                                                      feature,
                                                                                      contents,
