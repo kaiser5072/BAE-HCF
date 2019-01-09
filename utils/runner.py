@@ -122,7 +122,7 @@ def validate(infer_func, params):
             input_fn = input_func)
 
         print('\n [*] RECALL: %.4f' % eval_result['recall'])
-        return np.sqrt(eval_result['rmse_val'])
+        return eval_result['rmse_val']
     except KeyboardInterrupt:
         print("Keyboard interrupt")
 
