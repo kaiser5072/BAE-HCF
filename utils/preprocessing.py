@@ -17,7 +17,7 @@ def _deserialize_data_record(record, mode):
             feature  = obj['feature_t']
             contents = obj['contents_t']
 
-            return item, value, feature, contents, None, None
+            return item, value, feature, contents, None, None, None
     else:
         feature_map = {
             'column'   : tf.FixedLenFeature([], tf.string, ''),
@@ -25,7 +25,8 @@ def _deserialize_data_record(record, mode):
             'column_v' : tf.FixedLenFeature([], tf.string, ''),
             'value_v'  : tf.FixedLenFeature([], tf.string, ''),
             'feature_t': tf.FixedLenFeature([], tf.string, ''),
-            'contents_t': tf.FixedLenFeature([], tf.string, '')
+            'contents_t': tf.FixedLenFeature([], tf.string, ''),
+            'mask'      : tf.FixedLenFeature([], tf.string, '')
         }
 
         with tf.name_scope('deserialize_image_record'):
@@ -34,12 +35,13 @@ def _deserialize_data_record(record, mode):
             item, value       = obj['column'], obj['value']
             item_v, value_v   = obj['column_v'], obj['value_v']
             feature, contents = obj['feature_t'], obj['contents_t']
+            mask = obj['mask']
 
-            return item, value, feature, contents, item_v, value_v
+            return item, value, feature, contents, item_v, value_v, mask
 
 def _parse_and_preprocess_record(record, width, mode):
 
-    item, value, feature, content, item_v, value_v = _deserialize_data_record(record, mode)
+    item, value, feature, content, item_v, value_v, mask = _deserialize_data_record(record, mode)
 
     item  = tf.decode_raw(item, out_type=tf.int32)
     value = tf.decode_raw(value, out_type=tf.float32)
@@ -59,12 +61,13 @@ def _parse_and_preprocess_record(record, width, mode):
     else:
         item_v = tf.decode_raw(item_v, out_type=tf.int32)
         value_v = tf.decode_raw(value_v, out_type=tf.float32)
+        mask    = tf.decode_raw(mask, out_type=tf.int8)
 
         item_v = tf.cast(item_v, tf.int64)
 
         labels = tf.SparseTensor(tf.reshape(item_v, [-1, 1]), value_v, [width])
 
-        inputs = {'pref': inputs, 'sides': sides}
+        inputs = {'pref': inputs, 'sides': sides, 'mask': mask}
 
         return inputs, labels
 
