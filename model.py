@@ -134,11 +134,11 @@ class AE_CF(object):
 
         with tf.device(None):
             if mode == tf.estimator.ModeKeys.EVAL:
-                labels = tf.cast(labels, self.dtype)
+                labels = tf.cast(labels, tf.int64)
                 preds = tf.gather_nd(self.outputs, labels.indices)
                 target = labels.values
-                rmse_val = tf.metrics.mean_squared_error(
-                    labels=target, predictions=preds)
+                rmse_val = tf.metrics.recall_at_k(
+                    labels=labels, predictions=self.outputs, k=100)
                 rmse_train = tf.metrics.mean_squared_error(
                     labels=inputs.values, predictions=self.preds)
 
