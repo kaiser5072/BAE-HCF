@@ -192,6 +192,7 @@ def get_recall(ratingTest, preds, test_mask, n_recalls):
     # temp = np.zeros((16980, 5551))
     # temp[(ratingTest[:, 0], ratingTest[:, 1])] = 1
     # temp = np.transpose(ratingTest)
+    temp = ratingTest
     non_zero_idx = np.sum(temp, axis=1) != 0
 
     pred_user_interest = preds[non_zero_idx, :]
