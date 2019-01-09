@@ -150,13 +150,14 @@ class AE_CF(object):
                 preds = self.outputs * mask - 100 * (1-mask)
                 recall = tf.metrics.recall_at_k(
                     labels=tf.cast(labels, tf.int64), predictions=preds, k=100)
-                # rmse_train = tf.metrics.mean_squared_error(
-                #     labels=inputs.values, predictions=self.preds)
+                rmse = tf.metrics.mean_squared_error(
+                    labels=labels.values, predictions=tf.gather_nd(self.outputs, labels.indices))
 
                 tf.summary.scalar('recall', recall[1])
-                # tf.summary.scalar('rmse_train', rmse_train[1])
+                tf.summary.scalar('rmse', rmse[1])
 
-                metrics = {'recall': recall}
+                metrics = {'recall': recall,
+                           'rmse': rmse}
                 return tf.estimator.EstimatorSpec(
                     mode, loss=self.loss, eval_metric_ops=metrics)
         assert( mode == tf.estimator.ModeKeys.TRAIN)

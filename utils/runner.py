@@ -122,6 +122,7 @@ def validate(infer_func, params):
             input_fn = input_func)
 
         print('\n [*] RECALL: %.4f' % eval_result['recall'])
+        print(' [*] RMSE: %.4f' % eval_result['rmse'])
         return eval_result['recall']
     except KeyboardInterrupt:
         print("Keyboard interrupt")
