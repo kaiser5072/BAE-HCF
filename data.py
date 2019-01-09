@@ -16,11 +16,11 @@ opt = Option('./config.json')
 def parse_data(inputs):
     cidx, begin, end, DATA, item, feature, contents, out_dir = inputs
     col_t, row_t, rating_t, col_v, row_v, rating_v, mask = DATA
-    print(rating_t)
+
     data = Data()
     train_path = os.path.join(out_dir, 'train.%s.tfrecords' % cidx)
     train_writer = tf.python_io.TFRecordWriter(train_path)
-
+    print(rating_v)
     num_train, num_val = 0, 0
     with tqdm.tqdm(total=end-begin) as pbar:
         for column, value, column_v, value_v, feature_t, contents_t in data.generate(row_t,
@@ -117,7 +117,6 @@ class Data(object):
 
         row, columns, rating, item, feature, contents = self.load_data(data_dir, 'item')
         chunk_offsets = self._split_data(row, opt.chunk_size)
-        print(chunk_offsets)
         num_chunks = len(chunk_offsets)
         self.logger.info('split data into %d chunks' % (num_chunks))
 
@@ -169,7 +168,7 @@ class Data(object):
         val   = pref.multiply(mask)
 
         return (train.nonzero()[1], train.nonzero()[0], train.toarray()[train.nonzero()],
-                val.nonzero()[1], val.nonzero()[0], val.toarray()[train.nonzero()], mask)
+                val.nonzero()[1], val.nonzero()[0], val.toarray()[val.nonzero()], mask)
 
 
     def _split_data(self, row, chunk_size):
