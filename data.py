@@ -15,7 +15,7 @@ opt = Option('./config.json')
 
 def parse_data(inputs):
     cidx, begin, end, DATA, item, feature, contents, out_dir = inputs
-    col_t, row_t, rating_t, col_v, row_v, rating_v, mask = DATA
+    col_t, row_t, rating_t, col_v, row_v, rating_v = DATA
 
     data = Data()
     train_path = os.path.join(out_dir, 'train.%s.tfrecords' % cidx)
@@ -168,7 +168,7 @@ class Data(object):
         val   = pref.multiply(mask)
 
         return (train.nonzero()[1], train.nonzero()[0], train.toarray()[train.nonzero()],
-                val.nonzero()[1], val.nonzero()[0], val.toarray()[val.nonzero()], mask)
+                val.nonzero()[1], val.nonzero()[0], val.toarray()[val.nonzero()])
 
 
     def _split_data(self, row, chunk_size):
