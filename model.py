@@ -145,7 +145,7 @@ class AE_CF(object):
                 target = labels.values
                 preds = self.outputs * labels
                 recall = tf.metrics.recall_at_k(
-                    labels=labels, predictions=preds, k=100)
+                    labels=tf.cast(labels, tf.int64), predictions=preds, k=100)
                 # rmse_train = tf.metrics.mean_squared_error(
                 #     labels=inputs.values, predictions=self.preds)
 
