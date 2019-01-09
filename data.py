@@ -153,7 +153,7 @@ class Data(object):
 
     def _split_train_val(self, row, column, rating, train_ratio):
         val_ratio = int(1 / (1 - train_ratio))
-        val_index = np.random.choice(len(rating), len(rating)//val_ratio)
+        val_index = np.random.choice(len(rating), len(rating)//val_ratio, replace=False)
         val_index = np.sort(val_index)
         train_index = np.setdiff1d(np.arange(len(rating)), val_index)
 
