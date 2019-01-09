@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
 
-import cPickle
+import tqdm
 import time
 import utils
 import os
@@ -126,3 +126,49 @@ def validate(infer_func, params):
     except KeyboardInterrupt:
         print("Keyboard interrupt")
 
+
+def predict(infer_func, params):
+    data_dir        = params['data_dir']
+    log_dir         = params['log_dir'] #if params['mode'] == 'train' else params['model_dir']
+    height          = params['height']
+    width           = params['width']
+    batch_size      = params['batch_size']
+    prefetch_size   = params['prefetch_size']
+
+    config = tf.ConfigProto()
+    config.gpu_options.force_gpu_compatible = True
+    config.intra_op_parallelism_threads = 1
+    config.inter_op_parallelism_threads = 32
+
+    est = tf.estimator.Estimator(
+        model_fn=infer_func._BAE_model_fn,
+        model_dir=log_dir,
+        params={
+            'height': params['batch_size'],
+            'width' : params['width']
+        },
+        config=tf.estimator.RunConfig(
+            session_config=config,
+            save_checkpoints_secs=None,
+            save_checkpoints_steps=None,
+            keep_checkpoint_every_n_hours=3))
+
+    input_func = lambda: utils.data_set(data_dir, batch_size, prefetch_size, width,
+                                        mode='eval')
+
+    print("\n\n PREDICT\n")
+    try:
+        eval_result = est.predict(
+            input_fn=input_func)
+
+        pred_b = []
+        with tqdm.tqdm(total=height) as pbar:
+            for preds in eval_result:
+                _pred = preds['preds']
+                print(_pred)
+
+                pred_b.append(_pred)
+                pbar.update(1)
+
+    except KeyboardInterrupt:
+        print("Keyboard interrupt")

@@ -137,6 +137,11 @@ class AE_CF(object):
 
         self.loss = tf.add(self.loss, 2 * self.l2_lambda * tf.reduce_sum(l2_losses), name='total_loss')
 
+        if mode == tf.estimator.ModeKeys.PREDICT:
+            predictions = {
+                'preds': self.outputs
+            }
+            return tf.estimator.EstimatorSpec(mode, predictions=predictions)
 
         with tf.device(None):
             if mode == tf.estimator.ModeKeys.EVAL:
@@ -144,7 +149,7 @@ class AE_CF(object):
                 mask   = tf.cast(features['mask'], self.dtype)
                 preds = self.outputs * mask - 100 * (1-mask)
                 recall = tf.metrics.recall_at_k(
-                    labels=tf.cast(labels, tf.int64), predictions=preds, k=5551)
+                    labels=tf.cast(labels, tf.int64), predictions=preds, k=100)
                 # rmse_train = tf.metrics.mean_squared_error(
                 #     labels=inputs.values, predictions=self.preds)
 
