@@ -170,7 +170,7 @@ def predict(infer_func, params):
                 _pred = pred['preds']
                 _rating = pred['ratingTest']
                 _mask = pred['mask']
-                print(_rating)
+                print(_mask)
 
                 preds.append(_pred)
                 ratingTest.append(_rating)

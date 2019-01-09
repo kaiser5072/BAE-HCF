@@ -140,7 +140,7 @@ class AE_CF(object):
             predictions = {
                 'preds': self.outputs,
                 'mask': features['mask'],
-                'ratingTest': features['labels'].indices
+                'ratingTest': tf.sparse.to_dense(features['labels'])
             }
             return tf.estimator.EstimatorSpec(mode, predictions=predictions)
 
