@@ -140,7 +140,7 @@ class AE_CF(object):
 
         with tf.device(None):
             if mode == tf.estimator.ModeKeys.EVAL:
-                labels = tf.cast(labels, tf.int64)
+                labels = tf.cast(labels, tf.float32)
                 preds = tf.gather_nd(self.outputs, labels.indices)
                 target = labels.values
                 preds = self.outputs * labels
