@@ -168,7 +168,7 @@ class Data(object):
         train = pref.multiply(1 - mask)
         val   = pref.multiply(mask)
 
-        print(train.data, val.data, train.non_zero()[1])
+        print(train.data, val.data, train.nonzero()[1])
         return (train.nonzero()[1], train.nonzero()[0], train.data,
                 val.nonzero()[1], val.nonzero()[0], val.data, mask)
 
