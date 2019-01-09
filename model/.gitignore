@@ -1,0 +1,6 @@
+*.h5py
+checkpoint
+eval/
+model*
+graph.*
+events.*
