@@ -7,7 +7,7 @@ import fire
 import tqdm
 import os
 
-from scipy.sparse import csr_matrix
+from scipy.sparse import coo_matrix
 from multiprocessing import Pool
 from utils import get_logger, Option
 opt = Option('./config.json')
@@ -15,7 +15,7 @@ opt = Option('./config.json')
 
 def parse_data(inputs):
     cidx, begin, end, DATA, item, feature, contents, out_dir = inputs
-    col_t, row_t, rating_t, col_v, row_v, rating_v = DATA
+    col_t, row_t, rating_t, col_v, row_v, rating_v, mask = DATA
 
     data = Data()
     train_path = os.path.join(out_dir, 'train.%s.tfrecords' % cidx)
@@ -23,12 +23,13 @@ def parse_data(inputs):
 
     num_train, num_val = 0, 0
     with tqdm.tqdm(total=end-begin) as pbar:
-        for column, value, column_v, value_v, feature_t, contents_t in data.generate(row_t,
+        for column, value, column_v, value_v, feature_t, contents_t, mask in data.generate(row_t,
                                                                                      col_t,
                                                                                      rating_t,
                                                                                      row_v,
                                                                                      col_v,
                                                                                      rating_v,
+                                                                                     mask,
                                                                                      item,
                                                                                      feature,
                                                                                      contents,
@@ -38,6 +39,7 @@ def parse_data(inputs):
             value      = value.astype(np.float32)
             value_v    = value_v.astype(np.float32)
             contents_t = contents_t.astype(np.int8)
+            mask       = mask.astype(np.int8)
 
             example_train = tf.train.Example(features=tf.train.Features(feature={
                 'column'    : data._byte_feature(column.tostring()),
@@ -45,7 +47,8 @@ def parse_data(inputs):
                 'column_v'  : data._byte_feature(column_v.tostring()),
                 'value_v'   : data._byte_feature(value_v.tostring()),
                 'feature_t' : data._byte_feature(feature_t.tostring()),
-                'contents_t': data._byte_feature(contents_t.tostring())
+                'contents_t': data._byte_feature(contents_t.tostring()),
+                'mask'      : data._byte_feature(mask.tostring())
             }))
             train_writer.write(example_train.SerializeToString())
             pbar.update(1)
@@ -81,7 +84,7 @@ class Data(object):
 
         return row, column, pref, item, feature, contents
 
-    def generate(self, row_t, col_t, rating_t, row_v, col_v, rating_v, item, feature, contents, begin, end):
+    def generate(self, row_t, col_t, rating_t, row_v, col_v, rating_v, mask, item, feature, contents, begin, end):
 
 
         for i in range(begin, end):
@@ -104,7 +107,7 @@ class Data(object):
             # column_v = val[i, :].indices
             # value_v  = val[i, :].data
 
-            yield column_t, value_t, column_v, value_v, feature_t, contents_t
+            yield column_t, value_t, column_v, value_v, feature_t, contents_t, mask[i, :]
 
 
     def make_db(self, data_dir, out_dir, train_ratio):
@@ -152,13 +155,21 @@ class Data(object):
         self.logger.info('width: %s' % self.width)
 
     def _split_train_val(self, row, column, rating, train_ratio):
-        val_ratio = int(1 / (1 - train_ratio))
-        val_index = np.random.choice(len(rating), len(rating)//val_ratio, replace=False)
-        val_index = np.sort(val_index)
-        train_index = np.setdiff1d(np.arange(len(rating)), val_index)
+        # val_ratio = int(1 / (1 - train_ratio))
+        # val_index = np.random.choice(len(rating), len(rating)//val_ratio, replace=False)
+        # val_index = np.sort(val_index)
+        # train_index = np.setdiff1d(np.arange(len(rating)), val_index)
 
-        return (column[train_index], row[train_index], rating[train_index],
-                column[val_index], row[val_index], rating[val_index])
+        pref = coo_matrix((rating, (row, column)), shape=(self.height, self.width))
+        divider = np.random.uniform(0, 1, [self.height, self.width])
+        mask = np.zeros_like(divider)
+        mask[divider < train_ratio] = 1
+
+        train = pref.multiply(1 - mask)
+        val   = pref.multiply(mask)
+
+        return (train.nonzero()[1], train.nonzero()[0], train.data,
+                val.nonzero()[1], val.nonzero()[0], val.data, mask)
 
     def _split_data(self, row, chunk_size):
         total = np.max(row) + 1

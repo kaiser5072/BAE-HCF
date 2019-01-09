@@ -135,7 +135,7 @@ class AE_CF(object):
             if var.op.name.find('weight') >= 0:
                 l2_losses.append(tf.nn.l2_loss(var))
 
-        self.loss = tf.add(self.loss, self.l2_lambda * tf.reduce_sum(l2_losses), name='total_loss')
+        self.loss = tf.add(self.loss, 2 * self.l2_lambda * tf.reduce_sum(l2_losses), name='total_loss')
 
 
         with tf.device(None):
