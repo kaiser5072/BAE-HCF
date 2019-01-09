@@ -63,7 +63,7 @@ def train(infer_func, params):
         model_fn=infer_func._BAE_model_fn,
         model_dir=log_dir,
         params={
-            'height': params['height'],
+            'height': params['batch_size'],
             'width':  params['width']
         },
         config=tf.estimator.RunConfig(
@@ -104,7 +104,7 @@ def validate(infer_func, params):
         model_fn=infer_func._BAE_model_fn,
         model_dir=log_dir,
         params={
-            'height': params['height'],
+            'height': params['batch_size'],
             'width' : params['width']
         },
         config=tf.estimator.RunConfig(
