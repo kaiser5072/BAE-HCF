@@ -30,7 +30,7 @@ def parse_args(init_vals, custom_parser=None):
                    required=_required(init_vals, 'log_dir'),
                    help="""Directory in which to write training
                    summarizes and checkpoints.""")
-    p.add_argument('-m', '--mode', choices=['train', 'evaluate'],
+    p.add_argument('-m', '--mode', choices=['train', 'evaluate', 'predict'],
                    default=_default(init_vals, 'mode'),
                    required=_required(init_vals, 'mode'),
                    help="""Select the mode for estimator in terms 
