@@ -76,7 +76,10 @@ class AE_CF(object):
         self.outputs = tf.matmul(h, w)
 
         self.preds = tf.gather_nd(self.outputs, inputs.indices)
-        self.loss = tf.losses.mean_squared_error(labels=inputs.values, predictions=self.preds)
+        labels = tf.sparse.to_dense(inputs)
+        self.loss = tf.losses.mean_squared_error(labels=labels,
+                                                 predictions=self.outputs,
+                                                 weights=labels*79 + 1)
         self.loss = tf.identity(self.loss, name='loss')
 
         all_var = [var for var in tf.trainable_variables() ]
