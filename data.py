@@ -164,13 +164,14 @@ class Data(object):
         divider = np.random.uniform(0, 1, [self.height, self.width])
         mask = np.zeros_like(divider)
         mask[divider > train_ratio] = 1
-        print(mask)
 
         train = pref.multiply(1 - mask)
         val   = pref.multiply(mask)
 
+        print(train.data, val.data, train.non_zero()[1])
         return (train.nonzero()[1], train.nonzero()[0], train.data,
                 val.nonzero()[1], val.nonzero()[0], val.data, mask)
+
 
     def _split_data(self, row, chunk_size):
         total = np.max(row) + 1
