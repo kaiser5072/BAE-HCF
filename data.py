@@ -16,7 +16,7 @@ opt = Option('./config.json')
 def parse_data(inputs):
     cidx, begin, end, DATA, item, feature, contents, out_dir = inputs
     col_t, row_t, rating_t, col_v, row_v, rating_v, mask = DATA
-    print(col_t)
+    print(len(col_t))
     data = Data()
     train_path = os.path.join(out_dir, 'train.%s.tfrecords' % cidx)
     train_writer = tf.python_io.TFRecordWriter(train_path)
