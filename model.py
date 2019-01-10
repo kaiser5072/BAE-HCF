@@ -29,7 +29,7 @@ class AE_CF(object):
         self.dtype = tf.float16 if params['precision'] == 'fp16' else tf.float32
         self.n_layer = len(self.dims) - 1
 
-    def builder(self, inputs):
+    def builder(self, inputs, sides):
         w_init = tf.contrib.layers.variance_scaling_initializer()
         b_init = tf.constant_initializer(0.)
         h = inputs
@@ -44,24 +44,28 @@ class AE_CF(object):
                                               trainable=True,
                                               initializer=b_init,
                                               dtype=self.dtype)
+                s = tf.get_variable('weight_s', shape=[8000, self.dims[i]],
+                                                trainable=True,
+                                                initializer=w_init,
+                                                dtype=self.dtype)
 
             if i == 1 and self.n_layer != 2:
-                h = tf.sparse.matmul(inputs, w) + b
+                h = tf.sparse.matmul(inputs, w) + b + tf.sparse.matmul(sides, s)
                 # h = tf.layers.batch_normalization(h)
                 h = tf.nn.relu(h)
 
             elif self.n_layer == 2:
-                h = tf.sparse.matmul(inputs, w) + b
+                h = tf.sparse.matmul(inputs, w) + b + tf.sparse.matmul(sides, s)
                 # h = tf.layers.batch_normalization(h)
                 h = tf.nn.tanh(h)
 
             elif i == (self.n_layer-1):
-                h = tf.matmul(h ,w) + b
+                h = tf.matmul(h ,w) + b + tf.sparse.matmul(sides, s)
                 # h = tf.layers.batch_normalization(h)
                 h = tf.nn.tanh(h)
 
             else:
-                h = tf.matmul(h, w) + b
+                h = tf.matmul(h, w) + b + tf.sparse.matmul(sides, s)
                 # h = tf.layers.batch_normalization(h)
                 h = tf.nn.relu(h)
 
@@ -118,22 +122,29 @@ class AE_CF(object):
         values      = tf.identity(features['pref'].values)
         dense_shape = tf.identity(features['pref'].dense_shape)
 
+        indices_s   = tf.identity(features['sides'].indices)
+        values_s    = tf.identity(features['values'].indices)
+        dense_shape_s = tf.identity(features['dense_shape'].indices)
+
         is_training = (mode == tf.estimator.ModeKeys.TRAIN)
         if is_training:
             with tf.device('/cpu:0'):
                 # Stage inputs on the host
-                self.preload_op, (indices, values, dense_shape) = _stage([indices, values, dense_shape])
+                self.preload_op, (indices, values, dense_shape, indices_s, values_s, dense_shape_s) \
+                    = _stage([indices, values, dense_shape, indices_s, values_s, dense_shape_s])
             with tf.device(self.device):
                 # Stage inputs to the device
-                self.gpucopy_op, (indices, values, dense_shape) = _stage([indices, values, dense_shape])
+                self.gpucopy_op, (indices, values, dense_shape, indices_s, values_s, dense_shape_s)\
+                    = _stage([indices, values, dense_shape, indices_s, values_s, dense_shape_s])
 
         inputs = tf.SparseTensor(indices, values, dense_shape)
+        sides  = tf.SparseTensor(indices_s, values_s, dense_shape_s)
 
         with tf.device(self.device):
             inputs = tf.cast(inputs, self.dtype)
-            self.builder(inputs)
+            sides  = tf.cast(sides, self.dtype)
 
-
+            self.builder(inputs, sides)
 
         if mode == tf.estimator.ModeKeys.PREDICT:
             predictions = {
