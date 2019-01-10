@@ -40,7 +40,7 @@ class _LogSessionRunHook(tf.train.SessionRunHook):
             img_per_sec = 1 / dt
             epoch = print_step * self.global_batch_size / self.num_records
             print("|%6i %7.1f %5.1f %6.3f %7.3f %7.1f   |" %
-                  (print_step, epoch, img_per_sec, loss, total_loss, self.process_secs))
+                  (print_step, epoch, img_per_sec, np.sqrt(loss), np.sqrt(total_loss), self.process_secs))
             self.elapsed_secs = 0.
             self.count = 0
 
@@ -178,7 +178,7 @@ def predict(infer_func, params):
 
 
         recall = get_recall(ratingTest, preds, mask, 100)
-        print(recall)
+        print("\n [*] RECALL: %.4f" % recall)
 
     except KeyboardInterrupt:
         print("Keyboard interrupt")
