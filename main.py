@@ -28,7 +28,8 @@ default_args = {
     'n_folds': 1,
     'prefetch_size': 20,
     'checkpoints_secs': None,
-    'device': '/gpu:0'
+    'device': '/gpu:0',
+    'lr_power': 2.0
 }
 
 formatter = argparse.ArgumentDefaultsHelpFormatter

@@ -55,6 +55,7 @@ def train(infer_func, params):
     display_step     = params['display_every']
     checkpoints_secs = params['checkpoints_secs']
 
+    decay_steps = n_epochs // 10
     nstep = display_step# * height // batch_size
     nupdate = n_epochs# * height // batch_size
 
@@ -66,7 +67,8 @@ def train(infer_func, params):
         model_dir=log_dir,
         params={
             'height': params['batch_size'],
-            'width':  params['width']
+            'width':  params['width'],
+            'decay_steps': decay_steps
         },
         config=tf.estimator.RunConfig(
             session_config=config,

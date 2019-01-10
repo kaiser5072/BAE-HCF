@@ -18,13 +18,15 @@ class AE_CF(object):
         self.dims          = params['dims']
         self.n_epochs      = params['n_epochs']
         self.batch_size    = params['batch_size']
-        self.init_lr       = params['lr']
+        self.lr_init       = params['lr']
         self.l2_lambda     = params['l2_lambda']
         self.rank          = params['rank']
         self.eps           = params['eps']
         self.device        = params['device']
         self.log_dir       = params['log_dir']
         self.prefetch_size = params['prefetch_size']
+        self.lr_power      = params['lr_power']
+
 
         self.dtype = tf.float16 if params['precision'] == 'fp16' else tf.float32
         self.n_layer = len(self.dims) - 1
@@ -99,6 +101,11 @@ class AE_CF(object):
         # self.loss = tf.add_n([self.loss] + reg_losses, name='total_loss')
 
     def optimization(self):
+        self.lr = tf.train.polynomial_decay(
+            self.lr_init, tf.train.get_global_step(),
+            decay_steps=self.decay_steps, end_learning_rate=0.,
+            power=self.lr_power, cycle=False, name='learning_rate')
+
         opt = tf.train.AdamOptimizer(self.lr)
         train_op = opt.minimize(self.loss, global_step=tf.train.get_global_step(),
                                              name='step_update')
@@ -107,14 +114,15 @@ class AE_CF(object):
 
 
     def _BAE_model_fn(self, features, labels, mode, params):
-        self.height = params['height']
-        self.width  = params['width']
+        self.height        = params['height']
+        self.width         = params['width']
+        self.decay_steps   = params['decay_steps']
 
-        self.lr = tf.train.piecewise_constant(
-            tf.train.get_global_step(),
-            [40000, 80000],
-            [self.init_lr, 0.1*self.init_lr, 0.001*self.init_lr],
-            name='learning_rate')
+        # self.lr = tf.train.piecewise_constant(
+        #     tf.train.get_global_step(),
+        #     [40000, 80000],
+        #     [self.init_lr, 0.1*self.init_lr, 0.001*self.init_lr],
+        #     name='learning_rate')
 
         # TODO: Better way instead of tf.identity
 
