@@ -75,6 +75,22 @@ class AE_CF(object):
 
             self.outputs = tf.matmul(h, w)
 
+        self.preds = tf.gather_nd(self.outputs, inputs.indices)
+        pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
+        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - 1)) * 80
+
+        self.loss = tf.add_n([pref_diff_ones, pref_diff_zero]) / (self.height * self.width)
+        self.loss = tf.identity(self.loss, name='loss')
+
+        all_var = [var for var in tf.trainable_variables() ]
+
+        l2_losses = []
+        for var in all_var:
+            if var.op.name.find('weight') >= 0:
+                l2_losses.append(tf.nn.l2_loss(var))
+
+        self.loss = tf.add(self.loss, 2 * self.l2_lambda * tf.reduce_sum(l2_losses), name='total_loss')
+
         # reg_losses = tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES)
         # self.loss = tf.add_n([self.loss] + reg_losses, name='total_loss')
 
@@ -117,24 +133,7 @@ class AE_CF(object):
             inputs = tf.cast(inputs, self.dtype)
             self.builder(inputs)
 
-        self.preds = tf.gather_nd(self.outputs, inputs.indices)
-        pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
-        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - 1)) * 80
-        # pref_diff_zero = (self.outputs - 0) * (1 - tf.sparse.to_dense(inputs))
-        # pref_diff_ones = (self.outputs - 1) * tf.sparse.to_dense(inputs)
-        # self.loss = tf.reduce_mean(tf.square(pref_diff_ones) * 80 + tf.square(pref_diff_zero))
 
-        self.loss = tf.add_n([pref_diff_ones, pref_diff_zero]) / (self.height * self.width)
-        self.loss = tf.identity(self.loss, name='loss')
-
-        all_var = [var for var in tf.trainable_variables() ]
-
-        l2_losses = []
-        for var in all_var:
-            if var.op.name.find('weight') >= 0:
-                l2_losses.append(tf.nn.l2_loss(var))
-
-        self.loss = tf.add(self.loss, 2 * self.l2_lambda * tf.reduce_sum(l2_losses), name='total_loss')
 
         if mode == tf.estimator.ModeKeys.PREDICT:
             predictions = {
