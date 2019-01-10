@@ -12,7 +12,7 @@ utils.init()
 default_args = {
     'mode': 'train',
     'batch_size': 1024,
-    'lr': 1e-4,
+    'lr': 1e-3,
     'precision': 'fp32',
     'n_epochs': 10000,
     'data_dir': './Input/ml-1m/ratings.dat',
