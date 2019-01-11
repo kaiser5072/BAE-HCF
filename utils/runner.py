@@ -7,7 +7,6 @@ import utils
 import os
 import tracemalloc
 
-
 from scipy.stats import rankdata
 
 class _PrefillStagingAreasHook(tf.train.SessionRunHook):
@@ -178,7 +177,7 @@ def predict(infer_func, params):
 
         snapshot = tracemalloc.take_snapshot()
         display_top(snapshot)
-        
+
         recall = get_recall(ratingTest, preds, 100)
         print("\n [*] RECALL: %.4f" % recall)
 

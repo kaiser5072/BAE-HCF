@@ -3,7 +3,7 @@ import numpy as np
 import model
 import argparse
 import utils
-import cPickle
+import _pickle
 import os
 import shutil
 
@@ -44,7 +44,7 @@ args, flags = utils.parse_args(default_args, parser)
 # TODO: Combine lines to load rating data and save dictionary.
 def _get_input(args, mode):
     meta_path = os.path.join(args['data_dir'], 'meta')
-    meta = cPickle.loads(open(meta_path).read())
+    meta = _pickle.loads(open(meta_path).read())
 
     args['height'] = meta['height']
     args['width']  = meta['width']
