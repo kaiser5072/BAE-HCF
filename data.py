@@ -75,6 +75,7 @@ class Data(object):
             column = data['pref']['item'][:]
 
         pref = data['pref']['value'][:]
+        print(len(pref))
 
         self.height = np.max(row) + 1
         self.width  = np.max(column) + 1
