@@ -5,6 +5,8 @@ import tqdm
 import time
 import utils
 import os
+import tracemalloc
+
 
 from scipy.stats import rankdata
 
@@ -158,7 +160,7 @@ def predict(infer_func, params):
 
     input_func = lambda: utils.data_set(data_dir, batch_size, prefetch_size, width,
                                         mode='eval')
-
+    tracemalloc.start()
     print("\n\n PREDICT\n")
     try:
         eval_result = est.predict(
@@ -172,12 +174,15 @@ def predict(infer_func, params):
 
                 preds.append(_pred)
                 ratingTest.append(_rating)
-                del pred
                 pbar.update(1)
 
-
+        snapshot = tracemalloc.take_snapshot()
+        display_top(snapshot)
+        
         recall = get_recall(ratingTest, preds, 100)
         print("\n [*] RECALL: %.4f" % recall)
+
+
 
     except KeyboardInterrupt:
         print("Keyboard interrupt")
@@ -218,3 +223,29 @@ def get_order_array(list):
         order[k] = rankdata(-row, method='ordinal') - 1
 
     return order
+
+
+def display_top(snapshot, key_type='lineno', limit=3):
+    snapshot = snapshot.filter_traces((
+        tracemalloc.Filter(False, "<frozen importlib._bootstrap>"),
+        tracemalloc.Filter(False, "<unknown>"),
+    ))
+    top_stats = snapshot.statistics(key_type)
+
+    print("Top %s lines" % limit)
+    for index, stat in enumerate(top_stats[:limit], 1):
+        frame = stat.traceback[0]
+        # replace "/path/to/module/file.py" with "module/file.py"
+        filename = os.sep.join(frame.filename.split(os.sep)[-2:])
+        print("#%s: %s:%s: %.1f KiB"
+              % (index, filename, frame.lineno, stat.size / 1024))
+        line = linecache.getline(frame.filename, frame.lineno).strip()
+        if line:
+            print('    %s' % line)
+
+    other = top_stats[limit:]
+    if other:
+        size = sum(stat.size for stat in other)
+        print("%s other: %.1f KiB" % (len(other), size / 1024))
+    total = sum(stat.size for stat in top_stats)
+    print("Total allocated size: %.1f KiB" % (total / 1024))
