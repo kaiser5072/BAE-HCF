@@ -180,7 +180,6 @@ class AE_CF(object):
                 return tf.estimator.EstimatorSpec(
                     mode, loss=self.loss, eval_metric_ops=metrics)
         assert( mode == tf.estimator.ModeKeys.TRAIN)
-        self.decay_steps   = params['decay_steps']
         self.optimization()
 
         return tf.estimator.EstimatorSpec(mode, loss=self.loss, train_op=self.train_op)
