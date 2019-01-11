@@ -165,16 +165,15 @@ class AE_CF(object):
             if mode == tf.estimator.ModeKeys.EVAL:
                 labels = tf.cast(labels, self.dtype)
                 preds = self.outputs
-                recall = tf.metrics.recall_at_k(
-                    labels=tf.cast(labels, tf.int64), predictions=preds, k=100)
+                # recall = tf.metrics.recall_at_k(
+                #     labels=tf.cast(labels, tf.int64), predictions=preds, k=100)
                 rmse = tf.metrics.mean_squared_error(
                     labels=labels.values, predictions=tf.gather_nd(self.outputs, labels.indices))
 
-                tf.summary.scalar('recall', recall[1])
+                # tf.summary.scalar('recall', recall[1])
                 tf.summary.scalar('rmse', rmse[1])
 
-                metrics = {'recall': recall,
-                           'rmse': rmse}
+                metrics = {'rmse': rmse}
                 return tf.estimator.EstimatorSpec(
                     mode, loss=self.loss, eval_metric_ops=metrics)
         assert( mode == tf.estimator.ModeKeys.TRAIN)
