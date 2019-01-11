@@ -7,7 +7,7 @@ import fire
 import tqdm
 import os
 
-from scipy.sparse import coo_matrix
+from scipy.sparse import csr_matrix
 from multiprocessing import Pool
 from utils import get_logger, Option
 opt = Option('./config.json')
@@ -21,13 +21,11 @@ def parse_data(inputs):
     train_path = os.path.join(out_dir, '%s.%s.tfrecords' % (div, cidx))
     train_writer = tf.python_io.TFRecordWriter(train_path)
     num_train, num_val = 0, 0
+    sparse_tr = csr_matrix((pref_tr, (row_tr, col_tr)), shape=(1306055, 1497020))
+    sparse_co = csr_matrix((contents, (item, feature)), shape=(1306055, 2738))
     with tqdm.tqdm(total=end-begin) as pbar:
-        for column, value, feature_t, contents_t, Col_te, Pref_te in data.generate(row_tr,
-                                                                   col_tr,
-                                                                   pref_tr,
-                                                                   item,
-                                                                   feature,
-                                                                   contents,
+        for column, value, feature_t, contents_t, Col_te, Pref_te in data.generate(sparse_tr,
+                                                                                   sparse_co,
                                                                    row_te,
                                                                    col_te,
                                                                    pref_te,
@@ -101,17 +99,17 @@ class Data(object):
 
             return (row, column, pref, item, feature, contents, row_te, col_te, pref_te)
 
-    def generate(self, row_t, col_t, rating_t, item, feature, contents, row_te, col_te, pref_te, begin, end):
+    def generate(self, train, contents, row_te, col_te, pref_te, begin, end):
         for i in range(begin, end):
             # train = csr_matrix((rating_train, (row_train, column_train)), shape=(self.height, self.width))
             # val   = csr_matrix((rating_val, (row_val, column_val)), shape=(self.height, self.width))
-            train_index = (row_t == i)
-            column_t    = col_t[train_index]
-            value_t     = rating_t[train_index]
+            # train_index = (row_t == i)
+            column_t    = train[i].indices
+            value_t     = train[i].data
 
-            contents_index = (item == i)
-            feature_t      = feature[contents_index]
-            contents_t     = contents[contents_index]
+            # contents_index = (item == i)
+            feature_t      = contents[i].indices
+            contents_t     = contents[i].data
 
             if row_te is not None:
                 index_te = (row_te == i)
