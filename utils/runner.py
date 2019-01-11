@@ -167,8 +167,8 @@ def predict(infer_func, params):
         preds, ratingTest = [], []
         with tqdm.tqdm(total=height) as pbar:
             for pred in eval_result:
-                _pred = [pred['preds'][2]]
-                _rating = [pred['ratingTest'][2]]
+                _pred = [pred['preds'][1]]
+                _rating = [pred['ratingTest'][1]]
 
                 preds.append(_pred)
                 ratingTest.append(_rating)
