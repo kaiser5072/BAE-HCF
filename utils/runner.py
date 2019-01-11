@@ -169,6 +169,7 @@ def predict(infer_func, params):
             for pred in eval_result:
                 _pred = pred['preds'][:, :10000]
                 _rating = pred['ratingTest'][:, :10000]
+                print(np.shape(_pred))
 
                 preds.append(_pred)
                 ratingTest.append(_rating)
