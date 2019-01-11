@@ -67,8 +67,7 @@ def train(infer_func, params):
         model_dir=log_dir,
         params={
             'height': params['batch_size'],
-            'width':  params['width'],
-            'decay_steps': decay_steps
+            'width':  params['width']
         },
         config=tf.estimator.RunConfig(
             session_config=config,

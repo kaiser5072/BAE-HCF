@@ -26,8 +26,6 @@ class AE_CF(object):
         self.device        = params['device']
         self.log_dir       = params['log_dir']
         self.prefetch_size = params['prefetch_size']
-        self.lr_power      = params['lr_power']
-
 
         self.dtype = tf.float16 if params['precision'] == 'fp16' else tf.float32
         self.n_layer = len(self.dims) - 1
@@ -38,7 +36,7 @@ class AE_CF(object):
         h = inputs
 
         if np.random.uniform(0, 1, 1) < 0.5:
-            h.values = 0
+            h = h - inputs
         
         prev_dim = self.dims[0]
         for i in range(1, self.n_layer):
@@ -106,12 +104,7 @@ class AE_CF(object):
         # self.loss = tf.add_n([self.loss] + reg_losses, name='total_loss')
 
     def optimization(self):
-        self.lr = tf.train.polynomial_decay(
-            self.lr_init, tf.train.get_global_step(),
-            decay_steps=self.decay_steps, end_learning_rate=0.,
-            power=self.lr_power, cycle=False, name='learning_rate')
-
-        opt = tf.train.AdamOptimizer(self.lr)
+        opt = tf.train.AdamOptimizer(self.lr_init)
         train_op = opt.minimize(self.loss, global_step=tf.train.get_global_step(),
                                              name='step_update')
         update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
