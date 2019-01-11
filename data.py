@@ -102,8 +102,6 @@ class Data(object):
             return (row, column, pref, item, feature, contents, row_te, col_te, pref_te)
 
     def generate(self, row_t, col_t, rating_t, item, feature, contents, row_te, col_te, pref_te, begin, end):
-
-
         for i in range(begin, end):
             # train = csr_matrix((rating_train, (row_train, column_train)), shape=(self.height, self.width))
             # val   = csr_matrix((rating_val, (row_val, column_val)), shape=(self.height, self.width))
@@ -143,6 +141,7 @@ class Data(object):
 
         data = self.load_data(data_dir, div, 'item')
         chunk_offsets = self._split_data(opt.chunk_size)
+        print(chunk_offsets)
         num_chunks = len(chunk_offsets)
         self.logger.info('split data into %d chunks' % (num_chunks))
 
