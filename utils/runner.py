@@ -164,15 +164,14 @@ def predict(infer_func, params):
         eval_result = est.predict(
             input_fn=input_func)
 
-        preds, ratingTest, mask = [], [], []
+        preds, ratingTest = [], []
         with tqdm.tqdm(total=height) as pbar:
             for pred in eval_result:
-                _pred = pred['preds'][:2]
-                _rating = pred['ratingTest'][:2]
+                _pred = pred['preds'][2]
+                _rating = pred['ratingTest'][2]
 
                 preds.append(_pred)
                 ratingTest.append(_rating)
-                print(_rating)
                 del pred
                 pbar.update(1)
 
