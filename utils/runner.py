@@ -167,8 +167,8 @@ def predict(infer_func, params):
         preds, ratingTest = np.ones((height, 10000)), np.ones((height, 10000))
         with tqdm.tqdm(total=height) as pbar:
             for i, pred in enumerate(eval_result):
-                _pred = pred['preds'][:100]
-                _rating = pred['ratingTest'][:100]
+                _pred = pred['preds'][:10000]
+                _rating = pred['ratingTest'][:10000]
 
                 preds[i, :] = _pred
                 ratingTest[i, :] = _rating
