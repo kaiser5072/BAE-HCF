@@ -44,9 +44,9 @@ def _parse_and_preprocess_record(record, width, mode):
     item, value, feature, content, item_v, value_v, mask = _deserialize_data_record(record, mode)
 
     item  = tf.decode_raw(item, out_type=tf.int32)
-    value = tf.decode_raw(value, out_type=tf.float32)
+    value = tf.decode_raw(value, out_type=tf.int8)
     feature = tf.decode_raw(feature, out_type=tf.int32)
-    content = tf.decode_raw(content, out_type=tf.int8)
+    content = tf.decode_raw(content, out_type=tf.float32)
 
     item = tf.cast(item, tf.int64)
     feature = tf.cast(feature, tf.int64)
