@@ -86,6 +86,9 @@ class Data(object):
             contents_index = (item == i)
             feature_t = feature[contents_index]
             contents_t = contents[contents_index]
+
+            if column_t.size == 0 and value_t.size == 0 and feature_t.size == 0 and contents_t.size == 0:
+                continue
             # column_t = train[i, :].indices
             # value_t  = train[i, :].data
             #
@@ -167,6 +170,33 @@ class Data(object):
 
     def _byte_feature(self, value):
         return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
+
+    def build_data(self, data_dir):
+        ''' Remove duplicate interactions and collapse remaining interactions
+        into a single binary matrix in the form of a sparse matrix'''
+        # Training set
+        data_path = os.path.join(data_dir, 'recsys2017.pub/eval/warm/train.csv')
+        pref = np.loadtxt(data_path, dtype='int32, int32, float32',
+                          delimiter=',',
+                          usecols=(0, 1, 2),
+                          unpack=True)
+        pref[2] = np.ones(np.shape(pref[2]))
+
+        uniq = list(set(zip(pref[0], pref[1], pref[2])))
+        uniq = uniq.sort()
+
+        pref = zip(*uniq)
+
+        with open(os.path.join(data_dir, 'recsys2017.pub/eval/item_features_0based.txt', 'r')) as f:
+            item_feature, i = [], 0
+            for line in f:
+                for item in line.split()[1:]:
+                    item_feature.append([i, int(item.split(':')[0]), float(item.split(':')[1])])
+                i = i + 1
+
+        item_feature = item_feature.sort()
+        item_feature = zip(*item_feature)
+
 
 if __name__ == '__main__':
     data = Data()
