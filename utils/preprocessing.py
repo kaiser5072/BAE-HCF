@@ -39,7 +39,7 @@ def _deserialize_data_record(record, mode):
 
 def _parse_and_preprocess_record(record, width, mode):
 
-    item, value, feature, content, item_v, value_v, mask = _deserialize_data_record(record, mode)
+    item, value, feature, content, item_v, value_v = _deserialize_data_record(record, mode)
 
     item  = tf.decode_raw(item, out_type=tf.int32)
     value = tf.decode_raw(value, out_type=tf.int8)
@@ -59,13 +59,12 @@ def _parse_and_preprocess_record(record, width, mode):
     else:
         item_v = tf.decode_raw(item_v, out_type=tf.int32)
         value_v = tf.decode_raw(value_v, out_type=tf.int8)
-        mask    = tf.decode_raw(mask, out_type=tf.int8)
 
         item_v = tf.cast(item_v, tf.int64)
 
         labels = tf.SparseTensor(tf.reshape(item_v, [-1, 1]), value_v, [width])
 
-        inputs = {'pref': inputs, 'sides': sides, 'mask': mask, 'labels': labels}
+        inputs = {'pref': inputs, 'sides': sides, 'labels': labels}
 
         return inputs, labels
 
