@@ -32,7 +32,7 @@ def _deserialize_data_record(record, mode):
             obj = tf.parse_single_example(record, feature_map)
 
             item, value       = obj['column'], obj['value']
-            item_v, value_v   = obj['column_v'], obj['value_v']
+            item_v, value_v   = obj['column_te'], obj['value_te']
             feature, contents = obj['feature_t'], obj['contents_t']
 
             return item, value, feature, contents, item_v, value_v
