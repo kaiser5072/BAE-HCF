@@ -165,6 +165,7 @@ def predict(infer_func, params):
             input_fn=input_func)
 
         preds, ratingTest, mask = [], [], []
+        n_user = 0
         with tqdm.tqdm(total=height) as pbar:
             for pred in eval_result:
                 _pred = pred['preds']
@@ -174,6 +175,9 @@ def predict(infer_func, params):
                 preds.append(_pred)
                 ratingTest.append(_rating)
                 pbar.update(1)
+                if n_user > 5000:
+                    break
+                n_user += 1
 
 
         recall = get_recall(ratingTest, preds, 100)
