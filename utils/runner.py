@@ -173,6 +173,7 @@ def predict(infer_func, params):
                 preds.append(_pred)
                 ratingTest.append(_rating)
                 print(_rating)
+                del pred
                 pbar.update(1)
 
 
