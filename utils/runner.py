@@ -195,6 +195,7 @@ def get_recall(ratingTest, preds, n_recalls):
     # test_mask = np.asarray(test_mask)
 
     non_zero_idx = np.sum(temp, axis=1) != 0
+    print(len(non_zero_idx))
 
     pred_user_interest   = preds[non_zero_idx, :]
     target_user_interest = temp[non_zero_idx, :]
@@ -206,6 +207,7 @@ def get_recall(ratingTest, preds, n_recalls):
     match_interest  = pred_user_interest * target_user_interest
     num_match       = np.sum(match_interest, axis=1)
     num_interest    = np.sum(target_user_interest, axis=1)
+    print(num_interest)
 
     user_recall = num_match / num_interest
     recall = np.average(user_recall)
