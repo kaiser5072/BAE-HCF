@@ -1,4 +1,5 @@
 import tensorflow as tf
+import numpy as np
 from tensorflow.python.ops import data_flow_ops
 
 def _stage(tensors):
@@ -35,6 +36,10 @@ class AE_CF(object):
         w_init = tf.contrib.layers.variance_scaling_initializer()
         b_init = tf.constant_initializer(0.)
         h = inputs
+
+        if np.random.uniform(0, 1, 1) < 0.5:
+            h.values = 0
+        
         prev_dim = self.dims[0]
         for i in range(1, self.n_layer):
             with tf.variable_scope('layer%d'%i):
