@@ -170,15 +170,13 @@ def predict(infer_func, params):
             for pred in eval_result:
                 _pred = pred['preds']
                 _rating = pred['ratingTest']
-                _mask = pred['mask']
 
                 preds.append(_pred)
                 ratingTest.append(_rating)
-                mask.append(_mask)
                 pbar.update(1)
 
 
-        recall = get_recall(ratingTest, preds, mask, 100)
+        recall = get_recall(ratingTest, preds, 100)
         print("\n [*] RECALL: %.4f" % recall)
 
     except KeyboardInterrupt:
