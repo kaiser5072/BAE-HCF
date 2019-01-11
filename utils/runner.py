@@ -170,7 +170,7 @@ def predict(infer_func, params):
                 _pred = pred['preds'][:100]
                 _rating = pred['ratingTest'][:100]
 
-                preds[i, :] = pred
+                preds[i, :] = _pred
                 # ratingTest.append(_rating)
                 pbar.update(1)
 
