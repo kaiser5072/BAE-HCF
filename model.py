@@ -121,7 +121,6 @@ class AE_CF(object):
     def _BAE_model_fn(self, features, labels, mode, params):
         self.height        = params['height']
         self.width         = params['width']
-        self.decay_steps   = params['decay_steps']
 
         # self.lr = tf.train.piecewise_constant(
         #     tf.train.get_global_step(),
@@ -185,6 +184,7 @@ class AE_CF(object):
                 return tf.estimator.EstimatorSpec(
                     mode, loss=self.loss, eval_metric_ops=metrics)
         assert( mode == tf.estimator.ModeKeys.TRAIN)
+        self.decay_steps   = params['decay_steps']
         self.optimization()
 
         return tf.estimator.EstimatorSpec(mode, loss=self.loss, train_op=self.train_op)
