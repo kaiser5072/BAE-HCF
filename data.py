@@ -15,40 +15,29 @@ opt = Option('./config.json')
 
 def parse_data(inputs):
     cidx, begin, end, DATA, item, feature, contents, out_dir = inputs
-    col_t, row_t, rating_t, col_v, row_v, rating_v, Mask = DATA
+    col_t, row_t, rating_t = DATA
 
     data = Data()
     train_path = os.path.join(out_dir, 'train.%s.tfrecords' % cidx)
     train_writer = tf.python_io.TFRecordWriter(train_path)
-    print(rating_v)
     num_train, num_val = 0, 0
     with tqdm.tqdm(total=end-begin) as pbar:
-        for column, value, column_v, value_v, feature_t, contents_t, mask in data.generate(row_t,
-                                                                                     col_t,
-                                                                                     rating_t,
-                                                                                     row_v,
-                                                                                     col_v,
-                                                                                     rating_v,
-                                                                                     Mask,
-                                                                                     item,
-                                                                                     feature,
-                                                                                     contents,
-                                                                                     begin, end):
+        for column, value, feature_t, contents_t, in data.generate(row_t,
+                                                                   col_t,
+                                                                   rating_t,
+                                                                   item,
+                                                                   feature,
+                                                                   contents,
+                                                                   begin, end):
             num_train += len(value)
-            num_val   += len(value_v)
-            value      = value.astype(np.float32)
-            value_v    = value_v.astype(np.float32)
-            contents_t = contents_t.astype(np.int8)
-            mask       = mask.astype(np.int8)
+            value      = value.astype(np.int8)
+            contents_t = contents_t.astype(np.float32)
 
             example_train = tf.train.Example(features=tf.train.Features(feature={
                 'column'    : data._byte_feature(column.tostring()),
                 'value'     : data._byte_feature(value.tostring()),
-                'column_v'  : data._byte_feature(column_v.tostring()),
-                'value_v'   : data._byte_feature(value_v.tostring()),
                 'feature_t' : data._byte_feature(feature_t.tostring()),
-                'contents_t': data._byte_feature(contents_t.tostring()),
-                'mask'      : data._byte_feature(mask.tostring())
+                'contents_t': data._byte_feature(contents_t.tostring())
             }))
             train_writer.write(example_train.SerializeToString())
             pbar.update(1)
@@ -84,7 +73,7 @@ class Data(object):
 
         return row, column, pref, item, feature, contents
 
-    def generate(self, row_t, col_t, rating_t, row_v, col_v, rating_v, mask, item, feature, contents, begin, end):
+    def generate(self, row_t, col_t, rating_t, item, feature, contents, begin, end):
 
 
         for i in range(begin, end):
@@ -93,10 +82,6 @@ class Data(object):
             train_index = (row_t == i)
             column_t  = col_t[train_index]
             value_t = rating_t[train_index]
-
-            val_index = (row_v == i)
-            column_v  = col_v[val_index]
-            value_v = rating_v[val_index]
 
             contents_index = (item == i)
             feature_t = feature[contents_index]
@@ -107,7 +92,7 @@ class Data(object):
             # column_v = val[i, :].indices
             # value_v  = val[i, :].data
 
-            yield column_t, value_t, column_v, value_v, feature_t, contents_t, mask[i, :]
+            yield column_t, value_t, feature_t, contents_t
 
 
     def make_db(self, data_dir, out_dir, train_ratio):
@@ -121,7 +106,8 @@ class Data(object):
         num_chunks = len(chunk_offsets)
         self.logger.info('split data into %d chunks' % (num_chunks))
 
-        data = self._split_train_val(row, columns, rating, train_ratio)
+        # data = self._split_train_val(row, columns, rating, train_ratio)
+        data = (row, columns, rating)
 
         pool = Pool(opt.num_workers)
 
