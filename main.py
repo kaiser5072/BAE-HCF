@@ -76,9 +76,9 @@ def train(args):
         BEA = model.AE_CF(args)
         utils.train(BEA, args)
 
-        # VALIDATION
-        RMSE_VAL = utils.validate(BEA, args)
-        RMSE.append(RMSE_VAL)
+        # # VALIDATION
+        # RMSE_VAL = utils.validate(BEA, args)
+        # RMSE.append(RMSE_VAL)
 
         BEA.destroy_graph()
 

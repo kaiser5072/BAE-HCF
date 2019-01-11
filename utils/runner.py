@@ -185,14 +185,13 @@ def predict(infer_func, params):
         print("Keyboard interrupt")
 
 
-def get_recall(ratingTest, preds, test_mask, n_recalls):
+def get_recall(ratingTest, preds, n_recalls):
     # ratingTest[:, [1, 0]] = ratingTest[:, [0, 1]]
 
 
     # temp = np.zeros((16980, 5551))
     # temp[(ratingTest[:, 0], ratingTest[:, 1])] = 1
     preds       = np.transpose(preds)
-    test_mask   = np.transpose(test_mask)
     temp        = np.transpose(ratingTest)
     # temp      = np.asarray(ratingTest)
     # preds     = np.asarray(preds)
@@ -202,9 +201,8 @@ def get_recall(ratingTest, preds, test_mask, n_recalls):
 
     pred_user_interest   = preds[non_zero_idx, :]
     target_user_interest = temp[non_zero_idx, :]
-    test_mask            = test_mask[non_zero_idx, :]
 
-    pred_user_interest = pred_user_interest * test_mask + (1 - test_mask) * (-100)
+    # pred_user_interest = pred_user_interest * test_mask + (1 - test_mask) * (-100)
     pred_user_interest = get_order_array(pred_user_interest)
     pred_user_interest = pred_user_interest <= n_recalls
 

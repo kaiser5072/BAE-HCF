@@ -22,11 +22,10 @@ def _deserialize_data_record(record, mode):
         feature_map = {
             'column'   : tf.FixedLenFeature([], tf.string, ''),
             'value'    : tf.FixedLenFeature([], tf.string, ''),
-            'column_v' : tf.FixedLenFeature([], tf.string, ''),
-            'value_v'  : tf.FixedLenFeature([], tf.string, ''),
+            'column_te' : tf.FixedLenFeature([], tf.string, ''),
+            'value_te'  : tf.FixedLenFeature([], tf.string, ''),
             'feature_t': tf.FixedLenFeature([], tf.string, ''),
-            'contents_t': tf.FixedLenFeature([], tf.string, ''),
-            'mask'      : tf.FixedLenFeature([], tf.string, '')
+            'contents_t': tf.FixedLenFeature([], tf.string, '')
         }
 
         with tf.name_scope('deserialize_image_record'):
@@ -35,9 +34,8 @@ def _deserialize_data_record(record, mode):
             item, value       = obj['column'], obj['value']
             item_v, value_v   = obj['column_v'], obj['value_v']
             feature, contents = obj['feature_t'], obj['contents_t']
-            mask = obj['mask']
 
-            return item, value, feature, contents, item_v, value_v, mask
+            return item, value, feature, contents, item_v, value_v
 
 def _parse_and_preprocess_record(record, width, mode):
 
@@ -60,7 +58,7 @@ def _parse_and_preprocess_record(record, width, mode):
 
     else:
         item_v = tf.decode_raw(item_v, out_type=tf.int32)
-        value_v = tf.decode_raw(value_v, out_type=tf.float32)
+        value_v = tf.decode_raw(value_v, out_type=tf.int8)
         mask    = tf.decode_raw(mask, out_type=tf.int8)
 
         item_v = tf.cast(item_v, tf.int64)
@@ -73,8 +71,10 @@ def _parse_and_preprocess_record(record, width, mode):
 
 def data_set(data_dir, batch_size, prefetch_size, width, mode):
 
-
-    data_path = os.path.join(data_dir, 'train.*.tfrecords')
+    if mode == 'train':
+        data_path = os.path.join(data_dir, 'train.*.tfrecords')
+    else:
+        data_path = os.path.join(data_dir, 'val.*.tfrecords')
 
 
     filenames = tf.data.Dataset.list_files(data_path)
