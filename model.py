@@ -164,8 +164,7 @@ class AE_CF(object):
         with tf.device(None):
             if mode == tf.estimator.ModeKeys.EVAL:
                 labels = tf.cast(labels, self.dtype)
-                mask   = tf.cast(features['mask'], self.dtype)
-                preds = self.outputs * mask - 100 * (1-mask)
+                preds = self.outputs
                 recall = tf.metrics.recall_at_k(
                     labels=tf.cast(labels, tf.int64), predictions=preds, k=100)
                 rmse = tf.metrics.mean_squared_error(
