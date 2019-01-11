@@ -14,31 +14,45 @@ opt = Option('./config.json')
 
 
 def parse_data(inputs):
-    cidx, begin, end, DATA, item, feature, contents, out_dir = inputs
-    col_t, row_t, rating_t = DATA
+    cidx, begin, end, data, div, out_dir = inputs
+    row_tr, col_tr, pref_tr, item, feature, contents, row_te, col_te, pref_te = data
 
     data = Data()
-    train_path = os.path.join(out_dir, 'train.%s.tfrecords' % cidx)
+    train_path = os.path.join(out_dir, '%s.%s.tfrecords' % (div, cidx))
     train_writer = tf.python_io.TFRecordWriter(train_path)
     num_train, num_val = 0, 0
     with tqdm.tqdm(total=end-begin) as pbar:
-        for column, value, feature_t, contents_t, in data.generate(row_t,
-                                                                   col_t,
-                                                                   rating_t,
+        for column, value, feature_t, contents_t, Col_te, Pref_te in data.generate(row_tr,
+                                                                   col_tr,
+                                                                   pref_tr,
                                                                    item,
                                                                    feature,
                                                                    contents,
+                                                                   row_te,
+                                                                   col_te,
+                                                                   pref_te,
                                                                    begin, end):
             num_train += len(value)
             value      = value.astype(np.int8)
             contents_t = contents_t.astype(np.float32)
 
-            example_train = tf.train.Example(features=tf.train.Features(feature={
-                'column'    : data._byte_feature(column.tostring()),
-                'value'     : data._byte_feature(value.tostring()),
-                'feature_t' : data._byte_feature(feature_t.tostring()),
-                'contents_t': data._byte_feature(contents_t.tostring())
-            }))
+            if div == 'train':
+                example_train = tf.train.Example(features=tf.train.Features(feature={
+                    'column'    : data._byte_feature(column.tostring()),
+                    'value'     : data._byte_feature(value.tostring()),
+                    'feature_t' : data._byte_feature(feature_t.tostring()),
+                    'contents_t': data._byte_feature(contents_t.tostring())
+                }))
+            else:
+                Pref_te = Pref_te.astype(np.int8)
+                example_train = tf.train.Example(features=tf.train.Features(feature={
+                    'column'    : data._byte_feature(column.tostring()),
+                    'value'     : data._byte_feature(value.tostring()),
+                    'feature_t' : data._byte_feature(feature_t.tostring()),
+                    'contents_t': data._byte_feature(contents_t.tostring()),
+                    'column_te' : data._byte_feature(Col_te.tostring()),
+                    'value_te'  : data._byte_feature(Pref_te.tostring())
+                }))
             train_writer.write(example_train.SerializeToString())
             pbar.update(1)
 
@@ -50,7 +64,7 @@ class Data(object):
     def __init__(self):
         self.logger = get_logger('data')
 
-    def load_data(self, data_dir, AE_TYPE='item'):
+    def load_data(self, data_dir, div, AE_TYPE='item'):
         data = h5py.File(data_dir, 'r')
 
         if AE_TYPE == 'item':
@@ -71,21 +85,43 @@ class Data(object):
 
         self.n_item_feature = np.max(feature) + 1
 
-        return row, column, pref, item, feature, contents
+        if div == 'train':
+            return (row, column, pref, item, feature, contents, None, None, None)
 
-    def generate(self, row_t, col_t, rating_t, item, feature, contents, begin, end):
+        else:
+            if AE_TYPE == 'item':
+                row_te = data['labels']['item'][:]
+                col_te = data['labels']['user'][:]
+            else:
+                row_te = data['labels']['user'][:]
+                col_te = data['labels']['item'][:]
+
+            pref_te = data['labels']['value'][:]
+
+            return (row, column, pref, item, feature, contents, row_te, col_te, pref_te)
+
+    def generate(self, row_t, col_t, rating_t, item, feature, contents, row_te, col_te, pref_te, begin, end):
 
 
         for i in range(begin, end):
             # train = csr_matrix((rating_train, (row_train, column_train)), shape=(self.height, self.width))
             # val   = csr_matrix((rating_val, (row_val, column_val)), shape=(self.height, self.width))
             train_index = (row_t == i)
-            column_t  = col_t[train_index]
-            value_t = rating_t[train_index]
+            column_t    = col_t[train_index]
+            value_t     = rating_t[train_index]
 
             contents_index = (item == i)
-            feature_t = feature[contents_index]
-            contents_t = contents[contents_index]
+            feature_t      = feature[contents_index]
+            contents_t     = contents[contents_index]
+
+            if row_te is not None:
+                index_te = (row_te == i)
+                Col_te   = col_te[index_te]
+                Pref_te  = pref_te[index_te]
+
+            else:
+                Col_te = None
+                Pref_te = None
 
             if column_t.size == 0 and value_t.size == 0 and feature_t.size == 0 and contents_t.size == 0:
                 continue
@@ -95,27 +131,25 @@ class Data(object):
             # column_v = val[i, :].indices
             # value_v  = val[i, :].data
 
-            yield column_t, value_t, feature_t, contents_t
+            yield column_t, value_t, feature_t, contents_t, Col_te, Pref_te
 
 
-    def make_db(self, data_dir, out_dir, train_ratio):
+    def make_db(self, data_dir, out_dir, div):
         if os.path.exists(out_dir):
             shutil.rmtree(out_dir)
 
         os.makedirs(out_dir)
 
-        row, columns, rating, item, feature, contents = self.load_data(data_dir, 'item')
-        chunk_offsets = self._split_data(row, opt.chunk_size)
+        data = self.load_data(data_dir, div, 'item')
+        chunk_offsets = self._split_data(opt.chunk_size)
         num_chunks = len(chunk_offsets)
         self.logger.info('split data into %d chunks' % (num_chunks))
 
         # data = self._split_train_val(row, columns, rating, train_ratio)
-        data = (row, columns, rating)
-
         pool = Pool(opt.num_workers)
 
         try:
-            num_data = pool.map_async(parse_data, [(cidx, begin, end, data, item, feature, contents, out_dir)
+            num_data = pool.map_async(parse_data, [(cidx, begin, end, data, div, out_dir)
                                                    for cidx, (begin, end) in enumerate(chunk_offsets)]).get(999999999)
             pool.close()
             pool.join()
@@ -161,8 +195,8 @@ class Data(object):
                 val.nonzero()[1], val.nonzero()[0], val.toarray()[val.nonzero()], mask)
 
 
-    def _split_data(self, row, chunk_size):
-        total = np.max(row) + 1
+    def _split_data(self, chunk_size):
+        total = self.height
         chunks = [(i, min(i + chunk_size, total))
                   for i in range(0, total, chunk_size)]
 
