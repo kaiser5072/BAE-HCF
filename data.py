@@ -26,10 +26,10 @@ def parse_data(inputs):
     with tqdm.tqdm(total=end-begin) as pbar:
         for column, value, feature_t, contents_t, Col_te, Pref_te in data.generate(sparse_tr,
                                                                                    sparse_co,
-                                                                   row_te,
-                                                                   col_te,
-                                                                   pref_te,
-                                                                   begin, end):
+                                                                                   row_te,
+                                                                                   col_te,
+                                                                                   pref_te,
+                                                                                   begin, end):
             num_train += len(value)
             value      = value.astype(np.int8)
             contents_t = contents_t.astype(np.float32)
@@ -73,7 +73,6 @@ class Data(object):
             column = data['pref']['item'][:]
 
         pref = data['pref']['value'][:]
-        print(len(pref))
 
         self.height = np.max(row) + 1
         self.width  = np.max(column) + 1
@@ -101,13 +100,9 @@ class Data(object):
 
     def generate(self, train, contents, row_te, col_te, pref_te, begin, end):
         for i in range(begin, end):
-            # train = csr_matrix((rating_train, (row_train, column_train)), shape=(self.height, self.width))
-            # val   = csr_matrix((rating_val, (row_val, column_val)), shape=(self.height, self.width))
-            # train_index = (row_t == i)
             column_t    = train[i].indices
             value_t     = train[i].data
 
-            # contents_index = (item == i)
             feature_t      = contents[i].indices
             contents_t     = contents[i].data
 
@@ -122,11 +117,6 @@ class Data(object):
 
             if column_t.size == 0 and value_t.size == 0 and feature_t.size == 0 and contents_t.size == 0:
                 continue
-            # column_t = train[i, :].indices
-            # value_t  = train[i, :].data
-            #
-            # column_v = val[i, :].indices
-            # value_v  = val[i, :].data
 
             yield column_t, value_t, feature_t, contents_t, Col_te, Pref_te
 
