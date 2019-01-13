@@ -17,7 +17,7 @@ def _deserialize_data_record(record, mode):
             feature  = obj['feature_t']
             contents = obj['contents_t']
 
-            return item, value, feature, contents, None, None, None
+            return item, value, feature, contents, None, None
     else:
         feature_map = {
             'column'   : tf.FixedLenFeature([], tf.string, ''),
