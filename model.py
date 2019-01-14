@@ -56,7 +56,7 @@ class AE_CF(object):
                 if np.random.uniform(0, 1, 1) < 0.5:
                     h = tf.sparse.matmul(inputs, w) + b
                 else:
-                    h = b
+                    h = [b]
                 # h = tf.layers.batch_normalization(h)
                 h = tf.nn.relu(h)
 
@@ -64,7 +64,7 @@ class AE_CF(object):
                 if np.random.uniform(0, 1, 1) < 0.5:
                     h = tf.sparse.matmul(inputs, w) + b
                 else:
-                    h = b
+                    h = [b]
                 # h = tf.layers.batch_normalization(h)
                 h = tf.nn.tanh(h)
 
