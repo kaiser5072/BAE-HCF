@@ -66,12 +66,12 @@ class AE_CF(object):
                 else:
                     h = b + tf.sparse.matmul(sides, s)
                 # h = tf.layers.batch_normalization(h)
-                h = tf.nn.sigmoid(h)
+                h = tf.nn.tanh(h)
 
             elif i == (self.n_layer-1):
                 h = tf.matmul(h ,w) + b + tf.sparse.matmul(sides, s)
                 # h = tf.layers.batch_normalization(h)
-                h = tf.nn.sigmoid(h)
+                h = tf.nn.tanh(h)
 
             else:
                 h = tf.matmul(h, w) + b + tf.sparse.matmul(sides, s)
@@ -83,7 +83,7 @@ class AE_CF(object):
         with tf.variable_scope('layer%d'%self.n_layer):
             w = tf.get_variable('weight', shape=[h.get_shape()[1], self.dims[-1]],
                                 trainable=True,
-                                initializer=tf.initializers.truncated_normal(stddev=0.01),
+                                initializer=w_init,
                                 dtype=self.dtype)
 
             self.outputs = tf.matmul(h, w)
