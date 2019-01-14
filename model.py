@@ -18,6 +18,7 @@ class AE_CF(object):
     def __init__(self, params):
         self.dims          = params['dims']
         self.n_epochs      = params['n_epochs']
+        self.n_features    = params['n_features']
         self.batch_size    = params['batch_size']
         self.lr_init       = params['lr']
         self.l2_lambda     = params['l2_lambda']
@@ -46,7 +47,7 @@ class AE_CF(object):
                                               trainable=True,
                                               initializer=b_init,
                                               dtype=self.dtype)
-                s = tf.get_variable('weight_s', shape=[8000, self.dims[i]],
+                s = tf.get_variable('weight_s', shape=[self.n_features, self.dims[i]],
                                                 trainable=True,
                                                 initializer=w_init,
                                                 dtype=self.dtype)
