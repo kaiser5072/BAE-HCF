@@ -79,7 +79,7 @@ def train(infer_func, params):
     training_hooks = [_PrefillStagingAreasHook(),
                       _LogSessionRunHook(batch_size, height, display_step)]
 
-    input_func = lambda: utils.data_set(data_dir, batch_size, prefetch_size, width,
+    input_func = lambda: utils.data_set(data_dir, batch_size, prefetch_size, width, n_features,
                                         mode='train')
 
 
@@ -96,6 +96,7 @@ def validate(infer_func, params):
     data_dir        = params['data_dir']
     log_dir         = params['log_dir'] #if params['mode'] == 'train' else params['model_dir']
     width           = params['width']
+    n_features      = params['n_features']
     batch_size      = params['batch_size']
     prefetch_size   = params['prefetch_size']
 
@@ -117,7 +118,7 @@ def validate(infer_func, params):
             save_checkpoints_steps=None,
             keep_checkpoint_every_n_hours=3))
 
-    input_func = lambda: utils.data_set(data_dir, batch_size, prefetch_size, width,
+    input_func = lambda: utils.data_set(data_dir, batch_size, prefetch_size, width, n_features,
                                         mode='eval')
 
     print("\n\nEVALUATE\n")
@@ -136,6 +137,7 @@ def predict(infer_func, params):
     log_dir         = params['log_dir'] #if params['mode'] == 'train' else params['model_dir']
     height          = params['height']
     width           = params['width']
+    n_features      = params['n_features']
     batch_size      = params['batch_size']
     prefetch_size   = params['prefetch_size']
 
@@ -157,7 +159,7 @@ def predict(infer_func, params):
             save_checkpoints_steps=None,
             keep_checkpoint_every_n_hours=3))
 
-    input_func = lambda: utils.data_set(data_dir, batch_size, prefetch_size, width,
+    input_func = lambda: utils.data_set(data_dir, batch_size, prefetch_size, width, n_features,
                                         mode='eval')
 
     print("\n\n PREDICT\n")
