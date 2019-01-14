@@ -83,7 +83,7 @@ class AE_CF(object):
         with tf.variable_scope('layer%d'%self.n_layer):
             w = tf.get_variable('weight', shape=[h.get_shape()[1], self.dims[-1]],
                                 trainable=True,
-                                initializer=w_init,
+                                initializer=tf.initializers.truncated_normal(stddev=0.01),
                                 dtype=self.dtype)
 
             self.outputs = tf.matmul(h, w)
