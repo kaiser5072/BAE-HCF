@@ -51,6 +51,7 @@ def train(infer_func, params):
     log_dir          = params['log_dir']
     height           = params['height']
     width            = params['width']
+    n_features       = params['n_features']
     prefetch_size    = params['prefetch_size']
     display_step     = params['display_every']
     checkpoints_secs = params['checkpoints_secs']

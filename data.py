@@ -156,7 +156,8 @@ class Data(object):
         meta = {'num_train': num_train,
                 'num_val': num_val,
                 'height': self.height,
-                'width': self.width}
+                'width': self.width,
+                'n_features': self.n_item_feature}
         meta_fout.write(cPickle.dumps(meta, 2))
         meta_fout.close()
 
@@ -164,6 +165,7 @@ class Data(object):
         self.logger.info('size of validation set: %s' % num_val)
         self.logger.info('height: %s' % self.height)
         self.logger.info('width: %s' % self.width)
+        self.logger.info('The number of item features: %s' % self.n_item_feature)
 
     def _split_train_val(self, row, column, rating, train_ratio):
         # val_ratio = int(1 / (1 - train_ratio))

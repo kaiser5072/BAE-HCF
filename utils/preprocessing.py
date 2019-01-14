@@ -37,7 +37,7 @@ def _deserialize_data_record(record, mode):
 
             return item, value, feature, contents, item_v, value_v
 
-def _parse_and_preprocess_record(record, width, mode):
+def _parse_and_preprocess_record(record, width, n_features, mode):
 
     item, value, feature, content, item_v, value_v = _deserialize_data_record(record, mode)
 
@@ -50,7 +50,7 @@ def _parse_and_preprocess_record(record, width, mode):
     feature = tf.cast(feature, tf.int64)
 
     inputs = tf.SparseTensor(tf.reshape(item, [-1, 1]), value, [width])
-    sides = tf.SparseTensor(tf.reshape(feature, [-1, 1]), content, [8000])
+    sides = tf.SparseTensor(tf.reshape(feature, [-1, 1]), content, [n_featuress])
 
     if mode == 'train':
         inputs = {'pref': inputs, 'sides': sides}
@@ -68,7 +68,7 @@ def _parse_and_preprocess_record(record, width, mode):
 
         return inputs, labels
 
-def data_set(data_dir, batch_size, prefetch_size, width, mode):
+def data_set(data_dir, batch_size, prefetch_size, width, n_features, mode):
 
     if mode == 'train':
         data_path = os.path.join(data_dir, 'train.*.tfrecords')
@@ -90,7 +90,7 @@ def data_set(data_dir, batch_size, prefetch_size, width, mode):
         ds = ds.shuffle(100000)
         ds = ds.repeat()
 
-    preproc_func = lambda record: _parse_and_preprocess_record(record, width, mode)
+    preproc_func = lambda record: _parse_and_preprocess_record(record, width, n_features, mode)
 
     ds = ds.apply(tf.data.experimental.map_and_batch(
         map_func=preproc_func,

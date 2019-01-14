@@ -46,8 +46,9 @@ def _get_input(args, mode):
     meta_path = os.path.join(args['data_dir'], 'meta')
     meta = cPickle.loads(open(meta_path).read())
 
-    args['height'] = meta['height']
-    args['width']  = meta['width']
+    args['height']     = meta['height']
+    args['width']      = meta['width']
+    args['n_features'] = meta['n_features']
 
     print("[*] Input shape: %d x %d" % (args['height'], args['width']))
 
