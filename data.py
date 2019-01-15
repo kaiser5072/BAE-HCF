@@ -131,6 +131,7 @@ class Data(object):
 
         data = self.load_data(data_dir, div, 'user')
         chunk_offsets = self._split_data(opt.chunk_size)
+        print(chunk_offsets)
         num_chunks = len(chunk_offsets)
         self.logger.info('split data into %d chunks' % (num_chunks))
 
