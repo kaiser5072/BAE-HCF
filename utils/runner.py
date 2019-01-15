@@ -172,11 +172,10 @@ def predict(infer_func, params):
         eval_result = est.predict(
             input_fn=input_func)
 
-        preds, ratingTest = np.ones((height, len(user_idx))), np.ones((height, len(user_idx)))
+        preds, ratingTest = np.zeros((height, len(user_idx))), np.zeros((height, len(user_idx)), dtype=np.int8)
         with tqdm.tqdm(total=height) as pbar:
             for i, pred in enumerate(eval_result):
                 _pred = pred['preds'][user_idx]
-                print(np.shape(_pred))
                 _rating = pred['ratingTest'][user_idx]
 
                 preds[i, :] = _pred
@@ -184,7 +183,7 @@ def predict(infer_func, params):
                 pbar.update(1)
 
 
-        recall = get_recall(ratingTest, preds, 10000)
+        recall = get_recall(ratingTest, preds, 100)
         print("\n [*] RECALL: %.4f" % recall)
 
     except KeyboardInterrupt:
@@ -216,7 +215,6 @@ def get_recall(ratingTest, preds, n_recalls):
     match_interest  = pred_user_interest * target_user_interest
     num_match       = np.sum(match_interest, axis=1)
     num_interest    = np.sum(target_user_interest, axis=1)
-    print(num_interest)
 
     user_recall = num_match / num_interest
     recall = np.average(user_recall)
