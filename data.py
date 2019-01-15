@@ -14,15 +14,15 @@ opt = Option('./config.json')
 
 
 def parse_data(inputs):
-    cidx, begin, end, data, div, out_dir = inputs
+    cidx, begin, end, data, height, width, n_features, div, out_dir = inputs
     row_tr, col_tr, pref_tr, item, feature, contents, row_te, col_te, pref_te = data
 
     data = Data()
     train_path = os.path.join(out_dir, '%s.%s.tfrecords' % (div, cidx))
     train_writer = tf.python_io.TFRecordWriter(train_path)
     num_train, num_val = 0, 0
-    sparse_tr = csr_matrix((pref_tr, (row_tr, col_tr)), shape=(1306055, 1497020))
-    sparse_co = csr_matrix((contents, (item, feature)), shape=(1306055, 2738))
+    sparse_tr = csr_matrix((pref_tr, (row_tr, col_tr)), shape=(height, width))
+    sparse_co = csr_matrix((contents, (item, feature)), shape=(height, n_features))
     with tqdm.tqdm(total=end-begin) as pbar:
         for column, value, feature_t, contents_t, Col_te, Pref_te in data.generate(sparse_tr,
                                                                                    sparse_co,
@@ -138,7 +138,7 @@ class Data(object):
         pool = Pool(opt.num_workers)
 
         try:
-            num_data = pool.map_async(parse_data, [(cidx, begin, end, data, div, out_dir)
+            num_data = pool.map_async(parse_data, [(cidx, begin, end, data, self.height, self.width, self.n_contents, div, out_dir)
                                                    for cidx, (begin, end) in enumerate(chunk_offsets)]).get(999999999)
             pool.close()
             pool.join()
