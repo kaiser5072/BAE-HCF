@@ -81,7 +81,7 @@ class Data(object):
 
         pref = data['pref']['value'][:]
 
-        self.height = np.max(row) + 1
+        self.height = np.max(item) + 1
         self.width  = np.max(column) + 1
         self.n_contents = np.max(feature) + 1
 
