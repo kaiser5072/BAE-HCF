@@ -175,8 +175,8 @@ def predict(infer_func, params):
         preds, ratingTest = np.zeros((height, len(user_idx))), np.zeros((height, len(user_idx)), dtype=np.int8)
         with tqdm.tqdm(total=height) as pbar:
             for i, pred in enumerate(eval_result):
-                _pred = pred['preds'][user_idx[:100]]
-                _rating = pred['ratingTest'][user_idx[:100]]
+                _pred = pred['preds'][user_idx]
+                _rating = pred['ratingTest'][user_idx]
 
                 preds[i, :] = _pred
                 ratingTest[i, :] = _rating
@@ -197,23 +197,23 @@ def get_recall(ratingTest, preds, n_recalls):
     # temp = np.zeros((16980, 5551))
     # temp[(ratingTest[:, 0], ratingTest[:, 1])] = 1
     preds       = np.transpose(preds)
-    temp        = np.transpose(ratingTest)
+    target      = np.transpose(ratingTest)
     # temp      = np.asarray(ratingTest)
     # preds     = np.asarray(preds)
     # test_mask = np.asarray(test_mask)
 
-    non_zero_idx = np.sum(temp, axis=1) != 0
-
-    pred_user_interest   = preds[non_zero_idx, :]
-    target_user_interest = temp[non_zero_idx, :]
+    # non_zero_idx = np.sum(temp, axis=1) != 0
+    #
+    # pred_user_interest   = preds[non_zero_idx, :]
+    # target_user_interest = temp[non_zero_idx, :]
 
     # pred_user_interest = pred_user_interest * test_mask + (1 - test_mask) * (-100)
-    pred_user_interest = get_order_array(pred_user_interest)
+    pred_user_interest = get_order_array(preds)
     pred_user_interest = pred_user_interest <= n_recalls
 
-    match_interest  = pred_user_interest * target_user_interest
+    match_interest  = pred_user_interest * target
     num_match       = np.sum(match_interest, axis=1)
-    num_interest    = np.sum(target_user_interest, axis=1)
+    num_interest    = np.sum(target, axis=1)
 
     user_recall = num_match / num_interest
     recall = np.average(user_recall)
