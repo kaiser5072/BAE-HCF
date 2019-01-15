@@ -128,7 +128,7 @@ def validate(infer_func, params):
             input_fn = input_func)
 
         print('\n [*] RMSE_TRAIN: %.4f' % eval_result['rmse_tr'])
-        print('[*] RMSE_TEST: %.4f' % eval_result['rmse_te'])
+        print(' [*] RMSE_TEST: %.4f' % eval_result['rmse_te'])
 
         return eval_result['rmse_te']
 
