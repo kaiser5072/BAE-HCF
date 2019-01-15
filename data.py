@@ -66,22 +66,24 @@ class Data(object):
         data = h5py.File(data_dir, 'r')
 
         if AE_TYPE == 'item':
-            row    = data['pref']['item'][:]
-            column = data['pref']['user'][:]
+            row      = data['pref']['item'][:]
+            column   = data['pref']['user'][:]
+            item     = data['item-contents']['item'][:]
+            feature  = data['item-contents']['feature'][:]
+            contents = data['item-contents']['value'][:]
+
         else:
             row    = data['pref']['user'][:]
             column = data['pref']['item'][:]
+            item     = data['user-contents']['user'][:]
+            feature  = data['user-contents']['feature'][:]
+            contents = data['user-contents']['value'][:]
 
         pref = data['pref']['value'][:]
 
         self.height = np.max(row) + 1
         self.width  = np.max(column) + 1
-
-        item     = data['item-contents']['item'][:]
-        feature  = data['item-contents']['feature'][:]
-        contents = data['item-contents']['value'][:]
-
-        self.n_item_feature = np.max(feature) + 1
+        self.n_contents = np.max(feature) + 1
 
         if div == 'train':
             return (row, column, pref, item, feature, contents, None, None, None)
@@ -127,7 +129,7 @@ class Data(object):
 
         os.makedirs(out_dir)
 
-        data = self.load_data(data_dir, div, 'item')
+        data = self.load_data(data_dir, div, 'user')
         chunk_offsets = self._split_data(opt.chunk_size)
         num_chunks = len(chunk_offsets)
         self.logger.info('split data into %d chunks' % (num_chunks))
@@ -152,11 +154,11 @@ class Data(object):
             num_val += val
 
         meta_fout = open(os.path.join(out_dir, 'meta'), 'w')
-        meta = {'num_train': num_train,
-                'num_val': num_val,
-                'height': self.height,
-                'width': self.width,
-                'n_features': self.n_item_feature}
+        meta = {'num_train' : num_train,
+                'num_val'   : num_val,
+                'height'    : self.height,
+                'width'     : self.width,
+                'n_features': self.n_contents}
         meta_fout.write(cPickle.dumps(meta, 2))
         meta_fout.close()
 
@@ -164,7 +166,7 @@ class Data(object):
         self.logger.info('size of validation set: %s' % num_val)
         self.logger.info('height: %s' % self.height)
         self.logger.info('width: %s' % self.width)
-        self.logger.info('The number of item features: %s' % self.n_item_feature)
+        self.logger.info('The number of item features: %s' % self.n_contents)
 
     def _split_train_val(self, row, column, rating, train_ratio):
         # val_ratio = int(1 / (1 - train_ratio))
