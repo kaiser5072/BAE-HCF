@@ -83,14 +83,14 @@ class AE_CF(object):
         with tf.variable_scope('layer%d'%self.n_layer):
             w = tf.get_variable('weight', shape=[h.get_shape()[1], self.dims[-1]],
                                 trainable=True,
-                                initializer=tf.initializers.truncated_normal(stddev=0.01),
+                                initializer=w_init,
                                 dtype=self.dtype)
 
             self.outputs = tf.matmul(h, w)
 
         self.preds = tf.gather_nd(self.outputs, inputs.indices)
         pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
-        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - 1)) * 10000
+        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - 1)) * 65000
 
         self.loss = tf.add_n([pref_diff_ones, pref_diff_zero]) / (self.height * self.width)
         self.loss = tf.identity(self.loss, name='loss')
