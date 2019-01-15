@@ -175,8 +175,8 @@ def predict(infer_func, params):
         preds, ratingTest = np.zeros((height, len(user_idx))), np.zeros((height, len(user_idx)), dtype=np.int8)
         with tqdm.tqdm(total=height) as pbar:
             for i, pred in enumerate(eval_result):
-                _pred = pred['preds'][user_idx]
-                _rating = pred['ratingTest'][user_idx]
+                _pred = pred['preds'][user_idx[:100]]
+                _rating = pred['ratingTest'][user_idx[:100]]
 
                 preds[i, :] = _pred
                 ratingTest[i, :] = _rating
@@ -203,7 +203,6 @@ def get_recall(ratingTest, preds, n_recalls):
     # test_mask = np.asarray(test_mask)
 
     non_zero_idx = np.sum(temp, axis=1) != 0
-    print(len(non_zero_idx))
 
     pred_user_interest   = preds[non_zero_idx, :]
     target_user_interest = temp[non_zero_idx, :]
