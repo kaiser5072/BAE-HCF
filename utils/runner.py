@@ -182,7 +182,7 @@ def predict(infer_func, params):
                 pbar.update(1)
 
 
-        recall = get_recall(ratingTest, preds, 100)
+        recall = get_recall(ratingTest, preds, 60000)
         print("\n [*] RECALL: %.4f" % recall)
 
     except KeyboardInterrupt:
