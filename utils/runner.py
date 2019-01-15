@@ -129,7 +129,9 @@ def validate(infer_func, params):
 
         print('\n [*] RMSE_TRAIN: %.4f' % eval_result['rmse_tr'])
         print('\n [*] RMSE_TEST: %.4f' % eval_result['rmse_te'])
-        return eval_result['rmse']
+
+        return eval_result['rmse_te']
+
     except KeyboardInterrupt:
         print("Keyboard interrupt")
 
