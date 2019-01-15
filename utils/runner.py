@@ -127,7 +127,8 @@ def validate(infer_func, params):
         eval_result = est.evaluate(
             input_fn = input_func)
 
-        print('\n [*] RMSE: %.4f' % eval_result['rmse'])
+        print('\n [*] RMSE_TRAIN: %.4f' % eval_result['rmse_tr'])
+        print('\n [*] RMSE_TEST: %.4f' % eval_result['rmse_te'])
         return eval_result['rmse']
     except KeyboardInterrupt:
         print("Keyboard interrupt")
@@ -182,7 +183,7 @@ def predict(infer_func, params):
                 pbar.update(1)
 
 
-        recall = get_recall(ratingTest, preds, 60000)
+        recall = get_recall(ratingTest, preds, 100)
         print("\n [*] RECALL: %.4f" % recall)
 
     except KeyboardInterrupt:
