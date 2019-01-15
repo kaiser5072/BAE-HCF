@@ -90,9 +90,9 @@ class AE_CF(object):
 
         self.preds = tf.gather_nd(self.outputs, inputs.indices)
         pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
-        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - 1)) * 10000
+        pref_diff_ones = tf.reduce_mean(tf.square(self.preds - 1))
 
-        self.loss = tf.add_n([pref_diff_ones, pref_diff_zero]) / (self.height * self.width)
+        self.loss = tf.add_n([pref_diff_ones])
         self.loss = tf.identity(self.loss, name='loss')
 
         all_var = [var for var in tf.trainable_variables() ]
