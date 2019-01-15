@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 
+import h5py
 import tqdm
 import time
 import utils
@@ -146,12 +147,16 @@ def predict(infer_func, params):
     config.intra_op_parallelism_threads = 1
     config.inter_op_parallelism_threads = 32
 
+    warm_idx = h5py.File('warm_index.h5py', 'r')
+    user_idx = warm_idx['user_idx'][:]
+
     est = tf.estimator.Estimator(
         model_fn=infer_func._BAE_model_fn,
         model_dir=log_dir,
         params={
             'height': params['batch_size'],
-            'width' : params['width']
+            'width' : params['width'],
+            'user_idx' : user_idx
         },
         config=tf.estimator.RunConfig(
             session_config=config,

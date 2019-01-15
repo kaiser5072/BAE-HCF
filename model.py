@@ -156,8 +156,10 @@ class AE_CF(object):
             self.builder(inputs, sides)
 
         if mode == tf.estimator.ModeKeys.PREDICT:
+            user_idx = params['user_idx']
+
             predictions = {
-                'preds': self.outputs,
+                'preds': self.outputs[:, user_idx],
                 'ratingTest': tf.sparse.to_dense(features['labels'])
             }
             return tf.estimator.EstimatorSpec(mode, predictions=predictions)
