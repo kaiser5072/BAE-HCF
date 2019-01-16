@@ -158,8 +158,7 @@ class AE_CF(object):
         if mode == tf.estimator.ModeKeys.PREDICT:
             predictions = {
                 'preds'      : self.outputs,
-                'ratingTest' : features['labels'],
-                'ratingTrain': features['pref']
+                'ratingTest' : features['labels']
             }
             return tf.estimator.EstimatorSpec(mode, predictions=predictions)
 
