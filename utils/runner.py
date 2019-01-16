@@ -174,14 +174,15 @@ def predict(infer_func, params):
         eval_result = est.predict(
             input_fn=input_func)
 
+        tf_eval_target_batch = []
         preds, ratingTest = np.zeros((height, len(user_idx))), np.zeros((height, len(user_idx)), dtype=np.int8)
         with tqdm.tqdm(total=height) as pbar:
             for i, pred in enumerate(eval_result):
                 _pred = pred['preds'][user_idx]
-                _rating = pred['ratingTest'][user_idx]
+                print(pred['ratingTest'])
+                tf_eval_target_batch.append(pred['ratingTest'])
 
                 preds[i, :] = _pred
-                ratingTest[i, :] = _rating
                 pbar.update(1)
 
 
