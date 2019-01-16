@@ -174,26 +174,28 @@ def predict(infer_func, params):
         eval_result = est.predict(
             input_fn=input_func)
 
-        tf_eval_target_batch = []
         preds, ratingTest = np.zeros((height, len(user_idx))), np.zeros((height, len(user_idx)), dtype=np.int8)
+        mask = np.zeros((height, len(user_idx)), dtype=np.int8)
         with tqdm.tqdm(total=height) as pbar:
             for i, pred in enumerate(eval_result):
                 _pred = pred['preds'][user_idx]
-                print(pred['ratingTest'])
-                tf_eval_target_batch.append(pred['ratingTest'])
+                _target = pred['ratingTest'][user_idx]
+                _mask = pred['ratingTrain'][user_idx]
 
                 preds[i, :] = _pred
+                ratingTest[i, :] = _target
+                mask[i, :] = _mask
                 pbar.update(1)
 
 
-        recall = get_recall(ratingTest, preds, 100)
+        recall = get_recall(ratingTest, preds, mask, 100)
         print("\n [*] RECALL: %.4f" % recall)
 
     except KeyboardInterrupt:
         print("Keyboard interrupt")
 
 
-def get_recall(ratingTest, preds, n_recalls):
+def get_recall(ratingTest, preds, mask, n_recalls):
     # ratingTest[:, [1, 0]] = ratingTest[:, [0, 1]]
 
 
@@ -201,10 +203,11 @@ def get_recall(ratingTest, preds, n_recalls):
     # temp[(ratingTest[:, 0], ratingTest[:, 1])] = 1
     preds       = np.transpose(preds)
     target      = np.transpose(ratingTest)
+    mask        = np.transpose(mask)
     # temp      = np.asarray(ratingTest)
     # preds     = np.asarray(preds)
     # test_mask = np.asarray(test_mask)
-
+    preds       = preds * (1-mask) - 100 * mask
     # non_zero_idx = np.sum(temp, axis=1) != 0
     #
     # pred_user_interest   = preds[non_zero_idx, :]
