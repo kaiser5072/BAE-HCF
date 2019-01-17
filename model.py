@@ -95,7 +95,7 @@ class AE_CF(object):
             decay_steps=200000,
             end_learning_rate= 1000)
         pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
-        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - 1)) * 100 * 14 * self.batch_size\
+        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - 1)) * 1000 * 14 * self.batch_size\
                          / tf.cast(tf.size(inputs.values), tf.float32)
 
 
