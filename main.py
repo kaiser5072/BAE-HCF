@@ -19,7 +19,7 @@ default_args = {
     'log_dir': './log',
     'model_dir': './model',
     'display_every': 1000,
-    'l2_lambda': 1e-3,
+    'l2_lambda': 1e-4,
     'rank': 10,
     'eps': 0.1,
     'AE_TYPE': 'item',
