@@ -94,11 +94,12 @@ class AE_CF(object):
             global_step=tf.train.get_global_step(),
             decay_steps=200000,
             end_learning_rate= 1000)
-        pref_diff_zero = (tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds)))  / (self.height * self.width)
-        pref_diff_ones = tf.reduce_mean(tf.square(self.preds - 1))
+        pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
+        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - 1)) * 100 * 14 * self.batch_size\
+                         / tf.cast(tf.size(inputs.values), tf.float32)
 
 
-        self.loss = tf.add_n([pref_diff_ones, pref_diff_zero])
+        self.loss = tf.add_n([pref_diff_ones, pref_diff_zero]) / (self.height * self.width)
         self.loss = tf.identity(self.loss, name='loss')
 
         all_var = [var for var in tf.trainable_variables() ]
