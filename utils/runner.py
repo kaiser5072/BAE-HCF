@@ -204,25 +204,24 @@ def get_recall(ratingTest, preds, mask, n_recalls):
     preds       = np.transpose(preds)
     target      = np.transpose(ratingTest)
     mask        = np.transpose(mask)
-    print(np.sort(preds[0, :])[::-1])
-    print(np.sort(preds[0, :] * mask[0, :])[::-1])
+    print(np.sort(preds[0, :])[::-1][:100])
     print(np.sort(preds[0, :] * target[0, :])[::-1])
     # temp      = np.asarray(ratingTest)
     # preds     = np.asarray(preds)
     # test_mask = np.asarray(test_mask)
     preds       = preds * (1-mask) - 100 * mask
-    # non_zero_idx = np.sum(temp, axis=1) != 0
+    non_zero_idx = np.sum(target, axis=1) != 0
     #
-    # pred_user_interest   = preds[non_zero_idx, :]
-    # target_user_interest = temp[non_zero_idx, :]
+    pred_user_interest   = preds[non_zero_idx, :]
+    target_user_interest = target[non_zero_idx, :]
 
     # pred_user_interest = pred_user_interest * test_mask + (1 - test_mask) * (-100)
-    pred_user_interest = get_order_array(preds)
+    pred_user_interest = get_order_array(pred_user_interest)
     pred_user_interest = pred_user_interest <= n_recalls
 
-    match_interest  = pred_user_interest * target
-    num_match       = np.sum(match_interest, axis=1)
-    num_interest    = np.sum(target, axis=1)
+    match_interest  = pred_user_interest * target_user_interest
+    num_match       = np.sum(match_interest, axis=1, dtype=np.float32)
+    num_interest    = np.sum(target_user_interest, axis=1, dtype=np.float32)
 
     user_recall = num_match / num_interest
     recall = np.average(user_recall)
