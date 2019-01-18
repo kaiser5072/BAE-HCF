@@ -57,7 +57,7 @@ class AE_CF(object):
                 h = tf.sparse.matmul(inputs, w) + b + tf.sparse.matmul(sides, s)
                 # else:
                 #     h = b + tf.sparse.matmul(sides, s)
-                h = tf.layers.batch_normalization(h)
+                # h = tf.layers.batch_normalization(h)
                 h = tf.nn.relu(h)
 
             elif self.n_layer == 2:
@@ -65,17 +65,17 @@ class AE_CF(object):
                 h = tf.sparse.matmul(inputs, w) + b + tf.sparse.matmul(sides, s)
                 # else:
                 #     h = b + tf.sparse.matmul(sides, s)
-                h = tf.layers.batch_normalization(h)
+                # h = tf.layers.batch_normalization(h)
                 h = tf.nn.tanh(h)
 
             elif i == (self.n_layer-1):
                 h = tf.matmul(h ,w) + b + tf.sparse.matmul(sides, s)
-                h = tf.layers.batch_normalization(h)
+                # h = tf.layers.batch_normalization(h)
                 h = tf.nn.tanh(h)
 
             else:
                 h = tf.matmul(h, w) + b + tf.sparse.matmul(sides, s)
-                h = tf.layers.batch_normalization(h)
+                # h = tf.layers.batch_normalization(h)
                 h = tf.nn.relu(h)
 
             prev_dim = h.get_shape()[1]
