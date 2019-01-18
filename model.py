@@ -80,33 +80,26 @@ class AE_CF(object):
 
             prev_dim = h.get_shape()[1]
 
+        h = tf.layers.batch_normalization(h)
         with tf.variable_scope('layer%d'%self.n_layer):
             w = tf.get_variable('weight', shape=[h.get_shape()[1], self.dims[-1]],
                                 trainable=True,
-                                initializer=tf.initializers.truncated_normal(stddev=0.01),
+                                initializer=w_init,
                                 dtype=self.dtype)
 
             self.outputs = tf.matmul(h, w)
-            # self.outputs = tf.nn.softmax(self.outputs)
 
-        # self.preds = tf.gather_nd(self.outputs, inputs.indices)
-        # confidence = tf.train.polynomial_decay(
-        #     learning_rate=1.,
-        #     global_step=tf.train.get_global_step(),
-        #     decay_steps=200000,
-        #     end_learning_rate= 1000)
-        # pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
-        # pref_diff_ones = tf.reduce_sum(tf.square(self.preds - 1)) * 100
+        self.preds = tf.gather_nd(self.outputs, inputs.indices)
+        confidence = tf.train.polynomial_decay(
+            learning_rate=1.,
+            global_step=tf.train.get_global_step(),
+            decay_steps=200000,
+            end_learning_rate= 1000)
+        pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
+        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - 1)) * 100
 
-
-
-        log_softmax_var = tf.nn.log_softmax(self.outputs)
-        self.preds = tf.gather_nd(log_softmax_var, inputs.indices)
-        neg_ll = -tf.reduce_sum(self.preds, name='neg_ll') / self.height
-
-
-        # self.loss = tf.add_n([pref_diff_ones, pref_diff_zero]) / (self.height * self.width)
-        self.loss = tf.identity(neg_ll, name='loss')
+        self.loss = tf.add_n([pref_diff_ones, pref_diff_zero]) / (self.height * self.width)
+        self.loss = tf.identity(self.loss, name='loss')
 
         all_var = [var for var in tf.trainable_variables() ]
 
