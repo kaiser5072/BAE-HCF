@@ -87,7 +87,7 @@ class AE_CF(object):
                                 dtype=self.dtype)
 
             self.outputs = tf.matmul(h, w)
-            self.outputs = tf.nn.softmax(self.outputs)
+            # self.outputs = tf.nn.softmax(self.outputs)
 
         # self.preds = tf.gather_nd(self.outputs, inputs.indices)
         # confidence = tf.train.polynomial_decay(
