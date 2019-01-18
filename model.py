@@ -98,9 +98,11 @@ class AE_CF(object):
         # pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
         # pref_diff_ones = tf.reduce_sum(tf.square(self.preds - 1)) * 100
 
+
+
         log_softmax_var = tf.nn.log_softmax(self.outputs)
-        neg_ll = -tf.reduce_mean(tf.reduce_sum(
-            log_softmax_var * tf.sparse.to_dense(inputs), axis=1), name='neg_ll')
+        self.preds = tf.gather_nd(log_softmax_var, inputs.indices)
+        neg_ll = -tf.reduce_sum(self.preds, name='neg_ll') / self.height
 
 
         # self.loss = tf.add_n([pref_diff_ones, pref_diff_zero]) / (self.height * self.width)
