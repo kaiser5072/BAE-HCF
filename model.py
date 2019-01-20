@@ -98,11 +98,11 @@ class AE_CF(object):
             end_learning_rate= 1000)
 
         # pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
-        pred_top_k, _ = tf.nn.top_k(self.outputs, k=1000)
+        pred_top_k, _ = tf.nn.top_k(self.outputs, k=10)
         pref_diff_zero = tf.reduce_sum(tf.square(pred_top_k))
         pref_diff_ones = tf.reduce_sum(tf.square(self.preds - 1))
 
-        self.loss = tf.add_n([pref_diff_zero, pref_diff_ones]) / (self.height * 500)
+        self.loss = tf.add_n([pref_diff_zero, pref_diff_ones]) / (self.height * 10)
         self.loss = tf.identity(self.loss, name='loss')
 
         all_var = [var for var in tf.trainable_variables() ]
