@@ -164,6 +164,7 @@ class AE_CF(object):
         with tf.device(self.device):
             inputs = tf.cast(inputs, self.dtype)
             sides  = tf.cast(sides, self.dtype)
+            mask = tf.cast(mask, self.dtype)
 
             self.builder(inputs, sides, mask)
 
