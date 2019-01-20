@@ -32,7 +32,7 @@ class AE_CF(object):
         self.n_layer = len(self.dims) - 1
 
     def builder(self, inputs, sides):
-        w_init = tf.constant_initializer(0.)
+        w_init = tf.initializers.truncated_normal(stddev=0.01)
         b_init = tf.constant_initializer(0.)
         h = inputs
         
@@ -54,7 +54,7 @@ class AE_CF(object):
 
             if i == 1 and self.n_layer != 2:
                 # if np.random.uniform(0, 1, 1) < 0.5:
-                h = tf.sparse.matmul(inputs, w) + b + tf.sparse.matmul(sides, s)
+                h = tf.sparse.matmul(inputs, w) + tf.sparse.matmul(sides, s)
                 # else:
                 #     h = b + tf.sparse.matmul(sides, s)
                 h = tf.layers.batch_normalization(h)
@@ -63,19 +63,19 @@ class AE_CF(object):
 
             elif self.n_layer == 2:
                 # if np.random.uniform(0, 1, 1) < 0.5:
-                h = tf.sparse.matmul(inputs, w) + b + tf.sparse.matmul(sides, s)
+                h = tf.sparse.matmul(inputs, w) + tf.sparse.matmul(sides, s)
                 # else:
                 #     h = b + tf.sparse.matmul(sides, s)
                 h = tf.layers.batch_normalization(h)
                 h = tf.nn.tanh(h)
 
             elif i == (self.n_layer-1):
-                h = tf.matmul(h ,w) + b + tf.sparse.matmul(sides, s)
+                h = tf.matmul(h ,w) + tf.sparse.matmul(sides, s)
                 h = tf.layers.batch_normalization(h)
                 h = tf.nn.tanh(h)
 
             else:
-                h = tf.matmul(h, w) + b + tf.sparse.matmul(sides, s)
+                h = tf.matmul(h, w) + tf.sparse.matmul(sides, s)
                 h = tf.layers.batch_normalization(h)
                 h = tf.nn.relu(h)
                 h = tf.nn.dropout(h, self.drop_rate)
