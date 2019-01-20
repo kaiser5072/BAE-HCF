@@ -69,7 +69,8 @@ def train(infer_func, params):
         model_dir=log_dir,
         params={
             'height': params['batch_size'],
-            'width':  params['width']
+            'width':  params['width'],
+            'drop_rate': 1
         },
         config=tf.estimator.RunConfig(
             session_config=config,
@@ -112,7 +113,7 @@ def validate(infer_func, params):
         params={
             'height': params['batch_size'],
             'width' : params['width'],
-            'drop_rate': 0.5
+            'drop_rate': 1
         },
         config=tf.estimator.RunConfig(
             session_config=config,
