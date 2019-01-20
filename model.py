@@ -32,7 +32,7 @@ class AE_CF(object):
         self.n_layer = len(self.dims) - 1
 
     def builder(self, inputs, sides):
-        w_init = tf.initializers.truncated_normal(stddev=0.01)
+        w_init = tf.initializers.truncated_normal(stddev=0.001)
         b_init = tf.constant_initializer(0.)
         h = inputs
         
