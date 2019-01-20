@@ -31,7 +31,7 @@ class AE_CF(object):
         self.dtype = tf.float16 if params['precision'] == 'fp16' else tf.float32
         self.n_layer = len(self.dims) - 1
 
-    def builder(self, inputs, sides, mask):
+    def builder(self, inputs, sides):
         w_init = tf.initializers.truncated_normal(stddev=0.001)
         b_init = tf.constant_initializer(0.)
         h = inputs
@@ -98,11 +98,11 @@ class AE_CF(object):
             end_learning_rate= 1000)
 
         # pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
-        pred_top_k, _ = tf.nn.top_k(self.outputs * (1-mask), k=500)
-        pref_diff_zero = tf.reduce_sum(tf.square(pred_top_k))
-        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - 1))
+        # pred_top_k, _ = tf.nn.top_k(self.outputs, k=500)
+        # pref_diff_zero = tf.reduce_sum(tf.square(pred_top_k))
+        pref_diff_ones = tf.reduce_mean(tf.square(self.preds - 1))
 
-        self.loss = tf.add_n([pref_diff_zero, pref_diff_ones]) / (self.height * 500)
+        self.loss = tf.add_n([pref_diff_ones])
         self.loss = tf.identity(self.loss, name='loss')
 
         all_var = [var for var in tf.trainable_variables() ]
@@ -159,14 +159,12 @@ class AE_CF(object):
 
         inputs = tf.SparseTensor(indices, values, dense_shape)
         sides  = tf.SparseTensor(indices_s, values_s, dense_shape_s)
-        mask = tf.sparse.to_dense(inputs)
 
         with tf.device(self.device):
             inputs = tf.cast(inputs, self.dtype)
             sides  = tf.cast(sides, self.dtype)
-            mask = tf.cast(mask, self.dtype)
 
-            self.builder(inputs, sides, mask)
+            self.builder(inputs, sides)
 
         if mode == tf.estimator.ModeKeys.PREDICT:
             predictions = {
