@@ -159,12 +159,13 @@ class AE_CF(object):
 
         inputs = tf.SparseTensor(indices, values, dense_shape)
         sides  = tf.SparseTensor(indices_s, values_s, dense_shape_s)
+        mask = tf.sparse.to_dense(inputs)
 
         with tf.device(self.device):
             inputs = tf.cast(inputs, self.dtype)
             sides  = tf.cast(sides, self.dtype)
 
-            self.builder(inputs, sides, tf.sparse.to_dense(inputs))
+            self.builder(inputs, sides, mask)
 
         if mode == tf.estimator.ModeKeys.PREDICT:
             predictions = {
