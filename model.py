@@ -90,33 +90,6 @@ class AE_CF(object):
 
             self.outputs = tf.matmul(h, w)
 
-        self.preds = tf.gather_nd(self.outputs, inputs.indices)
-        confidence = tf.train.polynomial_decay(
-            learning_rate=1.,
-            global_step=tf.train.get_global_step(),
-            decay_steps=200000,
-            end_learning_rate= 1000)
-
-        # pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
-        pred_top_k, _ = tf.nn.top_k(self.outputs, k=500)
-        pref_diff_zero = tf.reduce_sum(tf.square(pred_top_k)) * 100
-        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - 1))
-
-        self.loss = tf.add_n([pref_diff_zero, pref_diff_ones]) / (self.height * 500)
-        self.loss = tf.identity(self.loss, name='loss')
-
-        all_var = [var for var in tf.trainable_variables() ]
-
-        l2_losses = []
-        for var in all_var:
-            if var.op.name.find('weight') >= 0 or var.op.name.find('sides') >= 0:
-                l2_losses.append(tf.nn.l2_loss(var))
-
-        self.loss = tf.add(self.loss, 2 * self.l2_lambda * tf.reduce_sum(l2_losses), name='total_loss')
-
-        # reg_losses = tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES)
-        # self.loss = tf.add_n([self.loss] + reg_losses, name='total_loss')
-
     def optimization(self):
         opt = tf.train.AdamOptimizer(self.lr_init)
         train_op = opt.minimize(self.loss, global_step=tf.train.get_global_step(),
@@ -165,6 +138,33 @@ class AE_CF(object):
             sides  = tf.cast(sides, self.dtype)
 
             self.builder(inputs, sides)
+
+        self.preds = tf.gather_nd(self.outputs, inputs.indices)
+        confidence = tf.train.polynomial_decay(
+            learning_rate=1.,
+            global_step=tf.train.get_global_step(),
+            decay_steps=200000,
+            end_learning_rate= 1000)
+
+        # pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
+        pred_top_k, _ = tf.nn.top_k(self.outputs * inputs, k=500)
+        pref_diff_zero = tf.reduce_sum(tf.square(pred_top_k)) * 100
+        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - 1))
+
+        self.loss = tf.add_n([pref_diff_zero, pref_diff_ones]) / (self.height * 500)
+        self.loss = tf.identity(self.loss, name='loss')
+
+        all_var = [var for var in tf.trainable_variables() ]
+
+        l2_losses = []
+        for var in all_var:
+            if var.op.name.find('weight') >= 0 or var.op.name.find('sides') >= 0:
+                l2_losses.append(tf.nn.l2_loss(var))
+
+        self.loss = tf.add(self.loss, 2 * self.l2_lambda * tf.reduce_sum(l2_losses), name='total_loss')
+
+        # reg_losses = tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES)
+        # self.loss = tf.add_n([self.loss] + reg_losses, name='total_loss')
 
         if mode == tf.estimator.ModeKeys.PREDICT:
             predictions = {
