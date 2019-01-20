@@ -147,7 +147,7 @@ class AE_CF(object):
             end_learning_rate= 1000)
 
         # pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
-        pred_top_k, _ = tf.nn.top_k(self.outputs * (1 - inputs), k=500)
+        pred_top_k, _ = tf.nn.top_k(self.outputs * inputs, k=500)
         pref_diff_zero = tf.reduce_sum(tf.square(pred_top_k)) * 100
         pref_diff_ones = tf.reduce_sum(tf.square(self.preds - 1))
 
