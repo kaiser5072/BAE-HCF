@@ -181,9 +181,9 @@ def predict(infer_func, params):
         mask = np.zeros((height, len(item_idx)), dtype=np.int8)
         with tqdm.tqdm(total=height) as pbar:
             for i, pred in enumerate(eval_result):
-                _pred = pred['preds']
-                _target = pred['ratingTest']
-                _mask = pred['ratingTrain']
+                _pred = pred['preds'][item_idx]
+                _target = pred['ratingTest'][item_idx]
+                _mask = pred['ratingTrain'][item_idx]
 
                 preds[i, :] = _pred
                 ratingTest[i, :] = _target
