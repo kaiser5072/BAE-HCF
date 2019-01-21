@@ -196,7 +196,7 @@ class Data(object):
     def _byte_feature(self, value):
         return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
 
-    def build_data(self, data_dir):
+    def build_data(self, data_dir, mode):
         ''' Remove duplicate interactions and collapse remaining interactions
         into a single binary matrix in the form of a sparse matrix'''
         # Training set
@@ -267,7 +267,7 @@ class Data(object):
         user_feature = user_feature[content_ind]
         content_user_value = content_user_value[content_ind]
 
-        with h5py.File('recsys2017_warm.h5py', 'w') as data:
+        with h5py.File('./Input/recsys2017_warm.h5py', 'w') as data:
             pref = data.create_group('pref')
             users = pref.create_dataset('user', np.shape(user), 'i')
             users[:] = user
@@ -299,6 +299,104 @@ class Data(object):
 
             contents_user_value = user_con.create_dataset('value', np.shape(content_user_value), 'f')
             contents_user_value[:] = content_user_value
+
+        test = np.loadtxt('./warm/test_warm.csv', dtype='int32, int32, int32',
+                          delimiter=',',
+                          usecols=(0, 1, 2),
+                          unpack=True)
+        test[2] = np.ones_like(test[2])
+
+        test_user = test[0]
+        test_item = test[1]
+        test_value = test[2]
+
+        test_user = [user_dict[i] for i in test_user]
+        test_item = [item_dict[i] for i in test_item]
+
+        if mode == 'item':
+            test_item_list = np.unique(test_item)
+            test_item_dict = dict()
+            for i, j in enumerate(test_item_list):
+                test_item_dict[j] = i
+
+            test_item = [test_item_dict[i] for i in test_item]
+            train_user = user
+            train_item = item
+            train_value = value
+
+            train_item = [(i, test_item_dict[j]) for i, j in enumerate(train_item) if j in test_item_dict]
+            train_item = np.asarray(train_item)
+            train_ind = train_item[:, 0]
+            train_item = train_item[:, 1]
+            train_user = np.asarray(train_user)
+            train_user = train_user[train_ind]
+            train_value = train_value[train_ind]
+
+            train_content_item = [(i, test_item_dict[j]) for i, j in enumerate(content_item) if j in test_item_dict]
+            train_content_item = np.asarray(train_content_item)
+            train_content_ind = train_content_item[:, 0]
+            train_content_ui = train_content_item[:, 1]
+            train_featrue = item_feature[train_content_ind]
+            train_content = content_item_value[train_content_ind]
+        else:
+            test_user_list = np.unique(test_user)
+            test_user_dict = dict()
+            for i, j in enumerate(test_user_list):
+                test_user_dict[j] = i
+
+            test_user = [test_user_dict[i] for i in test_user]
+            train_user, train_item, train_value = user, item, value
+
+            train_user = [(i, test_user_dict[j]) for i, j in enumerate(train_user) if j in test_user_dict]
+            train_user = np.asarray(train_user)
+            train_ind = train_user[:, 0]
+            train_user = train_user[:, 1]
+            train_item = np.asarray(train_item)
+            train_item = train_item[train_ind]
+            train_value = train_value[train_ind]
+
+            train_content_user = [(i, test_user_dict[j]) for i, j in enumerate(content_item) if j in test_user_dict]
+            train_content_user = np.asarray(train_content_user)
+            train_content_ind = train_content_user[:, 0]
+            train_content_ui = train_content_user[:, 1]
+            train_featrue = user_feature[train_content_ind]
+            train_content = content_user_value[train_content_ind]
+
+        with h5py.File('./Input/test_warm_subset.h5py', 'w') as data:
+            pref = data.create_group('pref')
+            users = pref.create_dataset('user', np.shape(train_user), 'i')
+            users[:] = train_user
+            items = pref.create_dataset('item', np.shape(train_item), 'i')
+            items[:] = train_item
+            values = pref.create_dataset('value', np.shape(train_value), 'i')
+            values[:] = train_value
+            
+            if mode == 'train':
+                feature_con = data.create_group('item-contents')
+
+                content_items = feature_con.create_dataset('item', np.shape(train_content_ui), 'i')
+                content_items[:] = train_content_ui
+            else:
+                feature_con = data.create_group('user_contents')
+                content_users = feature_con.create_dataset('user', np.shape(train_content_ui), 'i')
+                content_users[:] = train_content_ui
+
+            features = feature_con.create_dataset('feature', np.shape(train_featrue), 'i')
+            features[:] = train_featrue
+
+            contents = feature_con.create_dataset('value', np.shape(train_content), 'f')
+            contents[:] = train_content
+
+            labels = data.create_group('labels')
+
+            test_users = labels.create_dataset('user', np.shape(test_user), 'i')
+            test_users[:] = test_user
+
+            test_items = labels.create_dataset('item', np.shape(test_item), 'i')
+            test_items[:] = test_item
+
+            test_values = labels.create_dataset('value', np.shape(test_value), 'i')
+            test_values[:] = test_value
 
 if __name__ == '__main__':
     data = Data()
