@@ -207,10 +207,10 @@ class Data(object):
                           unpack=True)
         pref[2] = np.ones(np.shape(pref[2]))
 
-        uniq = list(set(zip(pref[0], pref[1], pref[2])))
-        uniq = uniq.sort()
+        uni = list(set(zip(pref[0], pref[1], pref[2])))
+        uni.sort()
 
-        user, item, value = zip(*uniq)
+        user, item, value = zip(*uni)
 
         user_list = np.unique(user)
         user_dict = dict()
@@ -234,7 +234,7 @@ class Data(object):
                     item_feature.append([i, int(item.split(':')[0]), float(item.split(':')[1])])
                 i = i + 1
 
-        item_feature = item_feature.sort()
+        item_feature.sort()
         content_item, item_feature, content_item_value = zip(*item_feature)
 
         content_item = [(i, item_dict[j]) for i, j in enumerate(content_item) if j in item_dict]
@@ -252,7 +252,7 @@ class Data(object):
                     user_feature.append([i, int(user.split(':')[0]), float(user.split(':')[1])])
                 i = i + 1
 
-        user_feature = user_feature.sort()
+        user_feature.sort()
         content_user, user_feature, content_user_value = zip(*user_feature)
 
         content_user = [(i, user_dict[j]) for i, j in enumerate(content_user) if j in user_dict]
