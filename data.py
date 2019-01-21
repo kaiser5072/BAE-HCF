@@ -129,7 +129,7 @@ class Data(object):
 
         os.makedirs(out_dir)
 
-        data = self.load_data(data_dir, div, 'item')
+        data = self.load_data(data_dir, div, 'user')
         chunk_offsets = self._split_data(opt.chunk_size)
         num_chunks = len(chunk_offsets)
         self.logger.info('split data into %d chunks' % (num_chunks))
@@ -166,7 +166,7 @@ class Data(object):
         self.logger.info('size of validation set: %s' % num_val)
         self.logger.info('height: %s' % self.height)
         self.logger.info('width: %s' % self.width)
-        self.logger.info('The number of item features: %s' % self.n_contents)
+        self.logger.info('The number of content features: %s' % self.n_contents)
 
     def _split_train_val(self, row, column, rating, train_ratio):
         # val_ratio = int(1 / (1 - train_ratio))
