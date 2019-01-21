@@ -298,4 +298,5 @@ class Data(object):
 
 if __name__ == '__main__':
     data = Data()
-    fire.Fire({'make_db': data.make_db})
+    fire.Fire({'make_db': data.make_db,
+               'build_data': data.build_data})
