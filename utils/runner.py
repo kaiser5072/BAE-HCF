@@ -153,7 +153,7 @@ def predict(infer_func, params):
     config.inter_op_parallelism_threads = 32
 
     warm_idx = h5py.File('warm_index.h5py', 'r')
-    user_idx = warm_idx['idx'][:10000]
+    item_idx = warm_idx['idx']
 
     est = tf.estimator.Estimator(
         model_fn=infer_func._BAE_model_fn,
@@ -177,8 +177,8 @@ def predict(infer_func, params):
         eval_result = est.predict(
             input_fn=input_func)
 
-        preds, ratingTest = np.zeros((10000, width)), np.zeros((10000, width), dtype=np.int8)
-        mask = np.zeros((10000, width), dtype=np.int8)
+        preds, ratingTest = np.zeros((height, len(item_idx))), np.zeros((height, len(item_idx)), dtype=np.int8)
+        mask = np.zeros((height, len(item_idx)), dtype=np.int8)
         with tqdm.tqdm(total=height) as pbar:
             for i, pred in enumerate(eval_result):
                 _pred = pred['preds']
@@ -189,9 +189,6 @@ def predict(infer_func, params):
                 ratingTest[i, :] = _target
                 mask[i, :] = _mask
                 pbar.update(1)
-                if i >= 9999:
-                    break
-
 
         recall = get_recall(ratingTest, preds, mask, 100)
         print("\n [*] RECALL: %.4f" % recall)

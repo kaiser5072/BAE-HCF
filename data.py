@@ -368,7 +368,7 @@ class Data(object):
 
             data_path = os.path.join(data_dir, 'Input/warm/test_warm_item_ids.csv')
             test_warm_item_ids  = np.loadtxt(data_path, dtype='int32')
-            test_warm_item_list = [user_dict[i] for i in test_warm_item_ids]
+            test_warm_item_list = [item_dict[i] for i in test_warm_item_ids]
 
             warm_index = h5py.File('warm_index.h5py', 'w')
             test_warm_item_lists = warm_index.create_dataset('idx', np.shape(test_warm_item_list), 'i')
