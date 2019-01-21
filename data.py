@@ -300,7 +300,9 @@ class Data(object):
             contents_user_value = user_con.create_dataset('value', np.shape(content_user_value), 'f')
             contents_user_value[:] = content_user_value
 
-        test = np.loadtxt('./warm/test_warm.csv', dtype='int32, int32, int32',
+        self.logger.info('Loading a preference matrix for test')
+
+        test = np.loadtxt('./Input/warm/test_warm.csv', dtype='int32, int32, int32',
                           delimiter=',',
                           usecols=(0, 1, 2),
                           unpack=True)
@@ -370,7 +372,7 @@ class Data(object):
             items[:] = train_item
             values = pref.create_dataset('value', np.shape(train_value), 'i')
             values[:] = train_value
-            
+
             if mode == 'train':
                 feature_con = data.create_group('item-contents')
 
