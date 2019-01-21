@@ -204,14 +204,15 @@ def get_recall(ratingTest, preds, mask, n_recalls):
 
     # temp = np.zeros((16980, 5551))
     # temp[(ratingTest[:, 0], ratingTest[:, 1])] = 1
-    preds       = np.transpose(preds)
-    target      = np.transpose(ratingTest)
-    mask        = np.transpose(mask)
+    # preds       = np.transpose(preds)
+    # target      = np.transpose(ratingTest)
+    # mask        = np.transpose(mask)
+    preds  = np.asarray(preds)
+    target = np.asarray(ratingTest)
+    mask   = np.asarray(mask)
     print(np.sort(preds[0, :])[::-1][:100])
     print(np.sort(preds[0, :] * target[0, :])[::-1])
-    # temp      = np.asarray(ratingTest)
-    # preds     = np.asarray(preds)
-    # test_mask = np.asarray(test_mask)
+
     preds       = preds * (1-mask) - 100 * mask
     non_zero_idx = np.sum(target, axis=1) != 0
     #
