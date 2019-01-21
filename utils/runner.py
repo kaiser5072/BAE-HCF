@@ -189,7 +189,7 @@ def predict(infer_func, params):
                 ratingTest[i, :] = _target
                 mask[i, :] = _mask
                 pbar.update(1)
-                if i >= 10000:
+                if i >= 9999:
                     break
 
 
