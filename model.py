@@ -54,7 +54,7 @@ class AE_CF(object):
 
             if i == 1 and self.n_layer != 2:
                 # if np.random.uniform(0, 1, 1) < 0.5:
-                h = tf.sparse.matmul(inputs, w)
+                h = tf.sparse.matmul(inputs, w) + tf.sparse.matmul(sides, s)
                 # else:
                 #     h = b + tf.sparse.matmul(sides, s)
                 h = tf.layers.batch_normalization(h)
@@ -63,19 +63,19 @@ class AE_CF(object):
 
             elif self.n_layer == 2:
                 # if np.random.uniform(0, 1, 1) < 0.5:
-                h = tf.sparse.matmul(inputs, w)
+                h = tf.sparse.matmul(inputs, w) + tf.sparse.matmul(sides, s)
                 # else:
                 #     h = b + tf.sparse.matmul(sides, s)
                 h = tf.layers.batch_normalization(h)
                 h = tf.nn.tanh(h)
 
             elif i == (self.n_layer-1):
-                h = tf.matmul(h ,w)
+                h = tf.matmul(h ,w) + tf.sparse.matmul(sides, s)
                 h = tf.layers.batch_normalization(h)
                 h = tf.nn.tanh(h)
 
             else:
-                h = tf.matmul(h, w)
+                h = tf.matmul(h, w) + tf.sparse.matmul(sides, s)
                 h = tf.layers.batch_normalization(h)
                 h = tf.nn.relu(h)
                 h = tf.nn.dropout(h, self.drop_rate)
@@ -97,12 +97,12 @@ class AE_CF(object):
             decay_steps=200000,
             end_learning_rate= 1000)
 
-        # pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
-        pred_top_k, _ = tf.nn.top_k(self.outputs, k=1500)
-        pref_diff_zero = tf.reduce_sum(tf.square(pred_top_k))
-        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - inputs.values)) * 2
+        pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
+        # pred_top_k, _ = tf.nn.top_k(self.outputs, k=1500)
+        # pref_diff_zero = tf.reduce_sum(tf.square(pred_top_k))
+        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - inputs.values)) * 100
 
-        self.loss = tf.add_n([pref_diff_zero, pref_diff_ones]) / (self.height * 1500)
+        self.loss = tf.add_n([pref_diff_zero, pref_diff_ones]) / (self.height * self.width)
         self.loss = tf.identity(self.loss, name='loss')
 
         all_var = [var for var in tf.trainable_variables() ]
