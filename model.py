@@ -100,7 +100,7 @@ class AE_CF(object):
         pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
         # pred_top_k, _ = tf.nn.top_k(self.outputs, k=1500)
         # pref_diff_zero = tf.reduce_sum(tf.square(pred_top_k))
-        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - inputs.values)) * 10
+        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - inputs.values)) * 200
 
         self.loss = tf.add_n([pref_diff_zero, pref_diff_ones]) / (self.height * self.width)
         self.loss = tf.identity(self.loss, name='loss')
