@@ -315,6 +315,8 @@ class Data(object):
         test_user = [user_dict[i] for i in test_user]
         test_item = [item_dict[i] for i in test_item]
 
+        train_user, train_item, train_value = np.asarray(user), np.asarray(item), np.asarray(value)
+
         if mode == 'item':
             test_item_list = np.unique(test_item)
             test_item_dict = dict()
@@ -322,16 +324,12 @@ class Data(object):
                 test_item_dict[j] = i
 
             test_item = [test_item_dict[i] for i in test_item]
-            train_user = user
-            train_item = item
-            train_value = value
 
             train_item = [(i, test_item_dict[j]) for i, j in enumerate(train_item) if j in test_item_dict]
             train_item = np.asarray(train_item)
-            train_ind = train_item[:, 0]
-            train_item = train_item[:, 1]
-            train_user = np.asarray(train_user)
-            train_user = train_user[train_ind]
+            train_ind   = train_item[:, 0]
+            train_item  = train_item[:, 1]
+            train_user  = train_user[train_ind]
             train_value = train_value[train_ind]
 
             train_content_item = [(i, test_item_dict[j]) for i, j in enumerate(content_item) if j in test_item_dict]
@@ -340,6 +338,7 @@ class Data(object):
             train_content_ui = train_content_item[:, 1]
             train_featrue = item_feature[train_content_ind]
             train_content = content_item_value[train_content_ind]
+
         else:
             test_user_list = np.unique(test_user)
             test_user_dict = dict()
@@ -347,14 +346,12 @@ class Data(object):
                 test_user_dict[j] = i
 
             test_user = [test_user_dict[i] for i in test_user]
-            train_user, train_item, train_value = user, item, value
 
-            train_user = [(i, test_user_dict[j]) for i, j in enumerate(train_user) if j in test_user_dict]
-            train_user = np.asarray(train_user)
-            train_ind = train_user[:, 0]
-            train_user = train_user[:, 1]
-            train_item = np.asarray(train_item)
-            train_item = train_item[train_ind]
+            train_user  = [(i, test_user_dict[j]) for i, j in enumerate(train_user) if j in test_user_dict]
+            train_user  = np.asarray(train_user)
+            train_ind   = train_user[:, 0]
+            train_user  = train_user[:, 1]
+            train_item  = train_item[train_ind]
             train_value = train_value[train_ind]
 
             train_content_user = [(i, test_user_dict[j]) for i, j in enumerate(content_item) if j in test_user_dict]
