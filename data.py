@@ -230,8 +230,8 @@ class Data(object):
         with open(os.path.join(data_dir, 'Input/warm/item_features_0based.txt'), 'r') as f:
             item_feature, i = [], 0
             for line in f:
-                for item in line.split()[1:]:
-                    item_feature.append([i, int(item.split(':')[0]), float(item.split(':')[1])])
+                for item_ind in line.split()[1:]:
+                    item_feature.append([i, int(item_ind.split(':')[0]), float(item_ind.split(':')[1])])
                 i = i + 1
 
         item_feature.sort()
@@ -250,8 +250,8 @@ class Data(object):
         with open(os.path.join(data_dir, 'Input/warm/user_features_0based.txt'), 'r') as f:
             user_feature, i = [], 0
             for line in f:
-                for user in line.split()[1:]:
-                    user_feature.append([i, int(user.split(':')[0]), float(user.split(':')[1])])
+                for user_ind in line.split()[1:]:
+                    user_feature.append([i, int(user_ind.split(':')[0]), float(user_ind.split(':')[1])])
                 i = i + 1
 
         user_feature.sort()
