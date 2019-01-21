@@ -177,13 +177,13 @@ def predict(infer_func, params):
         eval_result = est.predict(
             input_fn=input_func)
 
-        preds, ratingTest = np.zeros((height, len(user_idx))), np.zeros((height, len(user_idx)), dtype=np.int8)
+        preds, ratingTest = np.zeros((height, width)), np.zeros((height, width), dtype=np.int8)
         mask = np.zeros((height, len(user_idx)), dtype=np.int8)
         with tqdm.tqdm(total=height) as pbar:
             for i, pred in enumerate(eval_result):
-                _pred = pred['preds'][user_idx]
-                _target = pred['ratingTest'][user_idx]
-                _mask = pred['ratingTrain'][user_idx]
+                _pred = pred['preds']
+                _target = pred['ratingTest']
+                _mask = pred['ratingTrain']
 
                 preds[i, :] = _pred
                 ratingTest[i, :] = _target
