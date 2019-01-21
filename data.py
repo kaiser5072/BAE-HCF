@@ -236,6 +236,8 @@ class Data(object):
 
         item_feature.sort()
         content_item, item_feature, content_item_value = zip(*item_feature)
+        item_feature = np.asarray(item_feature)
+        content_item_value = np.asarray(content_item_value)
 
         content_item = [(i, item_dict[j]) for i, j in enumerate(content_item) if j in item_dict]
         content_item = np.asarray(content_item)
@@ -254,6 +256,8 @@ class Data(object):
 
         user_feature.sort()
         content_user, user_feature, content_user_value = zip(*user_feature)
+        user_feature = np.asarray(user_feature)
+        content_user_value = np.asarray(content_user_value)
 
         content_user = [(i, user_dict[j]) for i, j in enumerate(content_user) if j in user_dict]
         content_user = np.asarray(content_user)
