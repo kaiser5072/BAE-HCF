@@ -222,6 +222,16 @@ class Data(object):
         item_feature = item_feature.sort()
         item_feature = zip(*item_feature)
 
+        with open(os.path.join(data_dir, 'recsys2017.pub/eval/user_features_0based.txt', 'r')) as f:
+            user_feature, i = [], 0
+            for line in f:
+                for user in line.split()[1:]:
+                    user_feature.append([i, int(user.split(':')[0]), float(user.split(':')[1])])
+                i = i + 1
+
+        user_feature = user_feature.sort()
+        user_feature = zip(*user_feature)
+
 
 if __name__ == '__main__':
     data = Data()
