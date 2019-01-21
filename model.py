@@ -83,14 +83,14 @@ class AE_CF(object):
             prev_dim = h.get_shape()[1]
 
         with tf.variable_scope('layer%d'%self.n_layer):
-            w = tf.get_variable('weight', shape=[h.get_shape()[1], self.dims[-1]],
+            w = tf.get_variable('weight', shape=[h.get_shape()[1], 200],
                                 trainable=True,
                                 initializer=w_init,
                                 dtype=self.dtype)
             h = tf.matmul(h, w)
 
         with tf.variable_scope('layer%d' % (self.n_layer+1)):
-            w = tf.get_variable('weight', shape=[h.get_shape()[1], 200],
+            w = tf.get_variable('weight', shape=[h.get_shape()[1], self.dims[-1]],
                                 trainable=True,
                                 initializer=w_init,
                                 dtype=self.dtype)
