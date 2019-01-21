@@ -339,6 +339,10 @@ class Data(object):
             train_feature = item_feature[train_content_ind]
             train_content = content_item_value[train_content_ind]
 
+            warm_index = h5py.File('warm_index', 'w')
+            warm_index.create_dataset('idx', np.shape(test_item_list), 'i')
+            warm_index[:] = test_item_list
+
         else:
             test_user_list = np.unique(test_user)
             test_user_dict = dict()
@@ -361,6 +365,10 @@ class Data(object):
             train_feature = user_feature[train_content_ind]
             train_content = content_user_value[train_content_ind]
 
+            warm_index = h5py.File('warm_index', 'w')
+            warm_index.create_dataset('idx', np.shape(test_user_list), 'i')
+            warm_index[:] = test_user_list
+
         with h5py.File('./Input/test_warm_subset.h5py', 'w') as data:
             pref = data.create_group('pref')
             users = pref.create_dataset('user', np.shape(train_user), 'i')
@@ -376,7 +384,7 @@ class Data(object):
                 content_items = feature_con.create_dataset('item', np.shape(train_content_ui), 'i')
                 content_items[:] = train_content_ui
             else:
-                feature_con = data.create_group('user_contents')
+                feature_con = data.create_group('user-contents')
                 content_users = feature_con.create_dataset('user', np.shape(train_content_ui), 'i')
                 content_users[:] = train_content_ui
 
