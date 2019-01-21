@@ -200,7 +200,7 @@ class Data(object):
         ''' Remove duplicate interactions and collapse remaining interactions
         into a single binary matrix in the form of a sparse matrix'''
         # Training set
-        data_path = os.path.join(data_dir, 'recsys2017.pub/eval/warm/train.csv')
+        data_path = os.path.join(data_dir, 'Input/warm/train.csv')
         pref = np.loadtxt(data_path, dtype='int32, int32, float32',
                           delimiter=',',
                           usecols=(0, 1, 2),
@@ -210,9 +210,24 @@ class Data(object):
         uniq = list(set(zip(pref[0], pref[1], pref[2])))
         uniq = uniq.sort()
 
-        pref = zip(*uniq)
+        user, item, value = zip(*uniq)
 
-        with open(os.path.join(data_dir, 'recsys2017.pub/eval/item_features_0based.txt', 'r')) as f:
+        user_list = np.unique(user)
+        user_dict = dict()
+        for i, j in enumerate(user_list):
+            user_dict[j] = i
+
+        item_list = np.unique(item)
+        item_dict = dict()
+        for i, j in enumerate(item_list):
+            item_dict[j] = i
+
+        user = [user_dict[i] for i in user]
+        item = [item_dict[i] for i in item]
+
+        self.logger.info('Loaded a preference matrix')
+
+        with open(os.path.join(data_dir, 'Input/warm/item_features_0based.txt', 'r')) as f:
             item_feature, i = [], 0
             for line in f:
                 for item in line.split()[1:]:
@@ -220,9 +235,17 @@ class Data(object):
                 i = i + 1
 
         item_feature = item_feature.sort()
-        item_feature = zip(*item_feature)
+        content_item, item_feature, content_item_value = zip(*item_feature)
 
-        with open(os.path.join(data_dir, 'recsys2017.pub/eval/user_features_0based.txt', 'r')) as f:
+        content_item = [(i, item_dict[j]) for i, j in enumerate(content_item) if j in item_dict]
+        content_item = np.asarray(content_item)
+        content_ind  = content_item[:, 0]
+        content_item = content_item[:, 1]
+
+        item_feature = item_feature[content_ind]
+        content_item_value = content_item_value[content_ind]
+
+        with open(os.path.join(data_dir, 'Input/warm/user_features_0based.txt', 'r')) as f:
             user_feature, i = [], 0
             for line in f:
                 for user in line.split()[1:]:
@@ -230,8 +253,48 @@ class Data(object):
                 i = i + 1
 
         user_feature = user_feature.sort()
-        user_feature = zip(*user_feature)
+        content_user, user_feature, content_user_value = zip(*user_feature)
 
+        content_user = [(i, user_dict[j]) for i, j in enumerate(content_user) if j in user_dict]
+        content_user = np.asarray(content_user)
+        content_ind  = content_user[:, 0]
+        content_user = content_user[:, 1]
+
+        user_feature = user_feature[content_ind]
+        content_user_value = content_user_value[content_ind]
+
+        with h5py.File('recsys2017_warm.h5py', 'w') as data:
+            pref = data.create_group('pref')
+            users = pref.create_dataset('user', np.shape(user), 'i')
+            users[:] = user
+            items = pref.create_dataset('item', np.shape(item), 'i')
+            items[:] = item
+            values = pref.create_dataset('value', np.shape(value), 'i')
+            values[:] = value
+
+            # Item Contents
+            item_con = data.create_group('item-contents')
+
+            content_items = item_con.create_dataset('item', np.shape(content_item), 'i')
+            content_items[:] = content_item
+
+            item_features = item_con.create_dataset('feature', np.shape(item_feature), 'i')
+            item_features[:] = item_feature
+
+            contents = item_con.create_dataset('value', np.shape(content_item_value), 'f')
+            contents[:] = content_item_value
+
+            # User Contents
+            user_con = data.create_group('user-contents')
+
+            content_users = user_con.create_dataset('user', np.shape(content_user), 'i')
+            content_users[:] = content_user
+
+            user_features = user_con.create_dataset('feature', np.shape(user_feature), 'i')
+            user_features[:] = user_feature
+
+            contents_user_value = user_con.create_dataset('value', np.shape(content_user_value), 'f')
+            contents_user_value[:] = content_user_value
 
 if __name__ == '__main__':
     data = Data()
