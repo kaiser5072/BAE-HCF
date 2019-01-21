@@ -178,7 +178,7 @@ def predict(infer_func, params):
             input_fn=input_func)
 
         preds, ratingTest = np.zeros((10000, width)), np.zeros((10000, width), dtype=np.int8)
-        mask = np.zeros((height, len(user_idx)), dtype=np.int8)
+        mask = np.zeros((10000, width), dtype=np.int8)
         with tqdm.tqdm(total=height) as pbar:
             for i, pred in enumerate(eval_result):
                 _pred = pred['preds']
