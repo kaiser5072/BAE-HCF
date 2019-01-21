@@ -7,6 +7,9 @@ import cPickle
 import os
 import shutil
 
+from utils import Option
+opt = Option('./config.json')
+
 utils.init()
 
 default_args = {
