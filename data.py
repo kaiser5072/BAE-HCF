@@ -336,7 +336,7 @@ class Data(object):
             train_content_item = np.asarray(train_content_item)
             train_content_ind = train_content_item[:, 0]
             train_content_ui = train_content_item[:, 1]
-            train_featrue = item_feature[train_content_ind]
+            train_feature = item_feature[train_content_ind]
             train_content = content_item_value[train_content_ind]
 
         else:
@@ -354,11 +354,11 @@ class Data(object):
             train_item  = train_item[train_ind]
             train_value = train_value[train_ind]
 
-            train_content_user = [(i, test_user_dict[j]) for i, j in enumerate(content_item) if j in test_user_dict]
+            train_content_user = [(i, test_user_dict[j]) for i, j in enumerate(content_user) if j in test_user_dict]
             train_content_user = np.asarray(train_content_user)
             train_content_ind = train_content_user[:, 0]
             train_content_ui = train_content_user[:, 1]
-            train_featrue = user_feature[train_content_ind]
+            train_feature = user_feature[train_content_ind]
             train_content = content_user_value[train_content_ind]
 
         with h5py.File('./Input/test_warm_subset.h5py', 'w') as data:
@@ -380,8 +380,8 @@ class Data(object):
                 content_users = feature_con.create_dataset('user', np.shape(train_content_ui), 'i')
                 content_users[:] = train_content_ui
 
-            features = feature_con.create_dataset('feature', np.shape(train_featrue), 'i')
-            features[:] = train_featrue
+            features = feature_con.create_dataset('feature', np.shape(train_feature), 'i')
+            features[:] = train_feature
 
             contents = feature_con.create_dataset('value', np.shape(train_content), 'f')
             contents[:] = train_content
