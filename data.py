@@ -308,9 +308,10 @@ class Data(object):
                           unpack=True)
         test[2] = np.ones_like(test[2])
 
-        test_user = test[0]
-        test_item = test[1]
-        test_value = test[2]
+        uni = list(set(zip(test[0], test[1], test[2])))
+        uni.sort()
+
+        test_user, test_item, test_value = zip(*uni)
 
         test_user = [user_dict[i] for i in test_user]
         test_item = [item_dict[i] for i in test_item]
@@ -339,7 +340,7 @@ class Data(object):
             train_feature = item_feature[train_content_ind]
             train_content = content_item_value[train_content_ind]
 
-            warm_index = h5py.File('warm_index', 'w')
+            warm_index = h5py.File('warm_index.h5py', 'w')
             test_item_lists = warm_index.create_dataset('idx', np.shape(test_item_list), 'i')
             test_item_lists[:] = test_item_list
 
@@ -365,7 +366,7 @@ class Data(object):
             train_feature = user_feature[train_content_ind]
             train_content = content_user_value[train_content_ind]
 
-            warm_index = h5py.File('warm_index', 'w')
+            warm_index = h5py.File('warm_index.h5py', 'w')
             test_user_lists = warm_index.create_dataset('idx', np.shape(test_user_list), 'i')
             test_user_lists[:] = test_user_list
 
