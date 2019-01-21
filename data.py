@@ -366,9 +366,13 @@ class Data(object):
             train_feature = user_feature[train_content_ind]
             train_content = content_user_value[train_content_ind]
 
+            data_path = os.path.join(data_dir, 'Input/warm/test_warm_item_ids.csv')
+            test_warm_item_ids  = np.loadtxt(data_path, dtype='int32')
+            test_warm_item_list = [user_dict[i] for i in test_warm_item_ids]
+
             warm_index = h5py.File('warm_index.h5py', 'w')
-            test_user_lists = warm_index.create_dataset('idx', np.shape(test_user_list), 'i')
-            test_user_lists[:] = test_user_list
+            test_warm_item_lists = warm_index.create_dataset('idx', np.shape(test_warm_item_list), 'i')
+            test_warm_item_lists[:] = test_warm_item_list
 
         with h5py.File('./Input/test_warm_subset.h5py', 'w') as data:
             pref = data.create_group('pref')
