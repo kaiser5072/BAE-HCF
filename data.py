@@ -227,7 +227,7 @@ class Data(object):
 
         self.logger.info('Loaded a preference matrix')
 
-        with open(os.path.join(data_dir, 'Input/warm/item_features_0based.txt', 'r')) as f:
+        with open(os.path.join(data_dir, 'Input/warm/item_features_0based.txt'), 'r') as f:
             item_feature, i = [], 0
             for line in f:
                 for item in line.split()[1:]:
@@ -245,7 +245,7 @@ class Data(object):
         item_feature = item_feature[content_ind]
         content_item_value = content_item_value[content_ind]
 
-        with open(os.path.join(data_dir, 'Input/warm/user_features_0based.txt', 'r')) as f:
+        with open(os.path.join(data_dir, 'Input/warm/user_features_0based.txt'), 'r') as f:
             user_feature, i = [], 0
             for line in f:
                 for user in line.split()[1:]:
