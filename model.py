@@ -32,7 +32,7 @@ class AE_CF(object):
         self.n_layer = len(self.dims) - 1
 
     def builder(self, inputs, sides):
-        w_init = tf.initializers.truncated_normal(stddev=0.0001)
+        w_init = tf.initializers.truncated_normal(stddev=0.001)
         b_init = tf.constant_initializer(0.)
         h = inputs
         
@@ -95,12 +95,12 @@ class AE_CF(object):
             decay_steps=200000,
             end_learning_rate= 1000)
 
-        pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
-        # pred_top_k, _ = tf.nn.top_k(self.outputs, k=1500)
-        # pref_diff_zero = tf.reduce_sum(tf.square(pred_top_k))
+        # pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
+        pred_top_k, _ = tf.nn.top_k(self.outputs, k=500)
+        pref_diff_zero = tf.reduce_sum(tf.square(pred_top_k))
         pref_diff_ones = tf.reduce_sum(tf.square(self.preds - inputs.values)) * 100
 
-        self.loss = tf.add_n([pref_diff_zero, pref_diff_ones]) / (self.height * self.width)
+        self.loss = tf.add_n([pref_diff_zero, pref_diff_ones]) / (self.height * 500)
         self.loss = tf.identity(self.loss, name='loss')
 
         all_var = [var for var in tf.trainable_variables() ]
