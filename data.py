@@ -197,8 +197,6 @@ class Data(object):
         return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
 
     def build_data(self, data_dir, mode):
-        if mode == 'item':
-            print(mode)
         ''' Remove duplicate interactions and collapse remaining interactions
         into a single binary matrix in the form of a sparse matrix'''
         # Training set
@@ -381,6 +379,7 @@ class Data(object):
             values = pref.create_dataset('value', np.shape(train_value), 'i')
             values[:] = train_value
 
+            print(mode)
             if mode == 'item':
                 feature_con      = data.create_group('item-contents')
                 content_items    = feature_con.create_dataset('item', np.shape(train_content_ui), 'i')
