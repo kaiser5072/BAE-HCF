@@ -59,7 +59,6 @@ class AE_CF(object):
                 #     h = b + tf.sparse.matmul(sides, s)
                 h = tf.layers.batch_normalization(h)
                 h = tf.nn.relu(h)
-                h = tf.nn.dropout(h, self.drop_rate)
 
             elif self.n_layer == 2:
                 # if np.random.uniform(0, 1, 1) < 0.5:
@@ -78,7 +77,6 @@ class AE_CF(object):
                 h = tf.matmul(h, w) + tf.sparse.matmul(sides, s)
                 h = tf.layers.batch_normalization(h)
                 h = tf.nn.relu(h)
-                h = tf.nn.dropout(h, self.drop_rate)
 
             prev_dim = h.get_shape()[1]
 
