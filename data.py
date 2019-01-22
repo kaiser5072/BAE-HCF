@@ -379,7 +379,6 @@ class Data(object):
             values = pref.create_dataset('value', np.shape(train_value), 'i')
             values[:] = train_value
 
-            print(mode)
             if mode == 'item':
                 feature_con      = data.create_group('item-contents')
                 content_items    = feature_con.create_dataset('item', np.shape(train_content_ui), 'i')
