@@ -177,8 +177,9 @@ def predict(infer_func, params):
         eval_result = est.predict(
             input_fn=input_func)
 
-        preds, ratingTest = np.zeros((height, len(item_idx))), np.zeros((height, len(item_idx)), dtype=np.int8)
-        mask = np.zeros((height, len(item_idx)), dtype=np.int8)
+        max_user = 40000
+        preds, ratingTest = np.zeros((max_user, len(item_idx))), np.zeros((max_user, len(item_idx)), dtype=np.int8)
+        mask = np.zeros((max_user, len(item_idx)), dtype=np.int8)
         with tqdm.tqdm(total=height) as pbar:
             for i, pred in enumerate(eval_result):
                 _pred = pred['preds'][item_idx]
@@ -189,6 +190,9 @@ def predict(infer_func, params):
                 ratingTest[i, :] = _target
                 mask[i, :] = _mask
                 pbar.update(1)
+
+                if i >= max_user-1:
+                    break
 
         recall = get_recall(ratingTest, preds, mask, 100)
         print("\n [*] RECALL: %.4f" % recall)

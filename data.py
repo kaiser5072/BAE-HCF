@@ -370,7 +370,7 @@ class Data(object):
         test_warm_item_lists = warm_index.create_dataset('idx', np.shape(test_warm_item_list), 'i')
         test_warm_item_lists[:] = test_warm_item_list
 
-        with h5py.File('./Input/test_warm_subset.h5py', 'w') as data:
+        with h5py.File('./Input/test_warm.h5py', 'w') as data:
             pref = data.create_group('pref')
             users = pref.create_dataset('user', np.shape(train_user), 'i')
             users[:] = train_user
