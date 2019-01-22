@@ -89,18 +89,17 @@ class AE_CF(object):
             self.outputs = tf.matmul(h, w)
 
         self.preds = tf.gather_nd(self.outputs, inputs.indices)
+
         confidence = tf.train.polynomial_decay(
             learning_rate=1.,
             global_step=tf.train.get_global_step(),
             decay_steps=200000,
             end_learning_rate= 1000)
 
-        # pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
-        pred_top_k, _ = tf.nn.top_k(self.outputs, k=500)
-        pref_diff_zero = tf.reduce_sum(tf.square(pred_top_k))
+        pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
         pref_diff_ones = tf.reduce_sum(tf.square(self.preds - inputs.values)) * 100
 
-        self.loss = tf.add_n([pref_diff_zero, pref_diff_ones]) / (self.height * 500)
+        self.loss = tf.add_n([pref_diff_zero, pref_diff_ones]) / (self.height * self.width)
         self.loss = tf.identity(self.loss, name='loss')
 
         all_var = [var for var in tf.trainable_variables() ]
