@@ -123,13 +123,13 @@ class Data(object):
             yield column_t, value_t, feature_t, contents_t, Col_te, Pref_te
 
 
-    def make_db(self, data_dir, out_dir, div):
+    def make_db(self, data_dir, out_dir, div, mode):
         if os.path.exists(out_dir):
             shutil.rmtree(out_dir)
 
         os.makedirs(out_dir)
 
-        data = self.load_data(data_dir, div, 'user')
+        data = self.load_data(data_dir, div, mode)
         chunk_offsets = self._split_data(opt.chunk_size)
         num_chunks = len(chunk_offsets)
         self.logger.info('split data into %d chunks' % (num_chunks))
