@@ -177,13 +177,13 @@ def predict(infer_func, params):
         eval_result = est.predict(
             input_fn=input_func)
 
-        preds, ratingTest = np.zeros((height, len(item_idx))), np.zeros((height, len(item_idx)), dtype=np.int8)
-        mask = np.zeros((height, len(item_idx)), dtype=np.int8)
+        preds, ratingTest = np.zeros((height, 20000)), np.zeros((height, 20000), dtype=np.int8)
+        mask = np.zeros((height, 20000), dtype=np.int8)
         with tqdm.tqdm(total=height) as pbar:
             for i, pred in enumerate(eval_result):
-                _pred = pred['preds'][item_idx]
-                _target = pred['ratingTest'][item_idx]
-                _mask = pred['ratingTrain'][item_idx]
+                _pred = pred['preds'][:20000]
+                _target = pred['ratingTest'][:20000]
+                _mask = pred['ratingTrain'][:20000]
 
                 preds[i, :] = _pred
                 ratingTest[i, :] = _target
@@ -203,12 +203,12 @@ def get_recall(ratingTest, preds, mask, n_recalls):
 
     # temp = np.zeros((16980, 5551))
     # temp[(ratingTest[:, 0], ratingTest[:, 1])] = 1
-    # preds       = np.transpose(preds)
-    # target      = np.transpose(ratingTest)
-    # mask        = np.transpose(mask)
-    preds  = np.asarray(preds)
-    target = np.asarray(ratingTest)
-    mask   = np.asarray(mask)
+    preds       = np.transpose(preds)
+    target      = np.transpose(ratingTest)
+    mask        = np.transpose(mask)
+    # preds  = np.asarray(preds)
+    # target = np.asarray(ratingTest)
+    # mask   = np.asarray(mask)
     print(np.sort(preds[0, :])[::-1][:100])
     print(np.sort(preds[0, :] * target[0, :])[::-1])
 
