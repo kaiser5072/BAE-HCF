@@ -53,10 +53,10 @@ class AE_CF(object):
                                                 dtype=self.dtype)
 
             if i == 1 and self.n_layer != 2:
-                # if np.random.uniform(0, 1, 1) < 0.5:
-                h = tf.sparse.matmul(inputs, w) + tf.sparse.matmul(sides, s)
-                # else:
-                #     h = b + tf.sparse.matmul(sides, s)
+                if np.random.uniform(0, 1, 1) < 0.5:
+                    h = tf.sparse.matmul(inputs, w) + tf.sparse.matmul(sides, s)
+                else:
+                    h = b + tf.sparse.matmul(sides, s)
                 h = tf.layers.batch_normalization(h)
                 h = tf.nn.relu(h)
 
