@@ -31,10 +31,10 @@ class AE_CF(object):
         self.dtype = tf.float16 if params['precision'] == 'fp16' else tf.float32
         self.n_layer = len(self.dims) - 1
 
-    def builder(self, inputs, sides):
+    def builder(self, inputs, sides, drops_inputs):
         w_init = tf.initializers.truncated_normal(stddev=0.001)
         b_init = tf.constant_initializer(0.)
-        h = inputs
+        h = drops_inputs
         
         prev_dim = self.dims[0]
         for i in range(1, self.n_layer):
@@ -157,11 +157,19 @@ class AE_CF(object):
         inputs = tf.SparseTensor(indices, values, dense_shape)
         sides  = tf.SparseTensor(indices_s, values_s, dense_shape_s)
 
-        with tf.device(self.device):
-            inputs = tf.cast(inputs, self.dtype)
-            sides  = tf.cast(sides, self.dtype)
+        drops_row = np.random.choice(self.height, self.height/2)
+        drops_points  = tf.where(tf.equal(inputs.indices[:, 0], drops_row))
+        drops_indices = tf.gather(inputs.indices, tf.reshape(drops_points, [-1]))
+        drops_value   = tf.gather(inputs.values, tf.reshape(drops_points, [-1]))
 
-            self.builder(inputs, sides)
+        drops_inputs = tf.SparseTensor(drops_indices, drops_value, dense_shape)
+
+        with tf.device(self.device):
+            inputs       = tf.cast(inputs, self.dtype)
+            sides        = tf.cast(sides, self.dtype)
+            drops_inputs = tf.cast(drops_inputs, self.dtype)
+
+            self.builder(inputs, sides, drops_inputs)
 
         if mode == tf.estimator.ModeKeys.PREDICT:
             predictions = {
