@@ -97,7 +97,7 @@ class AE_CF(object):
             end_learning_rate= 1000)
 
         pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
-        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - inputs.values)) * confidence
+        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - inputs.values)) * 100
 
         self.loss = tf.add_n([pref_diff_zero, pref_diff_ones]) / (self.height * self.width)
         self.loss = tf.identity(self.loss, name='loss')
