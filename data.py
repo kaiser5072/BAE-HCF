@@ -230,33 +230,33 @@ class Data(object):
         item_feature = self.load_content_information(item_content_dir)
         item_feature.sort()
 
-        content_item, item_feature, content_item_value = zip(*item_feature)
-        item_feature = np.asarray(item_feature)
-        content_item_value = np.asarray(content_item_value)
+        item_content_ids, item_feature_ids, item_value = zip(*item_feature)
+        item_content_ids, item_feature_ids, item_value \
+            = np.asarray(item_content_ids), np.asarray(item_feature_ids), np.asarray(item_value)
 
-        content_item = [(i, item_dict[j]) for i, j in enumerate(content_item) if j in item_dict]
+        content_item = [(i, item_dict[j]) for i, j in enumerate(item_content_ids) if j in item_dict]
         content_item = np.asarray(content_item)
         content_ind  = content_item[:, 0]
         content_item = content_item[:, 1]
 
-        item_feature = item_feature[content_ind]
-        content_item_value = content_item_value[content_ind]
+        item_feature       = item_feature_ids[content_ind]
+        content_item_value = item_value[content_ind]
 
         user_content_dir = os.path.join(data_dir, 'Input/warm/user_features_0based.txt')
         user_feature = self.load_content_information(user_content_dir)
         user_feature.sort()
 
-        content_user, user_feature, content_user_value = zip(*user_feature)
-        user_feature = np.asarray(user_feature)
-        content_user_value = np.asarray(content_user_value)
+        user_content_ids, user_feature_ids, user_value = zip(*user_feature)
+        user_content_ids, user_feature_ids, user_value = \
+            np.asarray(user_content_ids), np.asarray(user_feature_ids), np.asarray(user_value)
 
-        content_user = [(i, user_dict[j]) for i, j in enumerate(content_user) if j in user_dict]
+        content_user = [(i, user_dict[j]) for i, j in enumerate(user_content_ids) if j in user_dict]
         content_user = np.asarray(content_user)
         content_ind  = content_user[:, 0]
         content_user = content_user[:, 1]
 
-        user_feature       = user_feature[content_ind]
-        content_user_value = content_user_value[content_ind]
+        user_feature       = user_feature_ids[content_ind]
+        content_user_value = user_value[content_ind]
 
         with h5py.File('./Input/recsys2017_warm.h5py', 'w') as data:
             # Preference matrix
@@ -408,6 +408,46 @@ class Data(object):
         item_te_usr_cold = [item_dict[i] for i in item_te_usr_cold]
 
         user_tr_usr_cold, item_tr_usr_cold, value_tr_usr_cold = [], [], []
+
+        user_content_usr_cold = [(i, user_cold_dict[j]) for i, j in enumerate(user_content_ids) if j in user_cold_dict]
+        user_content_usr_cold = np.asarray(user_content_usr_cold)
+        user_cold_ids = user_content_usr_cold[:, 0]
+        user_content_usr_cold = user_content_usr_cold[:, 1]
+        user_feature_usr_cold = user_feature_ids[user_cold_ids]
+        user_value_usr_cold   = user_value[user_cold_ids]
+
+        with h5py.File('./Input/test_user_cold.h5py', 'w') as data:
+            pref = data.create_group('pref')
+            users  = pref.create_dataset('user', np.shape(train_user), 'i')
+            items  = pref.create_dataset('item', np.shape(train_item), 'i')
+            values = pref.create_dataset('value', np.shape(train_value), 'i')
+            users[:]  = user_tr_usr_cold
+            items[:]  = item_tr_usr_cold
+            values[:] = value_tr_usr_cold
+
+            feature_con      = data.create_group('user-contents')
+            content_users    = feature_con.create_dataset('user', np.shape(train_content_ui), 'i')
+            features         = feature_con.create_dataset('feature', np.shape(train_feature), 'i')
+            contents         = feature_con.create_dataset('value', np.shape(train_content), 'f')
+            content_users[:] = user_content_usr_cold
+            features[:]      = user_feature_usr_cold
+            contents[:]      = user_value_usr_cold
+
+            labels = data.create_group('labels')
+            test_users  = labels.create_dataset('user', np.shape(user_te), 'i')
+            test_items  = labels.create_dataset('item', np.shape(item_te), 'i')
+            test_values = labels.create_dataset('value', np.shape(value_te), 'i')
+            test_users[:]  = user_te_usr_cold
+            test_items[:]  = item_te_usr_cold
+            test_values[:] = value_te_usr_cold
+
+        data_path = os.path.join(data_dir, 'Input/warm/test_cold_user_item_ids.csv')
+        test_cold_user_item_ids = np.loadtxt(data_path, dtype='int32')
+        test_cold_user_item_list = [item_dict[i] for i in test_cold_user_item_ids]
+
+        user_cold_index = h5py.File('cold_user_index.h5py', 'w')
+        test_cold_user_item_lists = user_cold_index.create_dataset('idx', np.shape(test_cold_user_item_list), 'i')
+        test_cold_user_item_lists[:] = test_cold_user_item_list
 
     def load_preference_matrix(self, data_path):
         pref = np.loadtxt(data_path, dtype='int32, int32, float32',
