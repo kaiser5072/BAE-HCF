@@ -217,8 +217,8 @@ def get_recall(ratingTest, preds, mask, n_recalls):
     preds  = np.asarray(preds)
     target = np.asarray(ratingTest)
     mask   = np.asarray(mask)
-    print(np.sort(preds[0, :])[::-1][:100])
-    print(np.sort(preds[0, :] * target[0, :])[::-1])
+    # print(np.sort(preds)[::-1][:100])
+    # print(np.sort(preds[0, :] * target[0, :])[::-1])
 
     preds       = preds * (1-mask) - 100 * mask
     # non_zero_idx = np.sum(target, axis=1) != 0
