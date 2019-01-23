@@ -180,26 +180,24 @@ def predict(infer_func, params):
         max_user = 40000
         preds, ratingTest = np.zeros((max_user, len(item_idx))), np.zeros((max_user, len(item_idx)), dtype=np.int8)
         mask = np.zeros((max_user, len(item_idx)), dtype=np.int8)
-        recall = []
         with tqdm.tqdm(total=height) as pbar:
             for i, pred in enumerate(eval_result):
                 _pred = pred['preds'][item_idx]
                 _target = pred['ratingTest'][item_idx]
                 _mask = pred['ratingTrain'][item_idx]
 
-                # preds[i, :] = _pred
-                # ratingTest[i, :] = _target
-                # mask[i, :] = _mask
-
-                if np.sum(_mask) != 0:
-                    recall.append(get_recall(_target, _pred, _mask, 100))
+                preds[i, :] = _pred
+                ratingTest[i, :] = _target
+                mask[i, :] = _mask
                 pbar.update(1)
 
                 if i >= max_user-1:
                     break
 
-
-        print("\n [*] RECALL: %.4f" % np.average(recall))
+        print('\n')
+        for k in np.arange(50, 550, 50):
+            recall = get_recall(ratingTest, preds, mask, k)
+            print("[*] RECALL@%d: %.4f" % (k, recall))
 
     except KeyboardInterrupt:
         print("Keyboard interrupt")
@@ -217,26 +215,26 @@ def get_recall(ratingTest, preds, mask, n_recalls):
     preds  = np.asarray(preds)
     target = np.asarray(ratingTest)
     mask   = np.asarray(mask)
-    # print(np.sort(preds)[::-1][:100])
-    # print(np.sort(preds[0, :] * target[0, :])[::-1])
+    print(np.sort(preds[0, :])[::-1][:100])
+    print(np.sort(preds[0, :] * target[0, :])[::-1])
 
     preds       = preds * (1-mask) - 100 * mask
-    # non_zero_idx = np.sum(target, axis=1) != 0
+    non_zero_idx = np.sum(target, axis=1) != 0
     #
-    # pred_user_interest   = preds[non_zero_idx, :]
-    # target_user_interest = target[non_zero_idx, :]
+    pred_user_interest   = preds[non_zero_idx, :]
+    target_user_interest = target[non_zero_idx, :]
 
     # pred_user_interest = pred_user_interest * test_mask + (1 - test_mask) * (-100)
-    pred_user_interest = get_order_array(preds)
+    pred_user_interest = get_order_array(pred_user_interest)
     pred_user_interest = pred_user_interest <= n_recalls
 
-    match_interest  = pred_user_interest * target
-    num_match       = np.sum(match_interest, dtype=np.float32)
-    num_interest    = np.sum(target, dtype=np.float32)
+    match_interest  = pred_user_interest * target_user_interest
+    num_match       = np.sum(match_interest, axis=1, dtype=np.float32)
+    num_interest    = np.sum(target_user_interest, axis=1, dtype=np.float32)
 
     user_recall = num_match / num_interest
-    # recall = np.average(user_recall)
-    return user_recall
+    recall = np.average(user_recall)
+    return recall
 
 def get_order_array(list):
     order = np.empty(list.shape, dtype=int)
