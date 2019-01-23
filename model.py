@@ -31,10 +31,13 @@ class AE_CF(object):
         self.dtype = tf.float16 if params['precision'] == 'fp16' else tf.float32
         self.n_layer = len(self.dims) - 1
 
-    def builder(self, inputs, sides, drops_inputs):
+    def builder(self, inputs, sides, drops_inputs, is_training):
         w_init = tf.initializers.truncated_normal(stddev=0.001)
         b_init = tf.constant_initializer(0.)
-        h = drops_inputs
+        if is_training:
+            h = drops_inputs
+        else:
+            h = inputs
         
         prev_dim = self.dims[0]
         for i in range(1, self.n_layer):
@@ -53,18 +56,12 @@ class AE_CF(object):
                                                 dtype=self.dtype)
 
             if i == 1 and self.n_layer != 2:
-                # if np.random.uniform(0, 1, 1) < 0.5:
                 h = tf.sparse.matmul(inputs, w) + tf.sparse.matmul(sides, s)
-                # else:
-                #     h = b + tf.sparse.matmul(sides, s)
                 h = tf.layers.batch_normalization(h)
                 h = tf.nn.relu(h)
 
             elif self.n_layer == 2:
-                # if np.random.uniform(0, 1, 1) < 0.5:
                 h = tf.sparse.matmul(inputs, w) + tf.sparse.matmul(sides, s)
-                # else:
-                #     h = b + tf.sparse.matmul(sides, s)
                 h = tf.layers.batch_normalization(h)
                 h = tf.nn.tanh(h)
 
@@ -169,7 +166,7 @@ class AE_CF(object):
             sides        = tf.cast(sides, self.dtype)
             drops_inputs = tf.cast(drops_inputs, self.dtype)
 
-            self.builder(inputs, sides, drops_inputs)
+            self.builder(inputs, sides, drops_inputs, is_training)
 
         if mode == tf.estimator.ModeKeys.PREDICT:
             predictions = {
