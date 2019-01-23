@@ -418,25 +418,25 @@ class Data(object):
 
         with h5py.File('./Input/test_user_cold.h5py', 'w') as data:
             pref = data.create_group('pref')
-            users  = pref.create_dataset('user', np.shape(train_user), 'i')
-            items  = pref.create_dataset('item', np.shape(train_item), 'i')
-            values = pref.create_dataset('value', np.shape(train_value), 'i')
+            users  = pref.create_dataset('user', np.shape(user_tr_usr_cold), 'i')
+            items  = pref.create_dataset('item', np.shape(item_tr_usr_cold), 'i')
+            values = pref.create_dataset('value', np.shape(value_tr_usr_cold), 'i')
             users[:]  = user_tr_usr_cold
             items[:]  = item_tr_usr_cold
             values[:] = value_tr_usr_cold
 
             feature_con      = data.create_group('user-contents')
-            content_users    = feature_con.create_dataset('user', np.shape(train_content_ui), 'i')
-            features         = feature_con.create_dataset('feature', np.shape(train_feature), 'i')
-            contents         = feature_con.create_dataset('value', np.shape(train_content), 'f')
+            content_users    = feature_con.create_dataset('user', np.shape(user_content_usr_cold), 'i')
+            features         = feature_con.create_dataset('feature', np.shape(user_feature_usr_cold), 'i')
+            contents         = feature_con.create_dataset('value', np.shape(user_value_usr_cold), 'f')
             content_users[:] = user_content_usr_cold
             features[:]      = user_feature_usr_cold
             contents[:]      = user_value_usr_cold
 
             labels = data.create_group('labels')
-            test_users  = labels.create_dataset('user', np.shape(user_te), 'i')
-            test_items  = labels.create_dataset('item', np.shape(item_te), 'i')
-            test_values = labels.create_dataset('value', np.shape(value_te), 'i')
+            test_users  = labels.create_dataset('user', np.shape(user_te_usr_cold), 'i')
+            test_items  = labels.create_dataset('item', np.shape(item_te_usr_cold), 'i')
+            test_values = labels.create_dataset('value', np.shape(value_te_usr_cold), 'i')
             test_users[:]  = user_te_usr_cold
             test_items[:]  = item_te_usr_cold
             test_values[:] = value_te_usr_cold
