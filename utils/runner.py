@@ -195,8 +195,9 @@ def predict(infer_func, params):
                     break
 
         print('\n')
-        for k in np.arange(50, 550, 50):
-            recall = get_recall(ratingTest, preds, mask, k)
+        recalls = get_recall(ratingTest, preds, mask, np.arange(50, 550, 50))
+
+        for k, recall in zip(np.arange(50, 550, 50), recalls):
             print("[*] RECALL@%d: %.4f" % (k, recall))
 
     except KeyboardInterrupt:
@@ -221,19 +222,23 @@ def get_recall(ratingTest, preds, mask, n_recalls):
     preds       = preds * (1-mask) - 100 * mask
     non_zero_idx = np.sum(target, axis=1) != 0
     #
-    pred_user_interest   = preds[non_zero_idx, :]
-    target_user_interest = target[non_zero_idx, :]
+    preds   = preds[non_zero_idx, :]
+    target  = target[non_zero_idx, :]
 
     # pred_user_interest = pred_user_interest * test_mask + (1 - test_mask) * (-100)
-    pred_user_interest = get_order_array(pred_user_interest)
-    pred_user_interest = pred_user_interest <= n_recalls
+    preds = get_order_array(preds)
 
-    match_interest  = pred_user_interest * target_user_interest
-    num_match       = np.sum(match_interest, axis=1, dtype=np.float32)
-    num_interest    = np.sum(target_user_interest, axis=1, dtype=np.float32)
+    recall = []
+    for i in n_recalls:
+        pred_user_interest = preds <= i
 
-    user_recall = num_match / num_interest
-    recall = np.average(user_recall)
+        match_interest  = pred_user_interest * target
+        num_match       = np.sum(match_interest, axis=1, dtype=np.float32)
+        num_interest    = np.sum(target, axis=1, dtype=np.float32)
+
+        user_recall = num_match / num_interest
+        recall.append(np.average(user_recall))
+
     return recall
 
 def get_order_array(list):
