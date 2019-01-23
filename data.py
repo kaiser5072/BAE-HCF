@@ -99,7 +99,7 @@ class Data(object):
             pref_te = data['labels']['value'][:]
 
             self.height = np.max(row_te) + 1
-            self.width = np.max(col_te) + 1
+            self.width = 495602
             self.n_contents = np.max(feature) + 1
 
             return (row, column, pref, item, feature, contents, row_te, col_te, pref_te)
