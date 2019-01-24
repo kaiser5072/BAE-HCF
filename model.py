@@ -35,7 +35,7 @@ class AE_CF(object):
         w_init = tf.initializers.truncated_normal(stddev=0.001)
         b_init = tf.constant_initializer(0.)
         if is_training:
-            h = inputs
+            h = drops_inputs
         else:
             h = inputs
         
