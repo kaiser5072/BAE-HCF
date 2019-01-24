@@ -58,7 +58,7 @@ def train(infer_func, params):
     checkpoints_secs = params['checkpoints_secs']
 
     decay_steps = n_epochs // 10
-    nstep = display_step * height // batch_size
+    nstep = display_step# * height // batch_size
     nupdate = n_epochs * height // batch_size
 
     config = tf.ConfigProto()
