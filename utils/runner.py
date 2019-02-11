@@ -152,7 +152,7 @@ def predict(infer_func, params):
     config.intra_op_parallelism_threads = 1
     config.inter_op_parallelism_threads = 32
 
-    warm_idx = h5py.File('user_cold_index.h5py', 'r')
+    warm_idx = h5py.File('cold_user_index.h5py', 'r')
     item_idx = warm_idx['idx']
 
     est = tf.estimator.Estimator(
