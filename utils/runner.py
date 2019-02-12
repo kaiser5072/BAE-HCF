@@ -177,7 +177,7 @@ def predict(infer_func, params):
         eval_result = est.predict(
             input_fn=input_func)
 
-        max_user = 80000
+        max_user = 40000
         preds, ratingTest = np.zeros((max_user, len(item_idx))), np.zeros((max_user, len(item_idx)), dtype=np.int8)
         mask = np.zeros((max_user, len(item_idx)), dtype=np.int8)
         with tqdm.tqdm(total=height) as pbar:
@@ -214,13 +214,13 @@ def get_recall(ratingTest, preds, mask, n_recalls):
     # target      = np.transpose(ratingTest)
     # mask        = np.transpose(mask)
     preds  = np.asarray(preds)
-    target = np.asarray(ratingTest)
+    target = np.asarray(mask)
     mask   = np.asarray(mask)
     print(np.sum(mask))
     print(np.sort(preds[0, :])[::-1][:100])
     print(np.sort(preds[0, :] * target[0, :])[::-1])
 
-    preds       = preds * (1-mask) - 100 * mask
+    # preds       = preds * (1-mask) - 100 * mask
     non_zero_idx = np.sum(target, axis=1) != 0
     #
     preds   = preds[non_zero_idx, :]
