@@ -22,8 +22,6 @@ class AE_CF(object):
         self.batch_size    = params['batch_size']
         self.lr_init       = params['lr']
         self.l2_lambda     = params['l2_lambda']
-        self.rank          = params['rank']
-        self.eps           = params['eps']
         self.device        = params['device']
         self.log_dir       = params['log_dir']
         self.prefetch_size = params['prefetch_size']
