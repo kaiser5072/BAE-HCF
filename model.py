@@ -92,7 +92,7 @@ class AE_CF(object):
             end_learning_rate= 1000)
 
         pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
-        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - inputs.values)) * 100
+        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - inputs.values)) * 500
 
         self.loss = tf.add_n([pref_diff_zero, pref_diff_ones]) / (self.height * self.width)
         self.loss = tf.identity(self.loss, name='loss')
@@ -152,7 +152,7 @@ class AE_CF(object):
         inputs = tf.SparseTensor(indices, values, dense_shape)
         sides  = tf.SparseTensor(indices_s, values_s, dense_shape_s)
 
-        drops_row = np.random.choice(self.height, self.height/2, replace=False)
+        drops_row = np.random.choice(self.height, self.height/4*3, replace=False)
         drops_points  = tf.where(tf.reduce_sum(tf.cast(tf.equal(tf.reshape(inputs.indices[:, 0], [-1, 1]), drops_row), dtype=tf.int8), axis=1))
         drops_indices = tf.gather(inputs.indices, tf.reshape(drops_points, [-1]))
         drops_value   = tf.gather(inputs.values, tf.reshape(drops_points, [-1]))
