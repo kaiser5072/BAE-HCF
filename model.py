@@ -57,6 +57,7 @@ class AE_CF(object):
                 h = tf.sparse.matmul(h, w) + tf.sparse.matmul(sides, s)
                 h = tf.layers.batch_normalization(h)
                 h = tf.nn.relu(h)
+                h = tf.nn.dropout(h, keep_prob=self.drop_rate)
 
             elif self.n_layer == 2:
                 h = tf.sparse.matmul(h, w) + tf.sparse.matmul(sides, s)
@@ -72,6 +73,7 @@ class AE_CF(object):
                 h = tf.matmul(h, w) + tf.sparse.matmul(sides, s)
                 h = tf.layers.batch_normalization(h)
                 h = tf.nn.relu(h)
+                h = tf.nn.dropout(h, keep_prob=self.drop_rate)
 
             prev_dim = h.get_shape()[1]
 
@@ -92,7 +94,7 @@ class AE_CF(object):
             end_learning_rate= 1000)
 
         pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
-        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - inputs.values)) * 700
+        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - inputs.values)) * 500
 
         self.loss = tf.add_n([pref_diff_zero, pref_diff_ones]) / (self.height * self.width)
         self.loss = tf.identity(self.loss, name='loss')

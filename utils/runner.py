@@ -70,7 +70,7 @@ def train(infer_func, params):
         params={
             'height': params['batch_size'],
             'width':  params['width'],
-            'drop_rate': 1
+            'drop_rate': 0.5
         },
         config=tf.estimator.RunConfig(
             session_config=config,
