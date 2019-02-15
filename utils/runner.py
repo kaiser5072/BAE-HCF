@@ -196,9 +196,10 @@ def predict(infer_func, params):
                     break
 
         print('\n')
-        target = csr_matrix(target)
-        mask   = csr_matrix(mask)
-        recalls = get_recall(target, preds, mask, np.arange(50, 550, 50))
+        targets = csr_matrix(target)
+        masks   = csr_matrix(mask)
+        del target, mask
+        recalls = get_recall(targets, preds, masks, np.arange(50, 550, 50))
 
         for k, recall in zip(np.arange(50, 550, 50), recalls):
             print("[*] RECALL@%d: %.4f" % (k, recall))
