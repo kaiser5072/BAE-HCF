@@ -7,6 +7,7 @@ import time
 import utils
 import os
 
+from scipy.sparse import csr_matrix
 from scipy.stats import rankdata
 
 class _PrefillStagingAreasHook(tf.train.SessionRunHook):
@@ -178,7 +179,7 @@ def predict(infer_func, params):
             input_fn=input_func)
 
         max_user = np.min((height, 80000))
-        preds, ratingTest = np.zeros((max_user, len(item_idx))), np.zeros((max_user, len(item_idx)), dtype=np.int8)
+        preds, target = np.zeros((max_user, len(item_idx))), np.zeros((max_user, len(item_idx)), dtype=np.int8)
         mask = np.zeros((max_user, len(item_idx)), dtype=np.int8)
         with tqdm.tqdm(total=height) as pbar:
             for i, pred in enumerate(eval_result):
@@ -187,7 +188,7 @@ def predict(infer_func, params):
                 _mask = pred['ratingTrain'][item_idx]
 
                 preds[i, :] = _pred
-                ratingTest[i, :] = _target
+                target[i, :] = _target
                 mask[i, :] = _mask
                 pbar.update(1)
 
@@ -195,7 +196,8 @@ def predict(infer_func, params):
                     break
 
         print('\n')
-        recalls = get_recall(ratingTest, preds, mask, np.arange(50, 550, 50))
+        target = csr_matrix(target)
+        recalls = get_recall(target, preds, mask, np.arange(50, 550, 50))
 
         for k, recall in zip(np.arange(50, 550, 50), recalls):
             print("[*] RECALL@%d: %.4f" % (k, recall))
@@ -204,7 +206,7 @@ def predict(infer_func, params):
         print("Keyboard interrupt")
 
 
-def get_recall(ratingTest, preds, mask, n_recalls):
+def get_recall(target, preds, mask, n_recalls):
     # ratingTest[:, [1, 0]] = ratingTest[:, [0, 1]]
 
 
@@ -214,19 +216,16 @@ def get_recall(ratingTest, preds, mask, n_recalls):
     # target      = np.transpose(ratingTest)
     # mask        = np.transpose(mask)
     preds  = np.asarray(preds)
-    target = np.asarray(ratingTest)
     mask   = np.asarray(mask)
-    print(np.sum(mask))
     print(np.sort(preds[0, :])[::-1][:100])
-    print(np.sort(preds[0, :] * target[0, :])[::-1])
+    print(np.sort(preds[0, :] * target[0].toarray()[0])[::-1])
 
     preds       = preds * (1-mask) - 100 * mask
-
-    del mask
-    non_zero_idx = np.sum(target, axis=1) != 0
+    non_zero_idx = np.asarray(target.sum(axis=1)).flatten() != 0
     #
+    del mask
     preds   = preds[non_zero_idx, :]
-    target  = target[non_zero_idx, :]
+    target  = target[non_zero_idx]
 
     # pred_user_interest = pred_user_interest * test_mask + (1 - test_mask) * (-100)
     preds = get_order_array(preds)
@@ -235,9 +234,9 @@ def get_recall(ratingTest, preds, mask, n_recalls):
     for i in n_recalls:
         pred_user_interest = preds <= i
 
-        match_interest  = pred_user_interest * target
+        match_interest  = target.multiply(pred_user_interest)
         num_match       = np.sum(match_interest, axis=1, dtype=np.float32)
-        num_interest    = np.sum(target, axis=1, dtype=np.float32)
+        num_interest    = target.sum(axis=1)
 
         user_recall = num_match / num_interest
         recall.append(np.average(user_recall))
