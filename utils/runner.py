@@ -178,7 +178,7 @@ def predict(infer_func, params):
         eval_result = est.predict(
             input_fn=input_func)
 
-        max_user = np.min((height, 80000))
+        max_user = np.min((height, 800000))
         preds, target = np.zeros((max_user, len(item_idx))), np.zeros((max_user, len(item_idx)), dtype=np.int8)
         mask = np.zeros((max_user, len(item_idx)), dtype=np.int8)
         with tqdm.tqdm(total=height) as pbar:
