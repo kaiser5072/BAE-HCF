@@ -198,7 +198,7 @@ def predict(infer_func, params):
         print('\n')
         targets = csr_matrix(target)
         masks   = csr_matrix(mask)
-        del target, mask
+        del target, mask, eval_result
         recalls = get_recall(targets, preds, masks, np.arange(50, 550, 50))
 
         for k, recall in zip(np.arange(50, 550, 50), recalls):
