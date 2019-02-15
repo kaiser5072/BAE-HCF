@@ -197,6 +197,7 @@ def predict(infer_func, params):
 
         print('\n')
         target = csr_matrix(target)
+        mask   = csr_matrix(mask)
         recalls = get_recall(target, preds, mask, np.arange(50, 550, 50))
 
         for k, recall in zip(np.arange(50, 550, 50), recalls):
@@ -216,7 +217,7 @@ def get_recall(target, preds, mask, n_recalls):
     # target      = np.transpose(ratingTest)
     # mask        = np.transpose(mask)
     preds  = np.asarray(preds)
-    mask   = np.asarray(mask)
+    mask   = mask.toarray()
     print(np.sort(preds[0, :])[::-1][:100])
     print(np.sort(preds[0, :] * target[0].toarray()[0])[::-1])
 
