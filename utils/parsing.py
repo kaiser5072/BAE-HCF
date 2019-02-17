@@ -72,6 +72,12 @@ def parse_args(init_vals, custom_parser=None):
                    required=_required(init_vals, 'display_every'),
                    help='How often to print out information')
 
+    p.add_argument('--test_mode', choices=['warm', 'cold_user', 'cold_item'],
+                   default=_default(init_vals, 'test_mode'),
+                   required=_required(init_vals, 'test_mode'),
+                   help="""Select the test mode for estimator 
+                   in terms of warm, cold_user and cold item""")
+
 
     FLAGS, unknown_args = p.parse_known_args()
     if len(unknown_args) > 0:
@@ -102,6 +108,8 @@ def parse_args(init_vals, custom_parser=None):
     del FLAGS.dims
     vals['mode'] = FLAGS.mode
     del FLAGS.mode
+    vals['test_mode'] = FLAGS.test_mode
+    del FLAGS.test_mode
 
 
     return vals, FLAGS

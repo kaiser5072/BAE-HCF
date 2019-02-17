@@ -2,6 +2,7 @@ from .runner import train, validate, predict
 from .preprocessing import data_set
 from .parsing import parse_args
 from .misc import get_logger, Option
+from .eval import get_eval
 
 import tensorflow as tf
 import os, sys

@@ -155,8 +155,13 @@ def predict(infer_func, params):
     config.intra_op_parallelism_threads = 1
     config.inter_op_parallelism_threads = 32
 
-    warm_idx = h5py.File('warm_index.h5py', 'r')
-    item_idx = warm_idx['idx']
+    if params['test_mode'] == 'warm':
+        test_idx = h5py.File('warm_index.h5py', 'r')
+    elif params['test_mode'] == 'cold_user':
+        test_idx = h5py.File('cold_user_index.h5py', 'r')
+    else:
+        test_idx = h5py.File('cold_item_index.h5py', 'r')
+    item_idx = test_idx['idx']
 
     est = tf.estimator.Estimator(
         model_fn=infer_func._BAE_model_fn,
@@ -181,75 +186,64 @@ def predict(infer_func, params):
             input_fn=input_func)
 
         max_user = np.min((height, 100000))
-        preds, target = np.zeros((max_user, len(item_idx))), np.zeros((max_user, len(item_idx)), dtype=np.int8)
-        mask = np.zeros((max_user, len(item_idx)), dtype=np.int8)
+        preds = np.zeros((max_user, len(item_idx)))
         with tqdm.tqdm(total=height) as pbar:
             for i, pred in enumerate(eval_result):
                 _pred = pred['preds'][item_idx]
-                _target = pred['ratingTest'][item_idx]
-                _mask = pred['ratingTrain'][item_idx]
 
                 preds[i, :] = _pred
-                target[i, :] = _target
-                mask[i, :] = _mask
                 pbar.update(1)
 
                 if i >= max_user-1:
                     break
 
         print('\n')
-        targets = csr_matrix(target)
-        masks   = csr_matrix(mask)
-        del target, mask, eval_result
-        recalls = get_recall(targets, preds, masks, np.arange(50, 550, 50))
 
-        for k, recall in zip(np.arange(50, 550, 50), recalls):
-            print("[*] RECALL@%d: %.4f" % (k, recall))
 
     except KeyboardInterrupt:
         print("Keyboard interrupt")
 
 
-def get_recall(target, preds, mask, n_recalls):
-    # ratingTest[:, [1, 0]] = ratingTest[:, [0, 1]]
-
-
-    # temp = np.zeros((16980, 5551))
-    # temp[(ratingTest[:, 0], ratingTest[:, 1])] = 1
-    # preds       = np.transpose(preds)
-    # target      = np.transpose(ratingTest)
-    # mask        = np.transpose(mask)
-    preds  = np.asarray(preds)
-    mask   = mask.toarray()
-    print(np.sort(preds[0, :])[::-1][:100])
-    print(np.sort(preds[0, :] * target[0].toarray()[0])[::-1])
-
-    preds       = preds * (1-mask) - 100 * mask
-    non_zero_idx = np.asarray(target.sum(axis=1)).flatten() != 0
-    #
-    del mask
-    preds   = preds[non_zero_idx, :]
-    target  = target[non_zero_idx]
-
-    # pred_user_interest = pred_user_interest * test_mask + (1 - test_mask) * (-100)
-    preds = get_order_array(preds)
-
-    recall = []
-    for i in n_recalls:
-        pred_user_interest = preds <= i
-
-        match_interest  = target.multiply(pred_user_interest)
-        num_match       = np.sum(match_interest, axis=1, dtype=np.float32)
-        num_interest    = target.sum(axis=1)
-
-        user_recall = num_match / num_interest
-        recall.append(np.average(user_recall))
-
-    return recall
-
-def get_order_array(list):
-    order = np.empty(list.shape, dtype=int)
-    for k, row in enumerate(list):
-        order[k] = rankdata(-row, method='ordinal') - 1
-
-    return order
+# def get_recall(target, preds, mask, n_recalls):
+#     # ratingTest[:, [1, 0]] = ratingTest[:, [0, 1]]
+#
+#
+#     # temp = np.zeros((16980, 5551))
+#     # temp[(ratingTest[:, 0], ratingTest[:, 1])] = 1
+#     # preds       = np.transpose(preds)
+#     # target      = np.transpose(ratingTest)
+#     # mask        = np.transpose(mask)
+#     preds  = np.asarray(preds)
+#     mask   = mask.toarray()
+#     print(np.sort(preds[0, :])[::-1][:100])
+#     print(np.sort(preds[0, :] * target[0].toarray()[0])[::-1])
+#
+#     preds       = preds * (1-mask) - 100 * mask
+#     non_zero_idx = np.asarray(target.sum(axis=1)).flatten() != 0
+#     #
+#     del mask
+#     preds   = preds[non_zero_idx, :]
+#     target  = target[non_zero_idx]
+#
+#     # pred_user_interest = pred_user_interest * test_mask + (1 - test_mask) * (-100)
+#     preds = get_order_array(preds)
+#
+#     recall = []
+#     for i in n_recalls:
+#         pred_user_interest = preds <= i
+#
+#         match_interest  = target.multiply(pred_user_interest)
+#         num_match       = np.sum(match_interest, axis=1, dtype=np.float32)
+#         num_interest    = target.sum(axis=1)
+#
+#         user_recall = num_match / num_interest
+#         recall.append(np.average(user_recall))
+#
+#     return recall
+#
+# def get_order_array(list):
+#     order = np.empty(list.shape, dtype=int)
+#     for k, row in enumerate(list):
+#         order[k] = rankdata(-row, method='ordinal') - 1
+#
+#     return order

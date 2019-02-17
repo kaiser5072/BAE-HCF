@@ -14,6 +14,7 @@ utils.init()
 
 default_args = {
     'mode': 'train',
+    'test_mode': 'warm',
     'batch_size': 1024,
     'lr': 1e-3,
     'precision': 'fp32',
@@ -96,9 +97,14 @@ def evaluate(args):
 
 def predict(args):
     if args['model_dir'] is not None:
+        meta_path = os.path.join(args['data_dir'], 'meta')
+        meta = cPickle.loads(open(meta_path).read())
+
         args = _get_input(args)
         BEA = model.AE_CF(args)
-        _ = utils.predict(BEA, args)
+        preds = utils.predict(BEA, args)
+
+        utils.get_eval(preds, args['test_mode'], meta)
         BEA.destroy_graph()
 
 if args['mode'] == 'train':
