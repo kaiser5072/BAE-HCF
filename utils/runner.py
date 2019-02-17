@@ -193,9 +193,6 @@ def predict(infer_func, params):
                 preds[i, :] = _pred
                 pbar.update(1)
 
-                if i >= max_user-1:
-                    break
-
         print('\n')
         return preds
 
