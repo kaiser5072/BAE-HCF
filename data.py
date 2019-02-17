@@ -222,7 +222,7 @@ class Data(object):
         item_based_data, item_test_dict, _ = self.get_train_for_test(self.item_warm_te, test_warm_item_list, item_te_tr, user_te_tr, value_te_tr,
                                                                   self.item_content, self.item_feature, self.item_value, 'item')
 
-        user_based_data, user_test_dict, _ = self.get_train_for_test(self.user_warm_te, test_warm_item_list, user_te_tr, item_te_tr, value_te_tr,
+        user_based_data, user_test_dict, user_list_warm = self.get_train_for_test(self.user_warm_te, test_warm_item_list, user_te_tr, item_te_tr, value_te_tr,
                                                                   self.user_content, self.user_feature, self.user_value, 'user')
 
         mask_warm = self.get_mask_for_test(item_test_dict, user_test_dict, user_te_tr, item_te_tr, value_te_tr)
@@ -273,7 +273,7 @@ class Data(object):
         meta_fout.close()
 
         ## Test item index for evaluating
-        self.save_index(user_list, item_dict)
+        self.save_index(user_list, item_dict, user_list_warm)
 
     def load_preference_matrix(self, data_path):
         pref = np.loadtxt(data_path, dtype='int32, int32, float32',
@@ -531,14 +531,16 @@ class Data(object):
             x = group.create_dataset(i, np.shape(j), dtype)
             x[:] = j
 
-    def save_index(self, user_list, item_dict):
+    def save_index(self, user_list, item_dict, user_list_warm):
         data_path = os.path.join('./Input/recsys', 'test_warm_item_ids.csv')
         test_warm_item_ids  = np.loadtxt(data_path, dtype='int32')
         test_warm_item_list = [item_dict[i] for i in test_warm_item_ids]
 
         warm_index = h5py.File('warm_index.h5py', 'w')
         test_warm_item_lists = warm_index.create_dataset('idx', np.shape(test_warm_item_list), 'i')
+        test_warm_user_lists = warm_index.create_dataset('user_idx', np.shape(user_list_warm), 'i')
         test_warm_item_lists[:] = test_warm_item_list
+        test_warm_user_lists[:] = user_list_warm
 
         data_path = os.path.join('./Input/recsys', 'test_cold_user_item_ids.csv')
         test_cold_user_item_ids  = np.loadtxt(data_path, dtype='int32')

@@ -47,9 +47,7 @@ def get_recall(target, preds, mask, n_recalls):
     print(np.sort(preds[0, :] * target[0].toarray()[0])[::-1])
 
     preds       = preds * (1-mask) - 100 * mask
-    print(np.asarray(target.sum(axis=1)).flatten())
     non_zero_idx = np.asarray(target.sum(axis=1)).flatten() != 0
-    print(non_zero_idx)
     #
     del mask
     preds   = preds[non_zero_idx, :]
