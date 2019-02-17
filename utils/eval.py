@@ -29,7 +29,7 @@ def get_eval(preds, mode, meta):
     target=target[0:max_user]
     preds=preds[0:max_user, :]
     mask=mask[0:max_user]
-    recalls = get_recall(mask, preds, mask, np.arange(50, 550, 50))
+    recalls = get_recall(target, preds, mask, np.arange(50, 550, 50))
 
     for k, recall in zip(np.arange(50, 550, 50), recalls):
         print("[*] RECALL@%d: %.4f" % (k, recall))
@@ -50,7 +50,7 @@ def get_recall(target, preds, mask, n_recalls):
     print(np.sort(preds[0, :])[::-1][:100])
     print(np.sort(preds[0, :] * target[0].toarray()[0])[::-1])
 
-    # preds       = preds * (1-mask) - 100 * mask
+    preds       = preds * (1-mask) - 100 * mask
     non_zero_idx = np.asarray(target.sum(axis=1)).flatten() != 0
     #
     del mask
