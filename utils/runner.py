@@ -185,8 +185,7 @@ def predict(infer_func, params):
         eval_result = est.predict(
             input_fn=input_func)
 
-        max_user = np.min((height, 100000))
-        preds = np.zeros((max_user, len(item_idx)))
+        preds = np.zeros((height, len(item_idx)))
         with tqdm.tqdm(total=height) as pbar:
             for i, pred in enumerate(eval_result):
                 _pred = pred['preds'][item_idx]
