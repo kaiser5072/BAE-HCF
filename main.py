@@ -103,6 +103,8 @@ def predict(args):
         args = _get_input(args)
         BEA = model.AE_CF(args)
         preds = utils.predict(BEA, args)
+        if args['AE_TYPE'] == 'item':
+            preds = np.transpose(preds)
 
         utils.get_eval(preds, args['test_mode'], meta)
         BEA.destroy_graph()
