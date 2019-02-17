@@ -219,10 +219,10 @@ class Data(object):
         self.remove_duplicate_test(user_dict, item_dict)
         user_te_tr, item_te_tr, value_te_tr = np.asarray(self.user), np.asarray(self.item), np.asarray(self.value)
 
-        item_based_data, item_test_dict = self.get_train_for_test(self.item_warm_te, test_warm_item_list, item_te_tr, user_te_tr, value_te_tr,
+        item_based_data, item_test_dict, _ = self.get_train_for_test(self.item_warm_te, test_warm_item_list, item_te_tr, user_te_tr, value_te_tr,
                                                                   self.item_content, self.item_feature, self.item_value, 'item')
 
-        user_based_data, user_test_dict = self.get_train_for_test(self.user_warm_te, test_warm_item_list, user_te_tr, item_te_tr, value_te_tr,
+        user_based_data, user_test_dict, _ = self.get_train_for_test(self.user_warm_te, test_warm_item_list, user_te_tr, item_te_tr, value_te_tr,
                                                                   self.user_content, self.user_feature, self.user_value, 'user')
 
         mask_warm = self.get_mask_for_test(item_test_dict, user_test_dict, user_te_tr, item_te_tr, value_te_tr)
@@ -239,7 +239,7 @@ class Data(object):
         user_based_data_cold_user \
             = self.get_contents_for_cold(user_dict_cold_user, user_content_ids, user_feature_ids, user_content_value, self.user_te_usr_cold)
 
-        item_based_data_cold_user, _ = self.get_train_for_test(self.item_te_usr_cold, test_cold_user_item_list, item_te_tr, user_te_tr, value_te_tr,
+        item_based_data_cold_user, _, _ = self.get_train_for_test(self.item_te_usr_cold, test_cold_user_item_list, item_te_tr, user_te_tr, value_te_tr,
                                                                                  self.item_content, self.item_feature, self.item_value, 'item')
         mask_cold_user = ([], [], [])
 
@@ -257,7 +257,7 @@ class Data(object):
             = self.get_contents_for_cold(item_dict_cold_item, item_content_ids, item_feature_ids, item_content_value, self.item_te_itm_cold)
 
 
-        user_based_data_cold_item, _ = self.get_train_for_test(self.user_te_itm_cold, _, user_te_tr, item_te_tr, value_te_tr,
+        user_based_data_cold_item, _, user_list = self.get_train_for_test(self.user_te_itm_cold, _, user_te_tr, item_te_tr, value_te_tr,
                                                                self.user_content, self.user_feature, self.user_value, 'user')
 
         mask_cold_item = ([], [], [])
@@ -273,6 +273,7 @@ class Data(object):
         meta_fout.close()
 
         ## Test item index for evaluating
+        self.save_index(user_list, item_dict)
 
     def load_preference_matrix(self, data_path):
         pref = np.loadtxt(data_path, dtype='int32, int32, float32',
@@ -403,7 +404,7 @@ class Data(object):
         features_tr = features[train_content_ind]
         values_tr   = contents_values[train_content_ind]
 
-        return (ids_tr, target_tr, value_tr, contents_tr, features_tr, values_tr, warm_test), test_dict
+        return (ids_tr, target_tr, value_tr, contents_tr, features_tr, values_tr, warm_test), test_dict, test_list
 
     def get_mask_for_test(self, item_test_dict, user_test_dict, user, item, value):
         item_ids = [(i, item_test_dict[j]) for i, j in enumerate(item) if j in item_test_dict]
@@ -530,6 +531,26 @@ class Data(object):
             x = group.create_dataset(i, np.shape(j), dtype)
             x[:] = j
 
+    def save_index(self, user_list, item_dict):
+        data_path = os.path.join('./Input/recsys', 'test_warm_item_ids.csv')
+        test_warm_item_ids  = np.loadtxt(data_path, dtype='int32')
+        test_warm_item_list = [item_dict[i] for i in test_warm_item_ids]
+
+        warm_index = h5py.File('warm_index.h5py', 'w')
+        test_warm_item_lists = warm_index.create_dataset('idx', np.shape(test_warm_item_list), 'i')
+        test_warm_item_lists[:] = test_warm_item_list
+
+        data_path = os.path.join('./Input/recsys', 'test_cold_user_item_ids.csv')
+        test_cold_user_item_ids  = np.loadtxt(data_path, dtype='int32')
+        test_cold_user_item_list = [item_dict[i] for i in test_cold_user_item_ids]
+
+        cold_user_index = h5py.File('cold_user_index.h5py', 'w')
+        test_cold_user_item_lists = cold_user_index.create_dataset('idx', np.shape(test_cold_user_item_list), 'i')
+        test_cold_user_item_lists[:] = test_cold_user_item_list
+
+        cold_item_index = h5py.File('cold_item_index.h5py', 'w')
+        test_cold_item_user_lists = cold_item_index.create_dataset('idx', np.shape(user_list), 'i')
+        test_cold_item_user_lists[:] = user_list
 
 if __name__ == '__main__':
     data = Data()
