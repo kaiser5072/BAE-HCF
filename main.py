@@ -52,11 +52,11 @@ def _get_input(args):
 
     if args['AE_TYPE'] == 'item':
         args['height']     = meta['n_item_height']
-        args['width']      = meta2['user']
+        args['width']      = meta2['n_user']
         args['n_features'] = meta['n_content_item']
     else:
         args['height']     = meta['n_user_height']
-        args['width']      = meta2['item']
+        args['width']      = meta2['n_item']
         args['n_features'] = meta['n_content_user']
 
     print("[*] Input shape: %d x %d" % (args['height'], args['width']))
