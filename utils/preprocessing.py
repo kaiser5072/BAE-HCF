@@ -70,11 +70,11 @@ def _parse_and_preprocess_record(record, width, n_features, mode):
 
 def data_set(data_dir, batch_size, prefetch_size, width, n_features, mode, AE_type, is_repeat):
 
-    if mode == 'train' and AE_type == 'U-AE':
+    if mode == 'train' and AE_type == 'user':
         data_path = os.path.join(data_dir, 'user.train.*.tfrecords')
-    elif mode == 'train' and AE_type == 'I-AE':
+    elif mode == 'train' and AE_type == 'item':
         data_path = os.path.join(data_dir, 'item.train.*.tfrecords')
-    elif mode == 'predict' and AE_type == 'U-AE':
+    elif mode == 'predict' and AE_type == 'user':
         data_path = os.path.join(data_dir, 'user.val.*.tfrecords')
     else:
         data_path = os.path.join(data_dir, 'item.val.*.tfrecords')
