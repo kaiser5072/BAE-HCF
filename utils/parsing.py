@@ -51,6 +51,12 @@ def parse_args(init_vals, custom_parser=None):
                    required=_required(init_vals, 'n_folds'),
                    help='Number of n-fold cross-validations')
 
+    p.add_argument('-t', '--AE_TYPE', choices=['item', 'user'],
+                   default=_default(init_vals, 'AE_TYPE'),
+                   required=_required(init_vals, 'AE_TYPE'),
+                   help="""Select the type of AE in temrs of 
+                   item or user""")
+
     p.add_argument('--precision', choices=['fp32', 'fp16'],
                    default=_default(init_vals, 'precision'),
                    required=_required(init_vals, 'precision'),
@@ -61,20 +67,11 @@ def parse_args(init_vals, custom_parser=None):
                    required=_required(init_vals, 'l2_lambda'),
                    help='L2 regularization parameters.')
 
-    p.add_argument('--rank', type=int,
-                   default=_default(init_vals, 'rank'),
-                   required=_required(init_vals, 'rank'),
-                   help='Rank for synthetic rating matrix')
-
-    p.add_argument('--eps', type=float,
-                   default=_default(init_vals, 'eps'),
-                   required=_required(init_vals, 'eps'),
-                   help='Observation probability for synthetic rating matrix')
-
     p.add_argument('--display_every', type=int,
                    default=_default(init_vals, 'display_every'),
                    required=_required(init_vals, 'display_every'),
                    help='How often to print out information')
+
 
     FLAGS, unknown_args = p.parse_known_args()
     if len(unknown_args) > 0:
@@ -93,14 +90,12 @@ def parse_args(init_vals, custom_parser=None):
     del FLAGS.batch_size
     vals['n_folds'] = FLAGS.n_folds
     del FLAGS.n_folds
+    vals['AE_TYPE'] = FLAGS.AE_TYPE
+    del FLAGS.AE_TYPE
     vals['precision'] = FLAGS.precision
     del FLAGS.precision
     vals['l2_lambda'] = FLAGS.l2_lambda
     del FLAGS.l2_lambda
-    vals['rank'] = FLAGS.rank
-    del FLAGS.rank
-    vals['eps'] = FLAGS.eps
-    del FLAGS.eps
     vals['display_every'] = FLAGS.display_every
     del FLAGS.display_every
     vals['dims'] = FLAGS.dims
