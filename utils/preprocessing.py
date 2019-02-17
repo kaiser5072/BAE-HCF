@@ -68,13 +68,16 @@ def _parse_and_preprocess_record(record, width, n_features, mode):
 
         return inputs, labels
 
-def data_set(data_dir, batch_size, prefetch_size, width, n_features, mode):
+def data_set(data_dir, batch_size, prefetch_size, width, n_features, mode, AE_type, is_repeat):
 
-    if mode == 'train':
-        data_path = os.path.join(data_dir, 'train.*.tfrecords')
+    if mode == 'train' and AE_type == 'U-AE':
+        data_path = os.path.join(data_dir, 'user.train.*.tfrecords')
+    elif mode == 'train' and AE_type == 'I-AE':
+        data_path = os.path.join(data_dir, 'item.train.*.tfrecords')
+    elif mode == 'predict' and AE_type == 'U-AE':
+        data_path = os.path.join(data_dir, 'user.val.*.tfrecords')
     else:
-        data_path = os.path.join(data_dir, 'val.*.tfrecords')
-
+        data_path = os.path.join(data_dir, 'item.val.*.tfrecords')
 
     filenames = tf.data.Dataset.list_files(data_path)
 
@@ -86,7 +89,7 @@ def data_set(data_dir, batch_size, prefetch_size, width, n_features, mode):
     # if training:
     #     ds = ds.shuffle(10000)
 
-    if mode == 'train':
+    if is_repeat:
         ds = ds.shuffle(100000)
         ds = ds.repeat()
 

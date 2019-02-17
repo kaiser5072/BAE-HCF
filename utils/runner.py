@@ -53,6 +53,7 @@ def train(infer_func, params):
     log_dir          = params['log_dir']
     height           = params['height']
     width            = params['width']
+    AE_type          = params['AE_type']
     n_features       = params['n_features']
     prefetch_size    = params['prefetch_size']
     display_step     = params['display_every']
@@ -83,7 +84,7 @@ def train(infer_func, params):
                       _LogSessionRunHook(batch_size, height, display_step)]
 
     input_func = lambda: utils.data_set(data_dir, batch_size, prefetch_size, width, n_features,
-                                        mode='train')
+                                        mode='train', AE_type=AE_type, is_repeat=True)
 
 
     print("\n\n TRAINING\n")
@@ -144,6 +145,7 @@ def predict(infer_func, params):
     log_dir         = params['log_dir'] #if params['mode'] == 'train' else params['model_dir']
     height          = params['height']
     width           = params['width']
+    AE_type         = params['AE_type']
     n_features      = params['n_features']
     batch_size      = params['batch_size']
     prefetch_size   = params['prefetch_size']
@@ -171,7 +173,7 @@ def predict(infer_func, params):
             keep_checkpoint_every_n_hours=3))
 
     input_func = lambda: utils.data_set(data_dir, batch_size, prefetch_size, width, n_features,
-                                        mode='eval')
+                                        mode='val', AE_type=AE_type, is_repeat=False)
 
     print("\n\n PREDICT\n")
     try:
