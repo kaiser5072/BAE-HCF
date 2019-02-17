@@ -288,7 +288,7 @@ class Data(object):
             contents, i = [], 0
             for line in f:
                 for content_ids in line.split()[1:]:
-                    contents.append([i, int(content_ids.split(':')[0]), float(content_ids.split(':')[1])])
+                    contents.append([i, int(content_ids.split(':')[0]), 1.0])
                 i = i + 1
 
         return contents
