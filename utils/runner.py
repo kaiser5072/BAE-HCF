@@ -198,7 +198,7 @@ def predict(infer_func, params):
                     break
 
         print('\n')
-
+        return preds
 
     except KeyboardInterrupt:
         print("Keyboard interrupt")
