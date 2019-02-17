@@ -178,7 +178,7 @@ def predict(infer_func, params):
             keep_checkpoint_every_n_hours=3))
 
     input_func = lambda: utils.data_set(data_dir, batch_size, prefetch_size, width, n_features,
-                                        mode='val', AE_type=AE_type, is_repeat=False)
+                                        mode='predict', AE_type=AE_type, is_repeat=False)
 
     print("\n\n PREDICT\n")
     try:
