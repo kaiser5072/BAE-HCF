@@ -36,7 +36,7 @@ def get_eval(preds, mode, meta):
     for i, (begin, end) in enumerate(chunks):
         recalls[i, :] = get_recall(target[begin:end], preds[begin:end], mask[begin:end], np.arange(50, 550, 50))
 
-    recalls = np.average(recalls, axis=1)
+    recalls = np.average(recalls, axis=0)
     for k, recall in zip(np.arange(50, 550, 50), recalls):
         print("[*] RECALL@%d: %.4f" % (k, recall))
 
