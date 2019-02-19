@@ -3,6 +3,7 @@ import h5py
 
 from scipy.stats import rankdata
 from scipy.sparse import csr_matrix
+from multiprocessing import Pool
 
 def get_eval(preds, mode, meta):
 
@@ -26,10 +27,26 @@ def get_eval(preds, mode, meta):
 
     print('\n')
     max_user = np.min((80000, meta['n_user_height']))
+    chunk_size = 1000
+    pool = Pool(32)
+    chunks = [(i, min(i + chunk_size, max_user))
+              for i in range(0, max_user, chunk_size)]
     target=target[0:max_user]
     preds=preds[0:max_user, :]
     mask=mask[0:max_user]
-    recalls = get_recall(target, preds, mask, np.arange(50, 550, 50))
+    try:
+        recalls = pool.map_async(get_recall, [(target[begin:end], preds[begin:end], mask[begin:end], np.arange(50, 550, 50)) for begin, end in chunks]).get(999999)
+
+        pool.close()
+        pool.join()
+
+    except KeyboardInterrupt:
+        pool.terminate()
+        pool.join()
+        raise
+
+    print(recalls)
+    # recalls = get_recall(target, preds, mask, np.arange(50, 550, 50))
 
     for k, recall in zip(np.arange(50, 550, 50), recalls):
         print("[*] RECALL@%d: %.4f" % (k, recall))
