@@ -26,11 +26,17 @@ def get_eval(preds, mode, meta):
 
     print('\n')
     max_user = np.min((80000, meta['n_user_height']))
-    target=target[0:max_user]
-    preds=preds[0:max_user, :]
-    mask=mask[0:max_user]
-    recalls = get_recall(target, preds, mask, np.arange(50, 550, 50))
+    chunk_size = 1000
+    # target=target[0:max_user]
+    # preds=preds[0:max_user, :]
+    # mask=mask[0:max_user]
+    chunks = [(i, min(i + chunk_size, max_user))
+              for i in range(0, max_user, chunk_size)]
+    recalls = np.zeros((len(chunks), 10))
+    for i, (begin, end) in enumerate(chunks):
+        recalls[i, :] = get_recall(target[begin:end], preds[begin:end], mask[begin:end], np.arange(50, 550, 50))
 
+    recalls = np.average(recalls, axis=1)
     for k, recall in zip(np.arange(50, 550, 50), recalls):
         print("[*] RECALL@%d: %.4f" % (k, recall))
 
