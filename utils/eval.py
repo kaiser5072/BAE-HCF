@@ -28,7 +28,7 @@ def get_eval(preds, mode, meta):
     print('\n')
     max_user = np.min((80000, meta['n_user_height']))
     chunk_size = 1000
-    pool = Pool(32)
+    pool = Pool(12)
     chunks = [(i, min(i + chunk_size, max_user))
               for i in range(0, max_user, chunk_size)]
     target=target[0:max_user]
