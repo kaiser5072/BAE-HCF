@@ -26,7 +26,7 @@ def get_eval(preds, mode, meta):
 
     print('\n')
     max_user = np.min((80000, meta['n_user_height']))
-    chunk_size = 1000
+    chunk_size = 2000
     # target=target[0:max_user]
     # preds=preds[0:max_user, :]
     # mask=mask[0:max_user]
