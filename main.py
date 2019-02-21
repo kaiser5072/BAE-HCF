@@ -72,6 +72,7 @@ def _get_input(args):
 
 def train(args):
     args = _get_input(args)
+    print(args['l2_lambda'])
 
     for i in range(args['n_folds']):
         log_dir = args['log_dir']
