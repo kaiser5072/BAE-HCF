@@ -101,7 +101,7 @@ class AE_CF(object):
 
         l2_losses = []
         for var in all_var:
-            if var.op.name.find('weight') >= 0 or var.op.name.find('sides') >= 0:
+            if var.op.name.find('weight') >= 0 >= 0:
                 l2_losses.append(tf.nn.l2_loss(var))
 
         self.loss = tf.add(self.loss, 2 * self.l2_lambda * tf.reduce_sum(l2_losses), name='total_loss')
