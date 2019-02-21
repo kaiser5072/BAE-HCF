@@ -54,23 +54,23 @@ class AE_CF(object):
                                                 dtype=self.dtype)
 
             if i == 1 and self.n_layer != 2:
-                h = tf.sparse.matmul(h, w) + tf.sparse.matmul(sides, s) + b
-                # h = tf.layers.batch_normalization(h)
+                h = tf.sparse.matmul(h, w) + tf.sparse.matmul(sides, s)
+                h = tf.layers.batch_normalization(h)
                 h = tf.nn.relu(h)
 
             elif self.n_layer == 2:
-                h = tf.sparse.matmul(h, w) + tf.sparse.matmul(sides, s) + b
-                # h = tf.layers.batch_normalization(h)
+                h = tf.sparse.matmul(h, w) + tf.sparse.matmul(sides, s)
+                h = tf.layers.batch_normalization(h)
                 h = tf.nn.tanh(h)
 
             elif i == (self.n_layer-1):
-                h = tf.matmul(h ,w) + b
-                # h = tf.layers.batch_normalization(h)
+                h = tf.matmul(h ,w)
+                h = tf.layers.batch_normalization(h)
                 h = tf.nn.tanh(h)
 
             else:
-                h = tf.matmul(h, w) + b
-                # h = tf.layers.batch_normalization(h)
+                h = tf.matmul(h, w)
+                h = tf.layers.batch_normalization(h)
                 h = tf.nn.relu(h)
 
             prev_dim = h.get_shape()[1]
@@ -92,7 +92,7 @@ class AE_CF(object):
             end_learning_rate= 1000)
 
         pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
-        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - inputs.values)) * 500
+        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - inputs.values)) * 1000
 
         self.loss = tf.add_n([pref_diff_zero, pref_diff_ones]) / (self.height * self.width)
         self.loss = tf.identity(self.loss, name='loss')
