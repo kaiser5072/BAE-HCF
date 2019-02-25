@@ -39,7 +39,7 @@ parser.add_argument('--dims', '--list', nargs='+',
                     required=True,
                     help='The number of units')
 
-args, flags = utils.parse_args(default_args, parser)
+args, flags = utils.parse_args(opt, parser)
 
 # TODO: Combine lines to load rating data and save dictionary.
 def _get_input(args):

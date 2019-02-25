@@ -5,10 +5,6 @@ import h5py
 import tqdm
 import time
 import utils
-import os
-
-from scipy.sparse import csr_matrix
-from scipy.stats import rankdata
 
 class _PrefillStagingAreasHook(tf.train.SessionRunHook):
     def after_create_session(self, session, coord):
@@ -96,6 +92,7 @@ def train(infer_func, params):
     except KeyboardInterrupt:
         print("Keyboard interrupt")
 
+#TODO: Real-time evaluation
 def validate(infer_func, params):
     data_dir        = params['data_dir']
     log_dir         = params['log_dir'] #if params['mode'] == 'train' else params['model_dir']
@@ -198,48 +195,3 @@ def predict(infer_func, params):
 
     except KeyboardInterrupt:
         print("Keyboard interrupt")
-
-
-# def get_recall(target, preds, mask, n_recalls):
-#     # ratingTest[:, [1, 0]] = ratingTest[:, [0, 1]]
-#
-#
-#     # temp = np.zeros((16980, 5551))
-#     # temp[(ratingTest[:, 0], ratingTest[:, 1])] = 1
-#     # preds       = np.transpose(preds)
-#     # target      = np.transpose(ratingTest)
-#     # mask        = np.transpose(mask)
-#     preds  = np.asarray(preds)
-#     mask   = mask.toarray()
-#     print(np.sort(preds[0, :])[::-1][:100])
-#     print(np.sort(preds[0, :] * target[0].toarray()[0])[::-1])
-#
-#     preds       = preds * (1-mask) - 100 * mask
-#     non_zero_idx = np.asarray(target.sum(axis=1)).flatten() != 0
-#     #
-#     del mask
-#     preds   = preds[non_zero_idx, :]
-#     target  = target[non_zero_idx]
-#
-#     # pred_user_interest = pred_user_interest * test_mask + (1 - test_mask) * (-100)
-#     preds = get_order_array(preds)
-#
-#     recall = []
-#     for i in n_recalls:
-#         pred_user_interest = preds <= i
-#
-#         match_interest  = target.multiply(pred_user_interest)
-#         num_match       = np.sum(match_interest, axis=1, dtype=np.float32)
-#         num_interest    = target.sum(axis=1)
-#
-#         user_recall = num_match / num_interest
-#         recall.append(np.average(user_recall))
-#
-#     return recall
-#
-# def get_order_array(list):
-#     order = np.empty(list.shape, dtype=int)
-#     for k, row in enumerate(list):
-#         order[k] = rankdata(-row, method='ordinal') - 1
-#
-#     return order
