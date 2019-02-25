@@ -70,21 +70,19 @@ def _get_input(args):
 
 def train(args):
     args = _get_input(args)
-    print(args['l2_lambda'])
+    
+    log_dir = args['log_dir']
 
-    for i in range(args['n_folds']):
-        log_dir = args['log_dir']
+    if os.path.exists(log_dir):
+        shutil.rmtree(log_dir)
 
-        if os.path.exists(log_dir):
-            shutil.rmtree(log_dir)
+    os.makedirs(log_dir)
 
-        os.makedirs(log_dir)
+    # TRAINIG
+    BEA = model.AE_CF(args)
+    utils.train(BEA, args)
 
-        # TRAINIG
-        BEA = model.AE_CF(args)
-        utils.train(BEA, args)
-
-        BEA.destroy_graph()
+    BEA.destroy_graph()
 
 
 def evaluate(args):
