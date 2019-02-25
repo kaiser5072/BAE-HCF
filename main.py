@@ -12,32 +12,8 @@ opt = Option('./config.json')
 
 utils.init()
 
-default_args = {
-    'mode': 'train',
-    'test_mode': 'warm',
-    'batch_size': 1024,
-    'lr': 1e-3,
-    'precision': 'fp32',
-    'n_epochs': 10,
-    'log_dir': './log',
-    'model_dir': './model',
-    'display_every': 1000,
-    'l2_lambda': 1e-4,
-    'AE_TYPE': 'item',
-    'height': None,
-    'width': None,
-    'prefetch_size': 20,
-    'checkpoints_secs': None,
-    'device': '/gpu:0'
-}
-
 formatter = argparse.ArgumentDefaultsHelpFormatter
 parser = argparse.ArgumentParser(formatter_class=formatter)
-
-parser.add_argument('--dims', '--list', nargs='+',
-                    default=[500, 500, 1500],
-                    required=True,
-                    help='The number of units')
 
 args, flags = utils.parse_args(opt, parser)
 
