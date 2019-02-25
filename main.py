@@ -60,7 +60,6 @@ def train(args):
 
     BEA.destroy_graph()
 
-
 def evaluate(args):
     if args['model_dir'] is not None:
         args = _get_input(args)

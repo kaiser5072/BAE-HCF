@@ -30,7 +30,7 @@ class AE_CF(object):
         self.n_layer = len(self.dims) - 1
 
     def builder(self, inputs, sides, drops_inputs, is_training):
-        w_init = tf.contrib.layers.variance_scaling_initializer() #tf.initializers.truncated_normal(stddev=0.0001)
+        w_init = tf.initializers.truncated_normal(stddev=0.01) # tf.contrib.layers.variance_scaling_initializer()
         b_init = tf.constant_initializer(0.)
         if is_training:
             h = drops_inputs
