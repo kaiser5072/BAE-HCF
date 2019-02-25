@@ -34,5 +34,6 @@
     "display_every" : 1000,
     "AE_TYPE"       : "item",
     "prefetch_size" : 20,
-    "device"        : "/gpu:0"
+    "device"        : "/gpu:0",
+    "checkpoints_secs": None
 }

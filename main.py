@@ -70,7 +70,7 @@ def _get_input(args):
 
 def train(args):
     args = _get_input(args)
-    
+
     log_dir = args['log_dir']
 
     if os.path.exists(log_dir):
