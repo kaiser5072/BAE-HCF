@@ -18,8 +18,7 @@ default_args = {
     'batch_size': 1024,
     'lr': 1e-3,
     'precision': 'fp32',
-    'n_epochs': 10000,
-    'data_dir': './Input/ml-1m/ratings.dat',
+    'n_epochs': 10,
     'log_dir': './log',
     'model_dir': './model',
     'display_every': 1000,
@@ -27,7 +26,6 @@ default_args = {
     'AE_TYPE': 'item',
     'height': None,
     'width': None,
-    'n_folds': 1,
     'prefetch_size': 20,
     'checkpoints_secs': None,
     'device': '/gpu:0'

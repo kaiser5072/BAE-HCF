@@ -46,11 +46,6 @@ def parse_args(init_vals, custom_parser=None):
                    required=_required(init_vals, 'batch_size'),
                    help="Size of each minibatch.")
 
-    p.add_argument('-f', '--n_folds', type=int,
-                   default=_default(init_vals, 'n_folds'),
-                   required=_required(init_vals, 'n_folds'),
-                   help='Number of n-fold cross-validations')
-
     p.add_argument('-t', '--AE_TYPE', choices=['item', 'user'],
                    default=_default(init_vals, 'AE_TYPE'),
                    required=_required(init_vals, 'AE_TYPE'),
@@ -94,8 +89,6 @@ def parse_args(init_vals, custom_parser=None):
     del FLAGS.n_epochs
     vals['batch_size'] = FLAGS.batch_size
     del FLAGS.batch_size
-    vals['n_folds'] = FLAGS.n_folds
-    del FLAGS.n_folds
     vals['AE_TYPE'] = FLAGS.AE_TYPE
     del FLAGS.AE_TYPE
     vals['precision'] = FLAGS.precision

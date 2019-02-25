@@ -18,15 +18,21 @@
         "../../raw/test.chunk.02"
     ],
     "chunk_size": 2000000,
-    "db_chunk_size": 100000,
     "num_workers": 16,
-    "num_predict_workers": 8,
     "lr_init": 1e-3,
     "lr_power": 2.0,
-    "num_epochs": 100,
-    "batch_size": 512,
-    "prefetch_size": 20,
     "display_step": 780,
     "l2_lambda": 0.0,
-    "q_level": 32
+    "mode": "train",
+    "test_mode": "warm",
+    "batch_size": 1024,
+    "lr": 1e-3,
+    "precision": "fp32",
+    "n_epochs": 10,
+    "log_dir": "./log",
+    "model_dir": "./model",
+    "display_every": 1000,
+    "AE_TYPE": "item",
+    "prefetch_size": 20,
+    "device": "/gpu:0"
 }
