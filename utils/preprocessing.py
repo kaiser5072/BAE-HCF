@@ -83,11 +83,10 @@ def data_set(data_dir, batch_size, prefetch_size, width, mode):
             cycle_length=1))
 
     if mode == 'train':
-        ds = ds.shuffle(100000)
-        # ds = ds.repeat()
+        ds = ds.shuffle(10000)
+        ds = ds.repeat()
 
     preproc_func = lambda record: _parse_and_preprocess_record(record, width, mode)
-    ds = ds.cache().repeat()
 
     ds = ds.apply(tf.data.experimental.map_and_batch(
         map_func=preproc_func,
