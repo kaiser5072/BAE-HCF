@@ -20,8 +20,6 @@ default_args = {
     'model_dir': './model',
     'display_every': 1000,
     'l2_lambda': 1e-3,
-    'rank': 10,
-    'eps': 0.1,
     'AE_TYPE': 'item',
     'height': None,
     'width': None,
@@ -61,11 +59,9 @@ def _get_input(args, mode):
 
 def train(args):
     args = _get_input(args, mode='train')
-    RMSE, BEST_RMSE = [], 9999999
 
     for i in range(args['n_folds']):
         log_dir = args['log_dir']
-        model_dir = args['model_dir']
 
         if os.path.exists(log_dir):
             shutil.rmtree(log_dir)
@@ -75,10 +71,6 @@ def train(args):
         # TRAINIG
         BEA = model.AE_CF(args)
         utils.train(BEA, args)
-
-        # VALIDATION
-        RMSE_VAL = utils.validate(BEA, args)
-        RMSE.append(RMSE_VAL)
 
         BEA.destroy_graph()
 

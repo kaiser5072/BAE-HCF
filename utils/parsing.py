@@ -61,16 +61,6 @@ def parse_args(init_vals, custom_parser=None):
                    required=_required(init_vals, 'l2_lambda'),
                    help='L2 regularization parameters.')
 
-    p.add_argument('--rank', type=int,
-                   default=_default(init_vals, 'rank'),
-                   required=_required(init_vals, 'rank'),
-                   help='Rank for synthetic rating matrix')
-
-    p.add_argument('--eps', type=float,
-                   default=_default(init_vals, 'eps'),
-                   required=_required(init_vals, 'eps'),
-                   help='Observation probability for synthetic rating matrix')
-
     p.add_argument('--display_every', type=int,
                    default=_default(init_vals, 'display_every'),
                    required=_required(init_vals, 'display_every'),
@@ -97,10 +87,6 @@ def parse_args(init_vals, custom_parser=None):
     del FLAGS.precision
     vals['l2_lambda'] = FLAGS.l2_lambda
     del FLAGS.l2_lambda
-    vals['rank'] = FLAGS.rank
-    del FLAGS.rank
-    vals['eps'] = FLAGS.eps
-    del FLAGS.eps
     vals['display_every'] = FLAGS.display_every
     del FLAGS.display_every
     vals['dims'] = FLAGS.dims

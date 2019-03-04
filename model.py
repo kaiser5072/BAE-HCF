@@ -20,7 +20,7 @@ class AE_CF(object):
     def __init__(self, params):
         self.dims = params['dims']
         self.n_epochs = params['n_epochs']
-        self.n_features = params['n_features']
+        self.n_features = 8000
         self.batch_size = params['batch_size']
         self.lr_init = params['lr']
         self.l2_lambda = params['l2_lambda']
@@ -32,7 +32,7 @@ class AE_CF(object):
         self.n_layer = len(self.dims) - 1
 
     def builder(self, inputs, sides, drops_inputs, is_training):
-        w_init = tf.initializers.truncated_normal(stddev=0.1)  # tf.contrib.layers.variance_scaling_initializer()
+        w_init = tf.contrib.layers.variance_scaling_initializer()
         b_init = tf.constant_initializer(0.)
         if is_training:
             h = drops_inputs
@@ -87,11 +87,6 @@ class AE_CF(object):
 
         self.preds = tf.gather_nd(self.outputs, inputs.indices)
 
-        confidence = tf.train.polynomial_decay(
-            learning_rate=1.,
-            global_step=tf.train.get_global_step(),
-            decay_steps=200000,
-            end_learning_rate=1000)
 
         pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
         pref_diff_ones = tf.reduce_sum(tf.square(self.preds - inputs.values)) * 1000
@@ -121,7 +116,6 @@ class AE_CF(object):
     def _BAE_model_fn(self, features, labels, mode, params):
         self.height = params['height']
         self.width = params['width']
-        self.drop_rate = params['drop_rate']
 
         # self.lr = tf.train.piecewise_constant(
         #     tf.train.get_global_step(),
