@@ -73,9 +73,7 @@ def _parse_and_preprocess_record(record, width, mode):
 
 def data_set(data_dir, batch_size, prefetch_size, width, mode):
 
-
     data_path = os.path.join(data_dir, 'train.*.tfrecords')
-
 
     filenames = tf.data.Dataset.list_files(data_path)
 
@@ -93,10 +91,15 @@ def data_set(data_dir, batch_size, prefetch_size, width, mode):
 
     preproc_func = lambda record: _parse_and_preprocess_record(record, width, mode)
 
-    ds = ds.apply(tf.data.experimental.map_and_batch(
-        map_func=preproc_func,
-        batch_size=batch_size,
-        num_parallel_calls=32))
+    ds = ds.map(map_func=preproc_func, num_parallel_calls=32)
+
+    ds = ds.cache()
+    ds = ds.batch(batch_size=batch_size)
+
+    # ds = ds.apply(tf.data.experimental.map_and_batch(
+    #     map_func=preproc_func,
+    #     batch_size=batch_size,
+    #     num_parallel_calls=32))
 
     ds = ds.prefetch(prefetch_size)
 
