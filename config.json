@@ -1,39 +1,23 @@
 {
-    "train_data_list": [
-        "../../raw/train.chunk.01",
-        "../../raw/train.chunk.02",
-        "../../raw/train.chunk.03",
-        "../../raw/train.chunk.04",
-        "../../raw/train.chunk.05",
-        "../../raw/train.chunk.06",
-        "../../raw/train.chunk.07",
-        "../../raw/train.chunk.08",
-        "../../raw/train.chunk.09"
-    ],
-    "dev_data_list": [
-        "../../raw/dev.chunk.01"
-    ],
-    "test_data_list": [
-        "../../raw/test.chunk.01",
-        "../../raw/test.chunk.02"
-    ],
+    "pref_data_dir" :  "../../raw/train.chunk.01",
+    "warm_test_dir" :  "../../raw/dev.chunk.01",
+    "cold_user_dir" :  "../../raw/test.chunk.01",
     "chunk_size"    : 2000000,
+    "log_dir"       : "./log",
+    "mode"          : "train",
+    "test_mode"     : "warm",
+    "AE_TYPE"       : "item",
+    "dims"          : [500, 200],
     "num_workers"   : 16,
     "lr_init"       : 1e-3,
     "lr_power"      : 2.0,
     "display_step"  : 780,
     "l2_lambda"     : 0.0,
-    "mode"          : "train",
-    "test_mode"     : "warm",
     "batch_size"    : 1024,
     "lr"            : 1e-3,
-    "precision"     : "fp32",
     "n_epochs"      : 10,
-    "log_dir"       : "./log",
-    "model_dir"     : "./model",
     "display_every" : 1000,
-    "AE_TYPE"       : "item",
     "prefetch_size" : 20,
-    "device"        : "/gpu:0",
-    "dims"          : [500, 200]
+    "precision"     : "fp32",
+    "device"        : "/gpu:0"
 }
