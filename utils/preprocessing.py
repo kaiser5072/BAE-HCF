@@ -82,16 +82,18 @@ def data_set(data_dir, batch_size, prefetch_size, width, mode):
             lambda filename: tf.data.TFRecordDataset(filename),
             cycle_length=4))
 
-    if mode == 'train':
-        ds = ds.shuffle(1000000)
+
         # ds = ds.repeat()
 
     preproc_func = lambda record: _parse_and_preprocess_record(record, width, mode)
 
     ds = ds.map(map_func=preproc_func, num_parallel_calls=32)
-    ds = ds.take(1000000).cache().repeat()
-    ds = ds.batch(batch_size=batch_size
-                  )
+    ds = ds.take(1000000).cache()
+    
+    if mode == 'train':
+        ds = ds.shuffle(1000000).repeat()
+
+    ds = ds.batch(batch_size=batch_size)
     # ds = ds.apply(tf.data.experimental.map_and_batch(
     #     map_func=preproc_func,
     #     batch_size=batch_size,
