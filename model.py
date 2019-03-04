@@ -21,8 +21,6 @@ class AE_CF(object):
         self.batch_size    = params['batch_size']
         self.lr_init       = params['lr']
         self.l2_lambda     = params['l2_lambda']
-        self.rank          = params['rank']
-        self.eps           = params['eps']
         self.device        = params['device']
         self.log_dir       = params['log_dir']
         self.prefetch_size = params['prefetch_size']
@@ -52,29 +50,23 @@ class AE_CF(object):
                                                 dtype=self.dtype)
 
             if i == 1 and self.n_layer != 2:
-                if np.random.uniform(0, 1, 1) < 0.5:
-                    h = tf.sparse.matmul(inputs, w) + b + tf.sparse.matmul(sides, s)
-                else:
-                    h = b + tf.sparse.matmul(sides, s)
-                # h = tf.layers.batch_normalization(h)
+                h = tf.sparse.matmul(inputs, w) + b + tf.sparse.matmul(sides, s)
+                h = tf.layers.batch_normalization(h)
                 h = tf.nn.relu(h)
 
             elif self.n_layer == 2:
-                if np.random.uniform(0, 1, 1) < 0.5:
-                    h = tf.sparse.matmul(inputs, w) + b + tf.sparse.matmul(sides, s)
-                else:
-                    h = b + tf.sparse.matmul(sides, s)
-                # h = tf.layers.batch_normalization(h)
+                h = tf.sparse.matmul(inputs, w) + b + tf.sparse.matmul(sides, s)
+                h = tf.layers.batch_normalization(h)
                 h = tf.nn.sigmoid(h)
 
             elif i == (self.n_layer-1):
                 h = tf.matmul(h ,w) + b
-                # h = tf.layers.batch_normalization(h)
+                h = tf.layers.batch_normalization(h)
                 h = tf.nn.sigmoid(h)
 
             else:
                 h = tf.matmul(h, w) + b
-                # h = tf.layers.batch_normalization(h)
+                h = tf.layers.batch_normalization(h)
                 h = tf.nn.relu(h)
 
             prev_dim = h.get_shape()[1]
@@ -89,7 +81,7 @@ class AE_CF(object):
 
         self.preds = tf.gather_nd(self.outputs, inputs.indices)
         pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
-        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - 1)) * 80
+        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - 1)) * 100
 
         self.loss = tf.add_n([pref_diff_ones, pref_diff_zero]) / (self.height * self.width)
         self.loss = tf.identity(self.loss, name='loss')
