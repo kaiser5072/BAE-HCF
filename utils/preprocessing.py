@@ -85,8 +85,8 @@ def data_set(data_dir, batch_size, prefetch_size, width, mode):
     preproc_func = lambda record: _parse_and_preprocess_record(record, width, mode)
 
     ds = ds.map(map_func=preproc_func, num_parallel_calls=32)
-    ds = ds.take(16980).cache()
-    
+    ds = ds.take(1000000).cache()
+
     if mode == 'train':
         ds = ds.shuffle(1000000).repeat()
 
