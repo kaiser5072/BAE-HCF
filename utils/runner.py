@@ -57,7 +57,7 @@ def train(infer_func, params):
 
     decay_steps = n_epochs // 10
     nstep = display_step# * height // batch_size
-    nupdate = n_epochs# * height // batch_size
+    nupdate = n_epochs * height // batch_size
 
     config = tf.ConfigProto()
     config.intra_op_parallelism_threads = 1
