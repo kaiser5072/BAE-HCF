@@ -82,18 +82,6 @@ def train(args):
 
         BEA.destroy_graph()
 
-        # if RMSE_VAL < BEST_RMSE:
-        #     BEST_RMSE = RMSE_VAL
-        #     data = args['data']
-        #
-        #     # Remove the previous best model
-        #     utils.remove_files(model_dir)
-        #
-        #     # Copy the best model to model directory
-        #     utils.copy_files(log_dir, model_dir)
-        #
-        # utils.write_files(model_dir, data)
-
 
 def evaluate(args):
     if args['model_dir'] is not None:

@@ -20,7 +20,6 @@ def parse_data(inputs):
     data = Data()
     train_path = os.path.join(out_dir, 'train.%s.tfrecords' % cidx)
     train_writer = tf.python_io.TFRecordWriter(train_path)
-    print(rating_v)
     num_train, num_val = 0, 0
     with tqdm.tqdm(total=end-begin) as pbar:
         for column, value, column_v, value_v, feature_t, contents_t, mask in data.generate(row_t,

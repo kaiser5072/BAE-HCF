@@ -68,12 +68,12 @@ class AE_CF(object):
                 h = tf.nn.sigmoid(h)
 
             elif i == (self.n_layer-1):
-                h = tf.matmul(h ,w) + b + tf.sparse.matmul(sides, s)
+                h = tf.matmul(h ,w) + b
                 # h = tf.layers.batch_normalization(h)
                 h = tf.nn.sigmoid(h)
 
             else:
-                h = tf.matmul(h, w) + b + tf.sparse.matmul(sides, s)
+                h = tf.matmul(h, w) + b
                 # h = tf.layers.batch_normalization(h)
                 h = tf.nn.relu(h)
 
