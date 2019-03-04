@@ -88,9 +88,9 @@ def data_set(data_dir, batch_size, prefetch_size, width, mode):
     ds = ds.take(1000000).cache()
 
     if mode == 'train':
-        ds = ds.shuffle_and_repeat(
-            buffer_size=1000000
-        )
+        ds = ds.apply(
+            tf.data.experimental.shuffle_and_repeat(
+                buffer_size=1000000))
 
     ds = ds.batch(batch_size=batch_size)
     # ds = ds.apply(tf.data.experimental.map_and_batch(
