@@ -80,10 +80,7 @@ def data_set(data_dir, batch_size, prefetch_size, width, mode):
     ds = filenames.apply(
         tf.data.experimental.parallel_interleave(
             lambda filename: tf.data.TFRecordDataset(filename),
-            cycle_length=4))
-
-    # if training:
-    #     ds = ds.shuffle(10000)
+            cycle_length=1))
 
     if mode == 'train':
         ds = ds.shuffle(100000)

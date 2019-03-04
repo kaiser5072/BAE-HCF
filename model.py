@@ -50,22 +50,22 @@ class AE_CF(object):
                                                 dtype=self.dtype)
 
             if i == 1 and self.n_layer != 2:
-                h = tf.sparse.matmul(inputs, w) + b + tf.sparse.matmul(sides, s)
+                h = tf.sparse.matmul(inputs, w) + tf.sparse.matmul(sides, s)
                 h = tf.layers.batch_normalization(h)
                 h = tf.nn.relu(h)
 
             elif self.n_layer == 2:
-                h = tf.sparse.matmul(inputs, w) + b + tf.sparse.matmul(sides, s)
+                h = tf.sparse.matmul(inputs, w) + tf.sparse.matmul(sides, s)
                 h = tf.layers.batch_normalization(h)
                 h = tf.nn.sigmoid(h)
 
             elif i == (self.n_layer-1):
-                h = tf.matmul(h ,w) + b
+                h = tf.matmul(h ,w)
                 h = tf.layers.batch_normalization(h)
                 h = tf.nn.sigmoid(h)
 
             else:
-                h = tf.matmul(h, w) + b
+                h = tf.matmul(h, w)
                 h = tf.layers.batch_normalization(h)
                 h = tf.nn.relu(h)
 
