@@ -51,7 +51,6 @@ def train(infer_func, params):
     width            = params['width']
     prefetch_size    = params['prefetch_size']
     display_step     = params['display_every']
-    checkpoints_secs = params['checkpoints_secs']
 
     decay_steps = n_epochs // 10
     nstep = display_step# * height // batch_size
@@ -69,7 +68,7 @@ def train(infer_func, params):
         },
         config=tf.estimator.RunConfig(
             session_config=config,
-            save_checkpoints_secs=checkpoints_secs,
+            save_checkpoints_secs=None,
             save_checkpoints_steps=nstep,
             keep_checkpoint_every_n_hours=3))
 
