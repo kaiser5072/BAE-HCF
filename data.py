@@ -120,10 +120,11 @@ class Data(object):
         num_chunks = len(chunk_offsets)
         self.logger.info('split data into %d chunks' % (num_chunks))
 
-        data = self._split_train_val(row, columns, rating)
+        col_tr, row_tr, val_tr, row_te, col_te, val_te, masks = self._split_train_val(row, columns, rating)
 
         pool = Pool(opt.num_workers)
         for i in range(opt.n_folds):
+            data = (col_tr[i], row_tr[i], val_tr[i], row_te[i], col_te[i], val_te[i], masks[i])
             try:
                 num_data = pool.map_async(parse_data, [(i, cidx, begin, end, data, item, feature, contents, out_dir)
                                                        for cidx, (begin, end) in enumerate(chunk_offsets)]).get(999999999)
@@ -178,7 +179,7 @@ class Data(object):
 
             masks.append(mask)
 
-        return (col_tr, row_tr, val_tr, row_te, col_te, val_te, masks)
+        return col_tr, row_tr, val_tr, row_te, col_te, val_te, masks
 
 
     def _split_data(self, row, chunk_size):
