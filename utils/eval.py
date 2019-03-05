@@ -1,43 +1,37 @@
 import numpy as np
 
 from scipy.stats import rankdata
+z
 
-def get_recall(target, preds, mask, n_recalls):
+def get_recall(ratingTest, preds, test_mask, n_recalls):
     # ratingTest[:, [1, 0]] = ratingTest[:, [0, 1]]
 
 
     # temp = np.zeros((16980, 5551))
     # temp[(ratingTest[:, 0], ratingTest[:, 1])] = 1
-    preds  = np.transpose(preds)
-    mask   = np.transpose(mask)
-    target = np.transpose(target)
+    preds       = np.transpose(preds)
+    test_mask   = np.transpose(test_mask)
+    temp        = np.transpose(ratingTest)
     # temp      = np.asarray(ratingTest)
     # preds     = np.asarray(preds)
     # test_mask = np.asarray(test_mask)
 
-    preds        = preds * (1-mask) - 100 * mask
-    non_zero_idx = np.sum(target, axis=1) != 0
+    non_zero_idx = np.sum(temp, axis=1) != 0
 
-    preds  = preds[non_zero_idx, :]
-    target = target[non_zero_idx, :]
+    pred_user_interest   = preds[non_zero_idx, :]
+    target_user_interest = temp[non_zero_idx, :]
+    test_mask            = test_mask[non_zero_idx, :]
 
-    preds = get_order_array(preds)
-    print(preds)
+    pred_user_interest = pred_user_interest * test_mask + (1 - test_mask) * (-100)
+    pred_user_interest = get_order_array(pred_user_interest)
+    pred_user_interest = pred_user_interest <= n_recalls
 
-    recalls = []
-    for i in n_recalls:
-        pred_user_interest = preds <= i
+    match_interest  = pred_user_interest * target_user_interest
+    num_match       = np.sum(match_interest, axis=1)
+    num_interest    = np.sum(target_user_interest, axis=1)
 
-        match_interest  = pred_user_interest * target
-        num_match       = np.sum(match_interest, axis=1, dtype=np.float32)
-        num_interest    = np.sum(target, axis=1, dtype=np.float32)
-
-        user_recall = num_match / num_interest
-        recalls.append(np.average(user_recall))
-
-    for k, recall in zip(np.arange(50, 550, 50), recalls):
-        print("[*] RECALL@%d: %.4f" % (k, recall))
-
+    user_recall = num_match / num_interest
+    recall = np.average(user_recall)
     return recall
 
 def get_order_array(list):
