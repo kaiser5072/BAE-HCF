@@ -22,6 +22,7 @@ def get_recall(target, preds, mask, n_recalls):
     target = target[non_zero_idx, :]
 
     preds = get_order_array(preds)
+    print(preds)
 
     recalls = []
     for i in n_recalls:
