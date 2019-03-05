@@ -18,14 +18,14 @@ def get_recall(target, preds, mask, n_recalls):
     preds = preds * mask - 100 * (1-mask)
     non_zero_idx = np.sum(target, axis=1) != 0
 
-    pred_user_interest   = preds[non_zero_idx, :]
+    preds   = preds[non_zero_idx, :]
     target_user_interest = target[non_zero_idx, :]
 
-    pred_user_interest = get_order_array(pred_user_interest)
+    preds = get_order_array(preds)
 
     recalls = []
     for i in n_recalls:
-        pred_user_interest = pred_user_interest <= i
+        pred_user_interest = preds <= i
 
         match_interest  = pred_user_interest * target_user_interest
         num_match       = np.sum(match_interest, axis=1)
