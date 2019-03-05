@@ -1,7 +1,6 @@
 import numpy as np
 
 from scipy.stats import rankdata
-z
 
 def get_recall(ratingTest, preds, test_mask, n_recalls):
     # ratingTest[:, [1, 0]] = ratingTest[:, [0, 1]]
