@@ -14,11 +14,11 @@ opt = Option('./config.json')
 
 
 def parse_data(inputs):
-    cidx, begin, end, DATA, item, feature, contents, out_dir = inputs
-    col_t, row_t, rating_t, col_v, row_v, rating_v, Mask = DATA
+    cidx, begin, end, data, item, feature, contents, out_dir = inputs
+    fold, col_t, row_t, rating_t, col_v, row_v, rating_v, Mask = data
 
     data = Data()
-    train_path = os.path.join(out_dir, 'train.%s.tfrecords' % cidx)
+    train_path = os.path.join(out_dir, 'train.%s.fold.%s.tfrecords' % (cidx, fold))
     train_writer = tf.python_io.TFRecordWriter(train_path)
     num_train, num_val = 0, 0
     with tqdm.tqdm(total=end-begin) as pbar:
@@ -123,35 +123,35 @@ class Data(object):
         data = self._split_train_val(row, columns, rating)
 
         pool = Pool(opt.num_workers)
+        for i in range(opt.n_folds):
+            try:
+                num_data = pool.map_async(parse_data, [(i, cidx, begin, end, data, item, feature, contents, out_dir)
+                                                       for cidx, (begin, end) in enumerate(chunk_offsets)]).get(999999999)
+                pool.close()
+                pool.join()
 
-        try:
-            num_data = pool.map_async(parse_data, [(cidx, begin, end, data, item, feature, contents, out_dir)
-                                                   for cidx, (begin, end) in enumerate(chunk_offsets)]).get(999999999)
-            pool.close()
-            pool.join()
+            except KeyboardInterrupt:
+                pool.terminate()
+                pool.join()
+                raise
 
-        except KeyboardInterrupt:
-            pool.terminate()
-            pool.join()
-            raise
+            num_train, num_val = 0, 0
+            for train, val in num_data:
+                num_train += train
+                num_val += val
 
-        num_train, num_val = 0, 0
-        for train, val in num_data:
-            num_train += train
-            num_val += val
+            meta_fout = open(os.path.join(out_dir, 'meta'), 'w')
+            meta = {'num_train': num_train,
+                    'num_val': num_val,
+                    'height': self.height,
+                    'width': self.width}
+            meta_fout.write(cPickle.dumps(meta, 2))
+            meta_fout.close()
 
-        meta_fout = open(os.path.join(out_dir, 'meta'), 'w')
-        meta = {'num_train': num_train,
-                'num_val': num_val,
-                'height': self.height,
-                'width': self.width}
-        meta_fout.write(cPickle.dumps(meta, 2))
-        meta_fout.close()
-
-        self.logger.info('size of training set: %s' % num_train)
-        self.logger.info('size of validation set: %s' % num_val)
-        self.logger.info('height: %s' % self.height)
-        self.logger.info('width: %s' % self.width)
+            self.logger.info('size of training set: %s' % num_train)
+            self.logger.info('size of validation set: %s' % num_val)
+            self.logger.info('height: %s' % self.height)
+            self.logger.info('width: %s' % self.width)
 
     def _split_train_val(self, row, column, rating):
         pref = coo_matrix((rating, (row, column)), shape=(self.height, self.width))
@@ -178,7 +178,7 @@ class Data(object):
 
             masks.append(mask)
 
-        return (col_tr[0], row_tr[0], val_tr[0], row_te[0], col_te[0], val_te[0], masks[0])
+        return (col_tr, row_tr, val_tr, row_te, col_te, val_te, masks)
 
 
     def _split_data(self, row, chunk_size):
