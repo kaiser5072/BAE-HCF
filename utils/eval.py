@@ -23,7 +23,7 @@ def get_recall(target, preds, mask, n_recalls):
 
     preds = get_order_array(preds)
 
-    recall = []
+    recalls = []
     for i in n_recalls:
         pred_user_interest = preds <= i
 
@@ -32,9 +32,9 @@ def get_recall(target, preds, mask, n_recalls):
         num_interest    = np.sum(target, axis=1)
 
         user_recall = num_match / num_interest
-        recall.append(np.average(user_recall))
+        recalls.append(np.average(user_recall))
 
-    for k, recall in zip(np.arange(50, 550, 50), n_recalls):
+    for k, recall in zip(np.arange(50, 550, 50), recalls):
         print("[*] RECALL@%d: %.4f" % (k, recall))
 
     return recall
