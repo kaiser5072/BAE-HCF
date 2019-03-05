@@ -109,7 +109,7 @@ class Data(object):
             yield column_t, value_t, column_v, value_v, feature_t, contents_t, mask[i, :]
 
 
-    def make_db(self, data_dir, out_dir, train_ratio):
+    def make_db(self, data_dir, out_dir):
         if os.path.exists(out_dir):
             shutil.rmtree(out_dir)
 
@@ -178,7 +178,7 @@ class Data(object):
 
             masks.append(mask)
 
-        return (col_tr, row_tr, val_tr, row_te, col_te, val_te, masks)
+        return (col_tr[0], row_tr[0], val_tr[0], row_te[0], col_te[0], val_te[0], masks[0])
 
 
     def _split_data(self, row, chunk_size):
