@@ -29,7 +29,7 @@ def get_recall(target, preds, mask, n_recalls):
 
         match_interest  = pred_user_interest * target
         num_match       = np.sum(match_interest, axis=1, dtype=np.float32)
-        num_interest    = np.sum(target, axis=1)
+        num_interest    = np.sum(target, axis=1, dtype=np.float32)
 
         user_recall = num_match / num_interest
         recalls.append(np.average(user_recall))
