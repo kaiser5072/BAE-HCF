@@ -14,8 +14,8 @@ opt = Option('./config.json')
 
 
 def parse_data(inputs):
-    cidx, begin, end, data, item, feature, contents, out_dir = inputs
-    fold, col_t, row_t, rating_t, col_v, row_v, rating_v, Mask = data
+    fold, cidx, begin, end, data, item, feature, contents, out_dir = inputs
+    col_t, row_t, rating_t, col_v, row_v, rating_v, Mask = data
 
     data = Data()
     train_path = os.path.join(out_dir, 'train.%s.fold.%s.tfrecords' % (cidx, fold))
