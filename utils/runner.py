@@ -4,7 +4,6 @@ import numpy as np
 import tqdm
 import time
 import utils
-from scipy.stats import rankdata
 
 class _PrefillStagingAreasHook(tf.train.SessionRunHook):
     def after_create_session(self, session, coord):
@@ -90,7 +89,7 @@ def train(infer_func, params):
 
 def validate(infer_func, params):
     data_dir        = params['data_dir']
-    log_dir         = params['log_dir'] #if params['mode'] == 'train' else params['model_dir']
+    log_dir         = params['log_dir']
     width           = params['width']
     batch_size      = params['batch_size']
     prefetch_size   = params['prefetch_size']
@@ -130,7 +129,7 @@ def validate(infer_func, params):
 
 def predict(infer_func, params):
     data_dir        = params['data_dir']
-    log_dir         = params['log_dir'] #if params['mode'] == 'train' else params['model_dir']
+    log_dir         = params['log_dir']
     height          = params['height']
     width           = params['width']
     batch_size      = params['batch_size']
