@@ -66,6 +66,11 @@ def parse_args(init_vals, custom_parser=None):
                    required=_required(init_vals, 'display_every'),
                    help='How often to print out information')
 
+    p.add_argument('-d', '--dims', '--list', nargs='+',
+                   default=_default(init_vals, 'dims'),
+                   required=True,
+                   help='The number of units')
+
     FLAGS, unknown_args = p.parse_known_args()
     if len(unknown_args) > 0:
         for bad_arg in unknown_args:

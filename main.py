@@ -7,37 +7,15 @@ import cPickle
 import os
 import shutil
 
-utils.init()
+from utils import Option
+opt = Option('./config.json')
 
-default_args = {
-    'mode': 'train',
-    'batch_size': 1024,
-    'lr': 1e-3,
-    'precision': 'fp32',
-    'n_epochs': 10000,
-    'data_dir': './Input/ml-1m/ratings.dat',
-    'log_dir': './log',
-    'model_dir': './model',
-    'display_every': 1000,
-    'l2_lambda': 1e-3,
-    'AE_TYPE': 'item',
-    'height': None,
-    'width': None,
-    'n_folds': 1,
-    'prefetch_size': 20,
-    'checkpoints_secs': None,
-    'device': '/gpu:0'
-}
+utils.init()
 
 formatter = argparse.ArgumentDefaultsHelpFormatter
 parser = argparse.ArgumentParser(formatter_class=formatter)
 
-parser.add_argument('--dims', '--list', nargs='+',
-                    default=[500, 500, 1500],
-                    required=True,
-                    help='The number of units')
-
-args, flags = utils.parse_args(default_args, parser)
+args, flags = utils.parse_args(opt, parser)
 
 # TODO: Combine lines to load rating data and save dictionary.
 def _get_input(args, mode):

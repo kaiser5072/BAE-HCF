@@ -19,7 +19,7 @@ class AE_CF(object):
         self.dims          = params['dims']
         self.n_epochs      = params['n_epochs']
         self.batch_size    = params['batch_size']
-        self.lr_init       = params['lr']
+        self.lr_init       = params['lr_init']
         self.l2_lambda     = params['l2_lambda']
         self.device        = params['device']
         self.log_dir       = params['log_dir']
