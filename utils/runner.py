@@ -41,11 +41,11 @@ class _LogSessionRunHook(tf.train.SessionRunHook):
             self.elapsed_secs = 0.
             self.count = 0
 
-def train(infer_func, params):
+def train(infer_func, params, i):
     batch_size       = params['batch_size']
     n_epochs         = params['n_epochs']
     data_dir         = params['data_dir']
-    log_dir          = params['log_dir']
+    log_dir          = params['log_dir'] + '/fold%d' % i
     height           = params['height']
     width            = params['width']
     prefetch_size    = params['prefetch_size']

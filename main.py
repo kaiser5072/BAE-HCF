@@ -48,7 +48,7 @@ def train(args):
 
         # TRAINIG
         BEA = model.AE_CF(args)
-        utils.train(BEA, args)
+        utils.train(BEA, args, i)
 
         BEA.destroy_graph()
 
