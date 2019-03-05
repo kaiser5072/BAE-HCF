@@ -120,7 +120,7 @@ class Data(object):
         num_chunks = len(chunk_offsets)
         self.logger.info('split data into %d chunks' % (num_chunks))
 
-        data = self._split_train_val(row, columns, rating, train_ratio)
+        data = self._split_train_val(row, columns, rating)
 
         pool = Pool(opt.num_workers)
 
@@ -153,22 +153,32 @@ class Data(object):
         self.logger.info('height: %s' % self.height)
         self.logger.info('width: %s' % self.width)
 
-    def _split_train_val(self, row, column, rating, train_ratio):
-        # val_ratio = int(1 / (1 - train_ratio))
-        # val_index = np.random.choice(len(rating), len(rating)//val_ratio, replace=False)
-        # val_index = np.sort(val_index)
-        # train_index = np.setdiff1d(np.arange(len(rating)), val_index)
-
+    def _split_train_val(self, row, column, rating):
         pref = coo_matrix((rating, (row, column)), shape=(self.height, self.width))
         divider = np.random.uniform(0, 1, [self.height, self.width])
-        mask = np.zeros_like(divider)
-        mask[divider > train_ratio] = 1
 
-        train = pref.multiply(1 - mask)
-        val   = pref.multiply(mask)
+        row_tr, col_tr, val_tr = [], [], []
+        row_te, col_te, val_te = [], [], []
+        masks = []
+        for i in range(opt.n_folds):
+            divider[divider < (i+1)*0.2] = 5 - i
+            mask = np.zeros_like(divider)
+            mask[divider == 5 - i] = 1
 
-        return (train.nonzero()[1], train.nonzero()[0], train.toarray()[train.nonzero()],
-                val.nonzero()[1], val.nonzero()[0], val.toarray()[val.nonzero()], mask)
+            train = pref.multiply(1 - mask)
+            val   = pref.multiply(mask)
+
+            row_tr.append(train.nonzero()[0])
+            col_tr.append(train.nonzero()[1])
+            val_tr.append(train.toarray()[train.nonzero()])
+
+            row_te.append(val.nonzero()[0])
+            col_te.append(val.nonzero()[1])
+            val_te.append(val.toarray()[val.nonzero()])
+
+            masks.append(mask)
+
+        return (col_tr, row_tr, val_tr, row_te, col_te, val_te, masks)
 
 
     def _split_data(self, row, chunk_size):
