@@ -18,8 +18,8 @@ parser = argparse.ArgumentParser(formatter_class=formatter)
 args, flags = utils.parse_args(opt, parser)
 
 # TODO: Combine lines to load rating data and save dictionary.
-def _get_input(args, fold, mode):
-    meta_path = os.path.join(args['data_dir'], 'meta%i' % fold)
+def _get_input(args, mode):
+    meta_path = os.path.join(args['data_dir'], 'meta%i' % args['n_folds'])
     meta = cPickle.loads(open(meta_path).read())
 
     args['height'] = meta['height']
