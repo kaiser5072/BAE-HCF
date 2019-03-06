@@ -261,11 +261,11 @@ class Data(object):
 
             cont_row_tr.append(cont_tr.nonzero()[0])
             cont_col_tr.append(cont_tr.nonzero()[1])
-            cont_val_tr.append(cont_tr.toarray()[train.nonzero()])
+            cont_val_tr.append(cont_tr.toarray()[cont_tr.nonzero()])
 
             cont_row_te.append(cont_te.nonzero()[0])
             cont_col_te.append(cont_te.nonzero()[1])
-            cont_val_te.append(cont_te.toarray()[train.nonzero()])
+            cont_val_te.append(cont_te.toarray()[cont_te.nonzero()])
 
             masks.append(np.ones((self.height_te, self.width)))
 
