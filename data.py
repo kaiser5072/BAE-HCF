@@ -85,7 +85,6 @@ class Data(object):
         return row, column, pref, item, feature, contents
 
     def generate(self, train, val, contents, mask, begin, end):
-        print(end)
         for i in range(begin, end):
             col_tr  = train[i].indices
             pref_tr = train[i].data
@@ -96,8 +95,6 @@ class Data(object):
             feature_t  = contents[i].indices
             contents_t = contents[i].data
 
-            if col_tr.size == 0 and pref_tr.size == 0 and feature_t.size == 0 and contents_t.size == 0:
-                continue
 
             yield col_tr, pref_tr, col_te, pref_te, feature_t, contents_t, mask[i, :]
 
