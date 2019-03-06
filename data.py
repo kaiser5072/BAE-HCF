@@ -244,10 +244,10 @@ class Data(object):
             self.height_tr.append(len(train_idx))
             self.height_te.append(len(test_idx))
 
-            train   = pref[train_idx]
-            val     = pref[test_idx]
-            cont_tr = cont[train_idx]
-            cont_te = cont[test_idx]
+            train   = pref[train_idx, :]
+            val     = pref[test_idx, :]
+            cont_tr = cont[train_idx, :]
+            cont_te = cont[test_idx, :]
 
             row_tr.append(train.nonzero()[0])
             col_tr.append(train.nonzero()[1])
