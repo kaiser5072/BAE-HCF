@@ -51,7 +51,7 @@ def parse_args(init_vals, custom_parser=None):
                    required=_required(init_vals, 'confidence'),
                    help="Confidence level alpha")
 
-    p.add_argument('-r', '--drop_rate', type=int,
+    p.add_argument('-r', '--drop_rate', type=float,
                    default=_default(init_vals, 'drop_rate'),
                    required=_required(init_vals, 'drop_rate'),
                    help="Input drop rate")
