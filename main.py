@@ -36,7 +36,7 @@ def _get_input(args, fold, mode):
 
 
 def train(args):
-    for i in range(args['n_folds']):
+    for i in range(1):
         args = _get_input(args, i, mode='train')
         log_dir = args['log_dir'] + '/fold%d' % i
 
@@ -66,7 +66,8 @@ def predict(args):
         BEA.destroy_graph()
 
 if args['mode'] == 'train':
-    train(args)
+    for i in range(5):
+        train(args)
 elif args['mode'] == 'predict':
     predict(args)
 else:
