@@ -20,7 +20,7 @@ def parse_data(inputs):
     col_te, row_te, pref_te, item, feature, contents, Mask = data
 
     data = Data()
-    train_path = os.path.join(out_dir, 'fold_%s/%s.%s.tfrecords' % (mode, cidx, fold))
+    train_path = os.path.join(out_dir, 'fold_%s/%s.%s.tfrecords' % (fold, cidx, mode))
     train_writer = tf.python_io.TFRecordWriter(train_path)
     num_train, num_val = 0, 0
 
