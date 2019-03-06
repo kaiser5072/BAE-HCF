@@ -25,7 +25,9 @@ def parse_data(inputs):
     num_train, num_val = 0, 0
 
     sparse_tr = csr_matrix((pref_tr, (row_tr, col_tr)), shape=(height, width))
+    print('a')
     sparse_te = csr_matrix((pref_te, (row_te, col_te)), shape=(height, width))
+    print('b')
     sparse_co = csr_matrix((contents, (item, feature)), shape=(height, n_contents))
 
     with tqdm.tqdm(total=end-begin) as pbar:
