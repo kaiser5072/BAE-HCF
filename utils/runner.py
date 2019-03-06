@@ -128,8 +128,8 @@ def validate(infer_func, params):
 
 
 def predict(infer_func, params):
-    data_dir        = params['data_dir']
-    log_dir         = params['log_dir']
+    data_dir        = params['data_dir'] + '/fold_%d' % params['n_folds']
+    log_dir         = params['log_dir'] + '/fold%d' % params['n_folds']
     height          = params['height']
     width           = params['width']
     batch_size      = params['batch_size']
