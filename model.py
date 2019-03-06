@@ -28,10 +28,14 @@ class AE_CF(object):
         self.dtype = tf.float16 if params['precision'] == 'fp16' else tf.float32
         self.n_layer = len(self.dims) - 1
 
-    def builder(self, inputs, sides):
+    def builder(self, inputs, sides, drops_inputs, is_training):
         w_init = tf.contrib.layers.variance_scaling_initializer()
         b_init = tf.constant_initializer(0.)
-        h = inputs
+
+        if is_training:
+            h = drops_inputs
+        else:
+            h = inputs
 
         prev_dim = self.dims[0]
         for i in range(1, self.n_layer):
@@ -50,12 +54,12 @@ class AE_CF(object):
                                                 dtype=self.dtype)
 
             if i == 1 and self.n_layer != 2:
-                h = tf.sparse.matmul(inputs, w) + tf.sparse.matmul(sides, s)
+                h = tf.sparse.matmul(h, w) + tf.sparse.matmul(sides, s)
                 h = tf.layers.batch_normalization(h)
                 h = tf.nn.relu(h)
 
             elif self.n_layer == 2:
-                h = tf.sparse.matmul(inputs, w) + tf.sparse.matmul(sides, s)
+                h = tf.sparse.matmul(h, w) + tf.sparse.matmul(sides, s)
                 h = tf.layers.batch_normalization(h)
                 h = tf.nn.sigmoid(h)
 
@@ -140,11 +144,20 @@ class AE_CF(object):
         inputs = tf.SparseTensor(indices, values, dense_shape)
         sides  = tf.SparseTensor(indices_s, values_s, dense_shape_s)
 
+        drops_row = np.random.choice(self.height, self.height/2, replace=False)
+        drops_points  = tf.where(tf.reduce_sum(tf.cast(tf.equal(tf.reshape(inputs.indices[:, 0], [-1, 1]), drops_row),
+                                                       dtype=tf.int8), axis=1))
+        drops_indices = tf.gather(inputs.indices, tf.reshape(drops_points, [-1]))
+        drops_value   = tf.gather(inputs.values, tf.reshape(drops_points, [-1]))
+
+        drops_inputs = tf.SparseTensor(drops_indices, drops_value, dense_shape)
+
         with tf.device(self.device):
             inputs = tf.cast(inputs, self.dtype)
             sides  = tf.cast(sides, self.dtype)
+            drops_inputs = tf.cast(drops_inputs, self.dtype)
 
-            self.builder(inputs, sides)
+            self.builder(inputs, sides, drops_inputs, is_training)
 
         if mode == tf.estimator.ModeKeys.PREDICT:
             predictions = {
