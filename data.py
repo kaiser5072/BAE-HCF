@@ -15,19 +15,17 @@ opt = Option('./config.json')
 
 
 def parse_data(inputs):
-    fold, cidx, begin, end, height, width, n_contents, data, item, feature, contents, out_dir = inputs
+    fold, cidx, begin, end, height, width, n_contents, data, out_dir, mode = inputs
     col_tr, row_tr, pref_tr, \
-    col_te, row_te, pref_te, Mask = data
+    col_te, row_te, pref_te, item, feature, contents, Mask = data
 
     data = Data()
-    train_path = os.path.join(out_dir, 'train.%s.fold.%s.tfrecords' % (cidx, fold))
+    train_path = os.path.join(out_dir, '%s.%s.fold.%s.tfrecords' % (mode, cidx, fold))
     train_writer = tf.python_io.TFRecordWriter(train_path)
     num_train, num_val = 0, 0
 
     sparse_tr = csr_matrix((pref_tr, (row_tr, col_tr)), shape=(height, width))
-    print('a')
     sparse_te = csr_matrix((pref_te, (row_te, col_te)), shape=(height, width))
-    print('b')
     sparse_co = csr_matrix((contents, (item, feature)), shape=(height, n_contents))
 
     with tqdm.tqdm(total=end-begin) as pbar:
@@ -113,15 +111,23 @@ class Data(object):
         num_chunks = len(chunk_offsets)
         self.logger.info('split data into %d chunks' % (num_chunks))
 
-        col_tr, row_tr, val_tr, row_te, col_te, val_te, masks = self._split_train_val(row, columns, rating, mode)
-
+        if mode == 'warm':
+            col_tr, row_tr, val_tr, row_te, col_te, val_te, cont_row_tr, cont_col_tr, cont_val_tr, cont_row_te, cont_col_te, cont_val_te, masks \
+                = self._split_train_val_for_warm(row, columns, rating, item, feature, contents)
+        else:
+            col_tr, row_tr, val_tr, row_te, col_te, val_te, cont_row_tr, cont_col_tr, cont_val_tr, cont_row_te, cont_col_te, cont_val_te, masks \
+                = self._split_train_val_for_cold(row, columns, rating, item, feature, contents)
 
         for i in range(opt.n_folds):
+            # For Training set
             pool = Pool(opt.num_workers)
-            data = (col_tr[i], row_tr[i], val_tr[i], row_te[i], col_te[i], val_te[i], masks[i])
+
+            data = (col_tr[i], row_tr[i], val_tr[i], [], [], [], cont_row_tr[i], cont_col_tr[i], cont_val_tr[i], None)
+
             try:
-                num_data = pool.map_async(parse_data, [(i, cidx, begin, end, self.height, self.width, self.n_item_feature, data, item, feature, contents, out_dir)
-                                                       for cidx, (begin, end) in enumerate(chunk_offsets)]).get(999999999)
+                num_data = pool.map_async(parse_data, [
+                    (i, cidx, begin, end, self.height_tr, self.width, self.n_item_feature, data, out_dir, 'train')
+                    for cidx, (begin, end) in enumerate(chunk_offsets)]).get(999999999)
                 pool.close()
                 pool.join()
 
@@ -131,6 +137,33 @@ class Data(object):
                 raise
 
             num_train, num_val = 0, 0
+
+            for train, val in num_data:
+                num_train += train
+                num_val += val
+
+            # For Test set
+            pool = Pool(opt.num_workers)
+
+            if mode == 'warm':
+                data = (col_tr[i], row_tr[i], val_tr[i], col_te[i], row_te[i], val_te[i], cont_row_te[i], cont_col_te[i], cont_val_te[i], masks[i])
+            else:
+                data = ([], [], [], col_te[i], row_te[i], val_te[i], cont_row_te[i], cont_col_te[i], cont_val_te[i], masks[i])
+
+            try:
+                num_data = pool.map_async(parse_data, [
+                    (i, cidx, begin, end, self.height_te, self.width, self.n_item_feature, data, out_dir, 'test')
+                    for cidx, (begin, end) in enumerate(chunk_offsets)]).get(999999999)
+                pool.close()
+                pool.join()
+
+            except KeyboardInterrupt:
+                pool.terminate()
+                pool.join()
+                raise
+
+            num_train, num_val = 0, 0
+
             for train, val in num_data:
                 num_train += train
                 num_val += val
@@ -148,13 +181,15 @@ class Data(object):
             self.logger.info('height: %s' % self.height)
             self.logger.info('width: %s' % self.width)
 
-    def _split_train_val(self, row, column, rating, mode):
+    def _split_train_val_for_warm(self, row, column, rating, item, feature, content):
         pref = coo_matrix((rating, (row, column)), shape=(self.height, self.width))
         divider = np.random.uniform(0, 1, [self.height, self.width])
 
-        row_tr, col_tr, val_tr = [], [], []
-        row_te, col_te, val_te = [], [], []
+        row_tr, col_tr, val_tr, cont_row_tr, cont_col_tr, cont_val_tr = [], [], [], [], [], []
+        row_te, col_te, val_te, cont_row_te, cont_col_te, cont_val_te = [], [], [], [], [], []
+        self.height_tr, self.height_te = [], []
         masks = []
+
         for i in range(opt.n_folds):
             divider[divider < (i+1)*0.2] = 5 - i
             mask = np.zeros_like(divider)
@@ -171,9 +206,69 @@ class Data(object):
             col_te.append(val.nonzero()[1])
             val_te.append(val.toarray()[val.nonzero()])
 
+            cont_row_tr.append(item)
+            cont_col_tr.append(feature)
+            cont_val_tr.append(content)
+
+            cont_row_te.append(item)
+            cont_col_te.append(feature)
+            cont_val_te.append(content)
+
             masks.append(mask)
 
-        return col_tr, row_tr, val_tr, col_te, row_te, val_te, masks
+            self.height_tr.append(self.height)
+            self.height_te.append(self.height)
+
+        return col_tr, row_tr, val_tr, col_te, row_te, val_te, \
+               cont_row_tr, cont_col_tr, cont_val_tr, cont_row_te, cont_col_te, cont_val_te, masks
+
+    def _split_train_val_for_cold(self, row, col, pref, item, feature, content):
+        pref = coo_matrix((pref, (row, col)), shape=(self.height, self.width))
+        cont = coo_matrix((content, (item, feature)), shape=(self.height, self.n_item_feature))
+
+        n_data = np.max(row) + 1
+        rand_idx = np.random.permutation(range(n_data))
+        n_one_fold = int(n_data * 0.2)
+
+        row_tr, col_tr, val_tr, cont_row_tr, cont_col_tr, cont_val_tr = [], [], [], [], [], []
+        row_te, col_te, val_te, cont_row_te, cont_col_te, cont_val_te = [], [], [], [], [], []
+        self.height_tr, self.height_te = [], []
+        masks = []
+
+        for i in range(opt.n_folds):
+            begin = i * n_one_fold
+            end   = np.minimum((i+1)*n_one_fold, n_data)
+
+            test_idx  = rand_idx[begin:end]
+            train_idx = np.setdiff1d(range(n_data), test_idx)
+            self.height_tr.append(len(train_idx))
+            self.height_te.append(len(test_idx))
+
+            train   = pref[train_idx]
+            val     = pref[test_idx]
+            cont_tr = cont[train_idx]
+            cont_te = cont[test_idx]
+
+            row_tr.append(train.nonzero()[0])
+            col_tr.append(train.nonzero()[1])
+            val_tr.append(train.toarray()[train.nonzero()])
+
+            row_te.append(val.nonzero()[0])
+            col_te.append(val.nonzero()[1])
+            val_te.append(val.toarray()[val.nonzero()])
+
+            cont_row_tr.append(cont_tr.nonzero()[0])
+            cont_col_tr.append(cont_tr.nonzero()[1])
+            cont_val_tr.append(cont_tr.toarray()[train.nonzero()])
+
+            cont_row_te.append(cont_te.nonzero()[0])
+            cont_col_te.append(cont_te.nonzero()[1])
+            cont_val_te.append(cont_te.toarray()[train.nonzero()])
+
+            masks.append(np.ones((self.height_te, self.width)))
+
+        return col_tr, row_tr, val_tr, col_te, row_te, val_te, \
+               cont_row_tr, cont_col_tr, cont_val_tr, cont_row_te, cont_col_te, cont_val_te, masks
 
 
     def _split_data(self, row, chunk_size):
