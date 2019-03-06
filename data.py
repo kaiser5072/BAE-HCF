@@ -27,7 +27,7 @@ def parse_data(inputs):
     train_path = os.path.join(train_path, '%s.%s.tfrecords' % (mode, cidx))
     train_writer = tf.python_io.TFRecordWriter(train_path)
     num_train, num_val = 0, 0
-    print(height)
+    print(pref_tr)
 
     sparse_tr = csr_matrix((pref_tr, (row_tr, col_tr)), shape=(height, width))
     sparse_te = csr_matrix((pref_te, (row_te, col_te)), shape=(height, width))
