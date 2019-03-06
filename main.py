@@ -38,7 +38,6 @@ def _get_input(args, fold, mode):
 def train(args):
     for i in range(args['n_folds']):
         args = _get_input(args, i, mode='train')
-
         log_dir = args['log_dir'] + '/fold%d' % i
 
         if os.path.exists(log_dir):
@@ -51,6 +50,7 @@ def train(args):
         utils.train(BEA, args, i)
 
         BEA.destroy_graph()
+        del BEA
 
 
 def evaluate(args):
