@@ -123,7 +123,7 @@ class Data(object):
             # For Training set
             pool = Pool(opt.num_workers)
 
-            data = (col_tr[i], row_tr[i], val_tr[i], [], [], [], cont_row_tr[i], cont_col_tr[i], cont_val_tr[i], masks[i])
+            data = (col_tr[i], row_tr[i], val_tr[i], [], [], [], cont_row_tr[i], cont_col_tr[i], cont_val_tr[i], np.ones((self.height_tr[i], self.width)))
             chunk_offsets = self._split_data(self.height_tr[i], opt.chunk_size)
 
             try:
