@@ -225,8 +225,8 @@ class Data(object):
                cont_row_tr, cont_col_tr, cont_val_tr, cont_row_te, cont_col_te, cont_val_te, masks
 
     def _split_train_val_for_cold(self, row, col, pref, item, feature, content):
-        pref = coo_matrix((pref, (row, col)), shape=(self.height, self.width))
-        cont = coo_matrix((content, (item, feature)), shape=(self.height, self.n_item_feature))
+        pref = csr_matrix((pref, (row, col)), shape=(self.height, self.width))
+        cont = csr_matrix((content, (item, feature)), shape=(self.height, self.n_item_feature))
 
         n_data = np.max(row) + 1
         rand_idx = np.random.permutation(range(n_data))
@@ -246,10 +246,10 @@ class Data(object):
             self.height_tr.append(len(train_idx))
             self.height_te.append(len(test_idx))
 
-            train   = pref.getrow(train_idx)
-            val     = pref[test_idx]
-            cont_tr = cont[train_idx]
-            cont_te = cont[test_idx]
+            train   = pref[train_idx].tocoo()
+            val     = pref[test_idx].tocoo()
+            cont_tr = cont[train_idx].tocoo()
+            cont_te = cont[test_idx].tocoo()
 
             row_tr.append(train.nonzero()[0])
             col_tr.append(train.nonzero()[1])
