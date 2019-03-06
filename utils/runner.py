@@ -82,7 +82,7 @@ def train(infer_func, params, i):
     try:
         est.train(
             input_fn=input_func,
-            max_steps=nupdate,
+            steps=nupdate,
             hooks=training_hooks)
     except KeyboardInterrupt:
         print("Keyboard interrupt")
