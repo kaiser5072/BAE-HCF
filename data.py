@@ -114,10 +114,10 @@ class Data(object):
         self.logger.info('split data into %d chunks' % (num_chunks))
 
         if mode == 'warm':
-            col_tr, row_tr, val_tr, row_te, col_te, val_te, cont_row_tr, cont_col_tr, cont_val_tr, cont_row_te, cont_col_te, cont_val_te, masks \
+            col_tr, row_tr, val_tr, col_te, row_te, val_te, cont_row_tr, cont_col_tr, cont_val_tr, cont_row_te, cont_col_te, cont_val_te, masks \
                 = self._split_train_val_for_warm(row, columns, rating, item, feature, contents)
         else:
-            col_tr, row_tr, val_tr, row_te, col_te, val_te, cont_row_tr, cont_col_tr, cont_val_tr, cont_row_te, cont_col_te, cont_val_te, masks \
+            col_tr, row_tr, val_tr, col_te, row_te, val_te, cont_row_tr, cont_col_tr, cont_val_tr, cont_row_te, cont_col_te, cont_val_te, masks \
                 = self._split_train_val_for_cold(row, columns, rating, item, feature, contents)
 
         for i in range(opt.n_folds):
