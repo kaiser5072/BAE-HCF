@@ -50,8 +50,6 @@ def train(args):
         utils.train(BEA, args, i)
 
         BEA.destroy_graph()
-        del BEA
-
 
 def evaluate(args):
     if args['model_dir'] is not None:

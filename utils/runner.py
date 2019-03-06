@@ -44,7 +44,7 @@ class _LogSessionRunHook(tf.train.SessionRunHook):
 def train(infer_func, params, i):
     batch_size       = params['batch_size']
     n_epochs         = params['n_epochs']
-    data_dir         = params['data_dir'] + '/fold_%d' % 1
+    data_dir         = params['data_dir'] + '/fold_%d' % 4
     log_dir          = params['log_dir'] + '/fold%d' % i
     height           = params['height']
     width            = params['width']
@@ -82,7 +82,7 @@ def train(infer_func, params, i):
     try:
         est.train(
             input_fn=input_func,
-            steps=nupdate,
+            max_steps=nupdate,
             hooks=training_hooks)
     except KeyboardInterrupt:
         print("Keyboard interrupt")
