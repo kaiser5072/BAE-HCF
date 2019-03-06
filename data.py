@@ -173,7 +173,7 @@ class Data(object):
 
             masks.append(mask)
 
-        return col_tr, row_tr, val_tr, row_te, col_te, val_te, masks
+        return col_tr, row_tr, val_tr, col_te, row_te, val_te, masks
 
 
     def _split_data(self, row, chunk_size):
