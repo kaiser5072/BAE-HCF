@@ -8,6 +8,8 @@
     "l2_lambda"     : 0.0,
     "n_epochs"      : 10000,
     "display_every" : 1000,
+    "confidence"    : 100,
+    "drop_rate"     : 0.5,
     "n_folds"       : 5,
     "dims"          : [500, 200],
     "data_dir"      : "./Input",

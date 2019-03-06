@@ -23,6 +23,8 @@ class AE_CF(object):
         self.l2_lambda     = params['l2_lambda']
         self.device        = params['device']
         self.log_dir       = params['log_dir']
+        self.confidence    = params['confidence']
+        self.drop_rate     = params['drop_rate']
         self.prefetch_size = params['prefetch_size']
 
         self.dtype = tf.float16 if params['precision'] == 'fp16' else tf.float32
@@ -85,7 +87,7 @@ class AE_CF(object):
 
         self.preds = tf.gather_nd(self.outputs, inputs.indices)
         pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
-        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - 1)) * 100
+        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - 1)) * self.confidence
 
         self.loss = tf.add_n([pref_diff_ones, pref_diff_zero]) / (self.height * self.width)
         self.loss = tf.identity(self.loss, name='loss')

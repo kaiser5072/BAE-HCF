@@ -46,6 +46,16 @@ def parse_args(init_vals, custom_parser=None):
                    required=_required(init_vals, 'batch_size'),
                    help="Size of each minibatch.")
 
+    p.add_argument('-c', '--confidence', type=int,
+                   default=_default(init_vals, 'confidence'),
+                   required=_required(init_vals, 'confidence'),
+                   help="Confidence level alpha")
+
+    p.add_argument('-r', '--drop_rate', type=int,
+                   default=_default(init_vals, 'drop_rate'),
+                   required=_required(init_vals, 'drop_rate'),
+                   help="Input drop rate")
+
     p.add_argument('-f', '--n_folds', type=int,
                    default=_default(init_vals, 'n_folds'),
                    required=_required(init_vals, 'n_folds'),
@@ -92,6 +102,10 @@ def parse_args(init_vals, custom_parser=None):
     del FLAGS.precision
     vals['l2_lambda'] = FLAGS.l2_lambda
     del FLAGS.l2_lambda
+    vals['confidence'] = FLAGS.confidence
+    del FLAGS.confidence
+    vals['drop_rate'] = FLAGS.drop_rate
+    del FLAGS.drop_rate
     vals['display_every'] = FLAGS.display_every
     del FLAGS.display_every
     vals['dims'] = FLAGS.dims
