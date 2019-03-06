@@ -124,7 +124,7 @@ class Data(object):
             # For Training set
             pool = Pool(opt.num_workers)
 
-            data = (col_tr[i], row_tr[i], val_tr[i], [], [], [], cont_row_tr[i], cont_col_tr[i], cont_val_tr[i], None)
+            data = (col_tr[i], row_tr[i], val_tr[i], [], [], [], cont_row_tr[i], cont_col_tr[i], cont_val_tr[i], masks[i])
 
             try:
                 num_data = pool.map_async(parse_data, [
