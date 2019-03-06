@@ -8,31 +8,32 @@ import tqdm
 import os
 
 from scipy.sparse import coo_matrix
+from scipy.sparse import csr_matrix
 from multiprocessing import Pool
 from utils import get_logger, Option
 opt = Option('./config.json')
 
 
 def parse_data(inputs):
-    fold, cidx, begin, end, data, item, feature, contents, out_dir = inputs
-    col_t, row_t, rating_t, col_v, row_v, rating_v, Mask = data
+    fold, cidx, begin, end, height, width, n_contents, data, item, feature, contents, out_dir = inputs
+    col_tr, row_tr, pref_tr, \
+    col_te, row_te, pref_te, Mask = data
 
     data = Data()
     train_path = os.path.join(out_dir, 'train.%s.fold.%s.tfrecords' % (cidx, fold))
     train_writer = tf.python_io.TFRecordWriter(train_path)
     num_train, num_val = 0, 0
+
+    sparse_tr = csr_matrix((pref_tr, (row_tr, col_tr)), shape=(height, width))
+    sparse_te = csr_matrix((pref_te, (row_te, col_te)), shape=(height, width))
+    sparse_co = csr_matrix((contents, (item, feature)), shape=(height, n_contents))
+
     with tqdm.tqdm(total=end-begin) as pbar:
-        for column, value, column_v, value_v, feature_t, contents_t, mask in data.generate(row_t,
-                                                                                     col_t,
-                                                                                     rating_t,
-                                                                                     row_v,
-                                                                                     col_v,
-                                                                                     rating_v,
-                                                                                     Mask,
-                                                                                     item,
-                                                                                     feature,
-                                                                                     contents,
-                                                                                     begin, end):
+        for column, value, column_v, value_v, feature_t, contents_t, mask in data.generate(sparse_tr,
+                                                                                           sparse_te,
+                                                                                           sparse_co,
+                                                                                           Mask,
+                                                                                           begin, end):
             num_train += len(value)
             num_val   += len(value_v)
             value      = value.astype(np.float32)
@@ -83,33 +84,23 @@ class Data(object):
 
         return row, column, pref, item, feature, contents
 
-    def generate(self, row_t, col_t, rating_t, row_v, col_v, rating_v, mask, item, feature, contents, begin, end):
-
-
+    def generate(self, train, val, contents, mask, begin, end):
         for i in range(begin, end):
-            # train = csr_matrix((rating_train, (row_train, column_train)), shape=(self.height, self.width))
-            # val   = csr_matrix((rating_val, (row_val, column_val)), shape=(self.height, self.width))
-            train_index = (row_t == i)
-            column_t  = col_t[train_index]
-            value_t = rating_t[train_index]
+            col_tr  = train[i].indices
+            pref_tr = train[i].data
 
-            val_index = (row_v == i)
-            column_v  = col_v[val_index]
-            value_v = rating_v[val_index]
+            col_te  = val[i].indices
+            pref_te = val[i].data
 
-            contents_index = (item == i)
-            feature_t = feature[contents_index]
-            contents_t = contents[contents_index]
-            # column_t = train[i, :].indices
-            # value_t  = train[i, :].data
-            #
-            # column_v = val[i, :].indices
-            # value_v  = val[i, :].data
+            feature_t      = contents[i].indices
+            contents_t     = contents[i].data
 
-            yield column_t, value_t, column_v, value_v, feature_t, contents_t, mask[i, :]
+            if col_tr.size == 0 and pref_tr.size == 0 and feature_t.size == 0 and contents_t.size == 0:
+                continue
 
+            yield col_tr, pref_tr, col_te, pref_te, feature_t, contents_t, mask[i, :]
 
-    def make_db(self, data_dir, out_dir):
+    def make_db(self, data_dir, out_dir, mode):
         if os.path.exists(out_dir):
             shutil.rmtree(out_dir)
 
@@ -120,7 +111,7 @@ class Data(object):
         num_chunks = len(chunk_offsets)
         self.logger.info('split data into %d chunks' % (num_chunks))
 
-        col_tr, row_tr, val_tr, row_te, col_te, val_te, masks = self._split_train_val(row, columns, rating)
+        col_tr, row_tr, val_tr, row_te, col_te, val_te, masks = self._split_train_val(row, columns, rating, mode)
 
 
         for i in range(opt.n_folds):
@@ -142,11 +133,11 @@ class Data(object):
                 num_train += train
                 num_val += val
 
-            meta_fout = open(os.path.join(out_dir, 'meta'), 'w')
-            meta = {'num_train': num_train,
-                    'num_val': num_val,
-                    'height': self.height,
-                    'width': self.width}
+            meta_fout = open(os.path.join(out_dir, 'meta%s'%i), 'w')
+            meta = {'num_train' : num_train,
+                    'num_val'   : num_val,
+                    'height'    : self.height,
+                    'width'     : self.width}
             meta_fout.write(cPickle.dumps(meta, 2))
             meta_fout.close()
 
@@ -155,7 +146,7 @@ class Data(object):
             self.logger.info('height: %s' % self.height)
             self.logger.info('width: %s' % self.width)
 
-    def _split_train_val(self, row, column, rating):
+    def _split_train_val(self, row, column, rating, mode):
         pref = coo_matrix((rating, (row, column)), shape=(self.height, self.width))
         divider = np.random.uniform(0, 1, [self.height, self.width])
 
