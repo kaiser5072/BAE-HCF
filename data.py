@@ -27,7 +27,6 @@ def parse_data(inputs):
     train_path = os.path.join(train_path, '%s.%s.tfrecords' % (mode, cidx))
     train_writer = tf.python_io.TFRecordWriter(train_path)
     num_train, num_val = 0, 0
-    print(row_tr)
 
     sparse_tr = csr_matrix((pref_tr, (row_tr, col_tr)), shape=(height, width))
     sparse_te = csr_matrix((pref_te, (row_te, col_te)), shape=(height, width))
@@ -110,7 +109,6 @@ class Data(object):
         os.makedirs(out_dir)
 
         row, columns, rating, item, feature, contents = self.load_data(data_dir, 'item')
-
 
         if mode == 'warm':
             col_tr, row_tr, val_tr, col_te, row_te, val_te, cont_row_tr, cont_col_tr, cont_val_tr, cont_row_te, cont_col_te, cont_val_te, masks \

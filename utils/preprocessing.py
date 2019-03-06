@@ -72,8 +72,10 @@ def _parse_and_preprocess_record(record, width, mode):
         return inputs, labels
 
 def data_set(data_dir, batch_size, prefetch_size, width, mode):
-
-    data_path = os.path.join(data_dir, 'train.*.tfrecords')
+    if mode == 'train':
+        data_path = os.path.join(data_dir, 'train.*.tfrecords')
+    else:
+        data_path = os.path.join(data_dir, 'test.*.tfrecords')
 
     filenames = tf.data.Dataset.list_files(data_path)
 
