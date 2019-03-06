@@ -105,9 +105,7 @@ class Data(object):
         os.makedirs(out_dir)
 
         row, columns, rating, item, feature, contents = self.load_data(data_dir, 'item')
-        chunk_offsets = self._split_data(row, opt.chunk_size)
-        num_chunks = len(chunk_offsets)
-        self.logger.info('split data into %d chunks' % (num_chunks))
+
 
         if mode == 'warm':
             col_tr, row_tr, val_tr, col_te, row_te, val_te, cont_row_tr, cont_col_tr, cont_val_tr, cont_row_te, cont_col_te, cont_val_te, masks \
@@ -121,6 +119,7 @@ class Data(object):
             pool = Pool(opt.num_workers)
 
             data = (col_tr[i], row_tr[i], val_tr[i], [], [], [], cont_row_tr[i], cont_col_tr[i], cont_val_tr[i], masks[i])
+            chunk_offsets = self._split_data(self.height_tr[i], opt.chunk_size)
 
             try:
                 num_data = pool.map_async(parse_data, [
@@ -147,6 +146,7 @@ class Data(object):
                 data = (col_tr[i], row_tr[i], val_tr[i], col_te[i], row_te[i], val_te[i], cont_row_te[i], cont_col_te[i], cont_val_te[i], masks[i])
             else:
                 data = ([], [], [], col_te[i], row_te[i], val_te[i], cont_row_te[i], cont_col_te[i], cont_val_te[i], masks[i])
+            chunk_offsets = self._split_data(self.height_te[i], opt.chunk_size)
 
             try:
                 num_data = pool.map_async(parse_data, [
@@ -269,8 +269,7 @@ class Data(object):
                cont_row_tr, cont_col_tr, cont_val_tr, cont_row_te, cont_col_te, cont_val_te, masks
 
 
-    def _split_data(self, row, chunk_size):
-        total = np.max(row) + 1
+    def _split_data(self, total, chunk_size):
         chunks = [(i, min(i + chunk_size, total))
                   for i in range(0, total, chunk_size)]
 
