@@ -21,10 +21,9 @@ def parse_data(inputs):
 
     data = Data()
     train_path = os.path.join(out_dir, 'fold_%s' % fold)
-    if os.path.exists(train_path):
-        shutil.rmtree(train_path)
+    if not os.path.exists(train_path):
+        os.makedirs(train_path)
 
-    os.makedirs(train_path)
     train_path = os.path.join(train_path, '%s.%s.tfrecords' % (mode, cidx))
     train_writer = tf.python_io.TFRecordWriter(train_path)
     num_train, num_val = 0, 0
