@@ -267,7 +267,7 @@ class Data(object):
             cont_col_te.append(cont_te.nonzero()[1])
             cont_val_te.append(cont_te.toarray()[cont_te.nonzero()])
 
-            masks.append(np.ones((self.height_te, self.width)))
+            masks.append(np.ones((len(test_idx), self.width)))
 
         return col_tr, row_tr, val_tr, col_te, row_te, val_te, \
                cont_row_tr, cont_col_tr, cont_val_tr, cont_row_te, cont_col_te, cont_val_te, masks
