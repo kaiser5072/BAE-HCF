@@ -18,8 +18,8 @@ parser = argparse.ArgumentParser(formatter_class=formatter)
 args, flags = utils.parse_args(opt, parser)
 
 # TODO: Combine lines to load rating data and save dictionary.
-def _get_input(args, mode):
-    meta_path = os.path.join(args['data_dir'], 'meta')
+def _get_input(args, fold, mode):
+    meta_path = os.path.join(args['data_dir'], 'meta%i' % fold)
     meta = cPickle.loads(open(meta_path).read())
 
     args['height'] = meta['height']
@@ -36,9 +36,9 @@ def _get_input(args, mode):
 
 
 def train(args):
-    args = _get_input(args, mode='train')
-
     for i in range(args['n_folds']):
+        args = _get_input(args, i, mode='train')
+
         log_dir = args['log_dir'] + '/fold%d' % i
 
         if os.path.exists(log_dir):
