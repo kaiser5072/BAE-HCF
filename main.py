@@ -39,7 +39,7 @@ def train(args):
     for i in range(args['n_folds']):
         args = _get_input(args, i, mode='train')
 
-        log_dir = args['log_dir'] + '/fold%d' % 0
+        log_dir = args['log_dir'] + '/fold%d' % i
 
         if os.path.exists(log_dir):
             shutil.rmtree(log_dir)
