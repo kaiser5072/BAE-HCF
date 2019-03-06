@@ -36,20 +36,19 @@ def _get_input(args, fold, mode):
 
 
 def train(args):
-    for i in range(1):
-        args = _get_input(args, i, mode='train')
-        log_dir = args['log_dir'] + '/fold%d' % i
+    args = _get_input(args, mode='train')
+    log_dir = args['log_dir'] + '/fold%d' % args['n_folds']
 
-        if os.path.exists(log_dir):
-            shutil.rmtree(log_dir)
+    if os.path.exists(log_dir):
+        shutil.rmtree(log_dir)
 
-        os.makedirs(log_dir)
+    os.makedirs(log_dir)
 
-        # TRAINIG
-        BEA = model.AE_CF(args)
-        utils.train(BEA, args, i)
+    # TRAINIG
+    BEA = model.AE_CF(args)
+    utils.train(BEA, args, args['n_folds'])
 
-        BEA.destroy_graph()
+    BEA.destroy_graph()
 
 def evaluate(args):
     if args['model_dir'] is not None:
@@ -66,8 +65,7 @@ def predict(args):
         BEA.destroy_graph()
 
 if args['mode'] == 'train':
-    for i in range(5):
-        train(args)
+    train(args)
 elif args['mode'] == 'predict':
     predict(args)
 else:
