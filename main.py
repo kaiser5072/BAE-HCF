@@ -58,11 +58,10 @@ def evaluate(args):
         BEA.destroy_graph()
 
 def predict(args):
-    if args['model_dir'] is not None:
-        args = _get_input(args, mode='val')
-        BEA = model.AE_CF(args)
-        _ = utils.predict(BEA, args)
-        BEA.destroy_graph()
+    args = _get_input(args, mode='val')
+    BEA = model.AE_CF(args)
+    _ = utils.predict(BEA, args)
+    BEA.destroy_graph()
 
 if args['mode'] == 'train':
     train(args)
