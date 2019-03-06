@@ -118,7 +118,7 @@ class Data(object):
             pool = Pool(opt.num_workers)
             data = (col_tr[i], row_tr[i], val_tr[i], row_te[i], col_te[i], val_te[i], masks[i])
             try:
-                num_data = pool.map_async(parse_data, [(i, cidx, begin, end, data, item, feature, contents, out_dir)
+                num_data = pool.map_async(parse_data, [(i, cidx, begin, end, self.height, self.width, self.n_item_feature, data, item, feature, contents, out_dir)
                                                        for cidx, (begin, end) in enumerate(chunk_offsets)]).get(999999999)
                 pool.close()
                 pool.join()
