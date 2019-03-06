@@ -128,7 +128,7 @@ class Data(object):
 
             try:
                 num_data = pool.map_async(parse_data, [
-                    (i, cidx, begin, end, self.height_tr, self.width, self.n_item_feature, data, out_dir, 'train')
+                    (i, cidx, begin, end, self.height_tr[i], self.width, self.n_item_feature, data, out_dir, 'train')
                     for cidx, (begin, end) in enumerate(chunk_offsets)]).get(999999999)
                 pool.close()
                 pool.join()
@@ -154,7 +154,7 @@ class Data(object):
 
             try:
                 num_data = pool.map_async(parse_data, [
-                    (i, cidx, begin, end, self.height_te, self.width, self.n_item_feature, data, out_dir, 'test')
+                    (i, cidx, begin, end, self.height_te[i], self.width, self.n_item_feature, data, out_dir, 'test')
                     for cidx, (begin, end) in enumerate(chunk_offsets)]).get(999999999)
                 pool.close()
                 pool.join()
