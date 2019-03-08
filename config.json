@@ -13,6 +13,8 @@
     "lr_power"      : 2.0,
     "display_step"  : 780,
     "l2_lambda"     : 0.0,
+    "confidence"    : 500,
+    "drop_rate"     : 0.25,
     "batch_size"    : 1024,
     "lr"            : 1e-3,
     "n_epochs"      : 10,

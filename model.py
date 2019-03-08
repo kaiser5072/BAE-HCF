@@ -24,6 +24,8 @@ class AE_CF(object):
         self.l2_lambda     = params['l2_lambda']
         self.device        = params['device']
         self.log_dir       = params['log_dir']
+        self.confidence    = params['confidence']
+        self.drop_rate     = params['drop_rate']
         self.prefetch_size = params['prefetch_size']
 
         self.dtype = tf.float16 if params['precision'] == 'fp16' else tf.float32
@@ -92,7 +94,7 @@ class AE_CF(object):
             end_learning_rate= 1000)
 
         pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
-        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - inputs.values)) * 1000
+        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - inputs.values)) * self.confidence
 
         self.loss = tf.add_n([pref_diff_zero, pref_diff_ones]) / (self.height * self.width)
         self.loss = tf.identity(self.loss, name='loss')
@@ -152,7 +154,7 @@ class AE_CF(object):
         inputs = tf.SparseTensor(indices, values, dense_shape)
         sides  = tf.SparseTensor(indices_s, values_s, dense_shape_s)
 
-        drops_row = np.random.choice(self.height, self.height/4*3, replace=False)
+        drops_row = np.random.choice(self.height, int(self.height * (1-self.drop_rate)), replace=False)
         drops_points  = tf.where(tf.reduce_sum(tf.cast(tf.equal(tf.reshape(inputs.indices[:, 0], [-1, 1]), drops_row), dtype=tf.int8), axis=1))
         drops_indices = tf.gather(inputs.indices, tf.reshape(drops_points, [-1]))
         drops_value   = tf.gather(inputs.values, tf.reshape(drops_points, [-1]))

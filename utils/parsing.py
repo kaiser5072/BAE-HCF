@@ -52,6 +52,16 @@ def parse_args(init_vals, custom_parser=None):
                    required=_required(init_vals, 'batch_size'),
                    help="Size of each minibatch.")
 
+    p.add_argument('-c', '--confidence', type=int,
+                   default=_default(init_vals, 'confidence'),
+                   required=_required(init_vals, 'confidence'),
+                   help="Confidence level alpha.")
+
+    p.add_argument('-r', '--drop_rate', type=float,
+                   default=_default(init_vals, 'drop_rate'),
+                   required=_required(init_vals, 'drop_rate'),
+                   help="Input dropout rate.")
+
     p.add_argument('-t', '--AE_TYPE', choices=['item', 'user'],
                    default=_default(init_vals, 'AE_TYPE'),
                    required=_required(init_vals, 'AE_TYPE'),
@@ -95,6 +105,10 @@ def parse_args(init_vals, custom_parser=None):
     del FLAGS.n_epochs
     vals['batch_size'] = FLAGS.batch_size
     del FLAGS.batch_size
+    vals['confidence'] = FLAGS.confidence
+    del FLAGS.confidence
+    vals['drop_rate'] = FLAGS.drop_rate
+    del FLAGS.drop_rate
     vals['AE_TYPE'] = FLAGS.AE_TYPE
     del FLAGS.AE_TYPE
     vals['precision'] = FLAGS.precision
