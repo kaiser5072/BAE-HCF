@@ -9,7 +9,6 @@
     "AE_TYPE"       : "item",
     "dims"          : [500, 200],
     "num_workers"   : 16,
-    "lr_init"       : 1e-3,
     "lr_power"      : 2.0,
     "display_step"  : 780,
     "l2_lambda"     : 0.0,

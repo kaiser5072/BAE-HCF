@@ -62,6 +62,11 @@ def parse_args(init_vals, custom_parser=None):
                    required=_required(init_vals, 'drop_rate'),
                    help="Input dropout rate.")
 
+    p.add_argument('--lr', type=float,
+                   default=_default(init_vals, 'lr'),
+                   required=_required(init_vals, 'lr'),
+                   help="Learning rate.")
+
     p.add_argument('-t', '--AE_TYPE', choices=['item', 'user'],
                    default=_default(init_vals, 'AE_TYPE'),
                    required=_required(init_vals, 'AE_TYPE'),
@@ -105,6 +110,8 @@ def parse_args(init_vals, custom_parser=None):
     del FLAGS.n_epochs
     vals['batch_size'] = FLAGS.batch_size
     del FLAGS.batch_size
+    vals['lr'] = FLAGS.lr
+    del FLAGS.lr
     vals['confidence'] = FLAGS.confidence
     del FLAGS.confidence
     vals['drop_rate'] = FLAGS.drop_rate
