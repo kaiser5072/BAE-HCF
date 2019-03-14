@@ -50,17 +50,21 @@ class AE_CF(object):
                                               trainable=True,
                                               initializer=b_init,
                                               dtype=self.dtype)
+
+            if i == 1 and self.n_layer != 2:
                 s = tf.get_variable('weight_s', shape=[self.n_features, self.dims[i]],
                                                 trainable=True,
                                                 initializer=w_init,
                                                 dtype=self.dtype)
-
-            if i == 1 and self.n_layer != 2:
                 h = tf.sparse.matmul(h, w) + tf.sparse.matmul(sides, s) + b
                 # h = tf.layers.batch_normalization(h)
                 h = tf.nn.relu(h)
 
             elif self.n_layer == 2:
+                s = tf.get_variable('weight_s', shape=[self.n_features, self.dims[i]],
+                                                trainable=True,
+                                                initializer=w_init,
+                                                dtype=self.dtype)
                 h = tf.sparse.matmul(h, w) + tf.sparse.matmul(sides, s) + b
                 # h = tf.layers.batch_normalization(h)
                 h = tf.nn.tanh(h)
@@ -103,7 +107,7 @@ class AE_CF(object):
 
         l2_losses = []
         for var in all_var:
-            if var.op.name.find('weight') >= 0 >= 0:
+            if var.op.name.find('weight') >= 0 or var.op.name.find('sides') >= 0:
                 l2_losses.append(tf.nn.l2_loss(var))
 
         self.loss = tf.add(self.loss, 2 * self.l2_lambda * tf.reduce_sum(l2_losses), name='total_loss')
