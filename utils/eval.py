@@ -11,6 +11,8 @@ def get_recall(target, preds, mask, n_recalls):
     preds       = np.transpose(preds)
     mask   = np.transpose(mask)
     target        = np.transpose(target)
+
+    print(np.sort(preds[0, :])[::-1][:100])
     # temp      = np.asarray(ratingTest)
     # preds     = np.asarray(preds)
     # test_mask = np.asarray(test_mask)
