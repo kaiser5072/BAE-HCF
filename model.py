@@ -168,7 +168,7 @@ class AE_CF(object):
 
         if mode == tf.estimator.ModeKeys.PREDICT:
             predictions = {
-                'preds': self.outputs,
+                'preds': tf.nn.softmax(self.outputs),
                 'mask': features['mask'],
                 'ratingTest': tf.sparse.to_dense(features['labels'])
             }
