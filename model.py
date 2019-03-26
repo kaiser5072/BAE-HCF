@@ -85,17 +85,17 @@ class AE_CF(object):
 
             self.outputs = tf.matmul(h, w)
 
-        log_softmax_var = tf.nn.log_softmax(self.outputs)
-        neg_ll = -tf.reduce_mean(tf.reduce_sum(
-            log_softmax_var * mask, axis=1), name='neg_ll')
-        self.loss = tf.identity(neg_ll, name='loss')
+        # log_softmax_var = tf.nn.log_softmax(self.outputs)
+        # neg_ll = -tf.reduce_mean(tf.reduce_sum(
+        #     log_softmax_var * mask, axis=1), name='neg_ll')
+        # self.loss = tf.identity(neg_ll, name='loss')
 
-        # self.preds = tf.gather_nd(self.outputs, inputs.indices)
-        # pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
-        # pref_diff_ones = tf.reduce_sum(tf.square(self.preds - 1)) * self.confidence
-        #
-        # self.loss = tf.add_n([pref_diff_ones, pref_diff_zero]) / (self.height * self.width)
-        # self.loss = tf.identity(self.loss, name='loss')
+        self.preds = tf.gather_nd(self.outputs, inputs.indices)
+        pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
+        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - 1)) * self.confidence
+
+        self.loss = tf.add_n([pref_diff_ones, pref_diff_zero]) / (self.height * self.width)
+        self.loss = tf.identity(self.loss, name='loss')
 
         all_var = [var for var in tf.trainable_variables() ]
 
@@ -168,7 +168,7 @@ class AE_CF(object):
 
         if mode == tf.estimator.ModeKeys.PREDICT:
             predictions = {
-                'preds': tf.nn.softmax(self.outputs),
+                'preds': self.outputs,
                 'mask': features['mask'],
                 'ratingTest': tf.sparse.to_dense(features['labels'])
             }
