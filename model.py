@@ -78,7 +78,7 @@ class AE_CF(object):
             prev_dim = h.get_shape()[1]
 
         with tf.variable_scope('layer%d'%self.n_layer):
-            w = tf.get_variable('weight', shape=[h.get_shape()[1], self.dims[-1]],
+            w = tf.get_variable('decoder', shape=[h.get_shape()[1], self.dims[-1]],
                                 trainable=True,
                                 initializer=w_init,
                                 dtype=self.dtype)
@@ -103,6 +103,8 @@ class AE_CF(object):
         for var in all_var:
             if var.op.name.find('weight') >= 0 or var.op.name.find('sides') >= 0:
                 l2_losses.append(tf.nn.l2_loss(var))
+            if var.op.name.find('decoder') >= 0:
+                l2_losses.append(tf.nn.l2_loss(tf.matmul(var, var, transpose_b=True) - tf.eye(200)))
 
         self.loss = tf.add(self.loss, 2 * self.l2_lambda * tf.reduce_sum(l2_losses), name='total_loss')
 
