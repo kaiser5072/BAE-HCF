@@ -78,24 +78,24 @@ class AE_CF(object):
             prev_dim = h.get_shape()[1]
 
         with tf.variable_scope('layer%d'%self.n_layer):
-            w = tf.get_variable('decoder', shape=[h.get_shape()[1], self.dims[-1]],
+            w = tf.get_variable('weight', shape=[h.get_shape()[1], self.dims[-1]],
                                 trainable=True,
                                 initializer=w_init,
                                 dtype=self.dtype)
 
             self.outputs = tf.matmul(h, w)
 
-        # log_softmax_var = tf.nn.log_softmax(self.outputs)
-        # neg_ll = -tf.reduce_mean(tf.reduce_sum(
-        #     log_softmax_var * mask, axis=1), name='neg_ll')
-        # self.loss = tf.identity(neg_ll, name='loss')
+        log_softmax_var = tf.nn.log_softmax(self.outputs)
+        neg_ll = -tf.reduce_mean(tf.reduce_sum(
+            log_softmax_var * mask, axis=1), name='neg_ll')
+        self.loss = tf.identity(neg_ll, name='loss')
 
-        self.preds = tf.gather_nd(self.outputs, inputs.indices)
-        pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
-        pref_diff_ones = tf.reduce_sum(tf.square(self.preds - 1)) * self.confidence
-
-        self.loss = tf.add_n([pref_diff_ones, pref_diff_zero]) / (self.height * self.width)
-        self.loss = tf.identity(self.loss, name='loss')
+        # self.preds = tf.gather_nd(self.outputs, inputs.indices)
+        # pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
+        # pref_diff_ones = tf.reduce_sum(tf.square(self.preds - 1)) * self.confidence
+        #
+        # self.loss = tf.add_n([pref_diff_ones, pref_diff_zero]) / (self.height * self.width)
+        # self.loss = tf.identity(self.loss, name='loss')
 
         all_var = [var for var in tf.trainable_variables() ]
 
@@ -103,8 +103,6 @@ class AE_CF(object):
         for var in all_var:
             if var.op.name.find('weight') >= 0 or var.op.name.find('sides') >= 0:
                 l2_losses.append(tf.nn.l2_loss(var))
-            if var.op.name.find('decoder') >= 0:
-                l2_losses.append(tf.nn.l2_loss(tf.matmul(var, var, transpose_b=True) - tf.eye(200)))
 
         self.loss = tf.add(self.loss, 2 * self.l2_lambda * tf.reduce_sum(l2_losses), name='total_loss')
 
@@ -170,7 +168,7 @@ class AE_CF(object):
 
         if mode == tf.estimator.ModeKeys.PREDICT:
             predictions = {
-                'preds': self.outputs,
+                'preds': tf.nn.softmax(self.outputs),
                 'mask': features['mask'],
                 'ratingTest': tf.sparse.to_dense(features['labels'])
             }
