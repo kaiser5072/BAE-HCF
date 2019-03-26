@@ -87,8 +87,8 @@ class AE_CF(object):
 
         log_softmax_var = tf.nn.log_softmax(self.outputs)
         neg_ll = -tf.reduce_mean(tf.reduce_sum(
-            log_softmax_var * mask, axis=1), name='loss')
-        self.loss = tf.identity(neg_ll)
+            log_softmax_var * mask, axis=1), name='neg_ll')
+        self.loss = tf.identity(neg_ll, name='loss')
 
         # self.preds = tf.gather_nd(self.outputs, inputs.indices)
         # pref_diff_zero = tf.reduce_sum(tf.square(self.outputs)) - tf.reduce_sum(tf.square(self.preds))
