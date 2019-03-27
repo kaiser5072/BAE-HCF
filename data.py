@@ -184,7 +184,7 @@ class Data(object):
 
     def _split_train_val_for_warm(self, row, column, rating, item, feature, content):
         pref = coo_matrix((rating, (row, column)), shape=(self.height, self.width))
-
+        
         cut_list = pref.sum(axis=0)
         cut_idx = np.where(cut_list < 5)[0]
         item_idx = np.setdiff1d(range(self.width), cut_idx)
