@@ -52,7 +52,7 @@ def _parse_and_preprocess_record(record, width, mode):
     feature = tf.cast(feature, tf.int64)
 
     inputs = tf.SparseTensor(tf.reshape(item, [-1, 1]), value, [width])
-    sides = tf.SparseTensor(tf.reshape(feature, [-1, 1]), content, [8000])
+    sides = tf.SparseTensor(tf.reshape(feature, [-1, 1]), content, [20000])
 
     if mode == 'train':
         inputs = {'pref': inputs, 'sides': sides}
