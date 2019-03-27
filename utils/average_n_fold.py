@@ -6,7 +6,7 @@ result = []
 for line in f:
     result.append(line.split())
 
-result = np.asarray(result)
+result = np.asarray(result).astype(np.float32)
 print(result)
 results = np.average(result, axis=1)
 
