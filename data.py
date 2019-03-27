@@ -187,6 +187,7 @@ class Data(object):
         
         cut_list = pref.sum(axis=0)
         cut_idx = np.where(cut_list < 5)[0]
+        print(cut_idx)
         item_idx = np.setdiff1d(range(self.width), cut_idx)
         
         divider = np.random.uniform(0, 1, [self.height, np.size(item_idx, 0)])
