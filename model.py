@@ -50,7 +50,7 @@ class AE_CF(object):
                                               trainable=True,
                                               initializer=b_init,
                                               dtype=self.dtype)
-                s = tf.get_variable('weight_s', shape=[8000, self.dims[i]],
+                s = tf.get_variable('weight_s', shape=[20000, self.dims[i]],
                                                 trainable=True,
                                                 initializer=w_init,
                                                 dtype=self.dtype)
