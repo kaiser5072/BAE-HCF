@@ -2,7 +2,7 @@ import numpy as np
 import fire
 
 def average(idx):
-    f = open('results/results%d.txt' % idx, 'r')
+    f = open('results/results%s.txt' % idx, 'r')
 
     result = []
     for line in f:
