@@ -7,6 +7,7 @@ for line in f:
     result.append(line.split())
 
 result = np.asarray(result)
+print(result)
 results = np.average(result, axis=1)
 
 for k, recall in enumerate(results):
