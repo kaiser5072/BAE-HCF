@@ -8,7 +8,7 @@ for line in f:
 
 result = np.asarray(result).astype(np.float32)
 print(result)
-results = np.average(result, axis=1)
+results = np.average(result, axis=0)
 
 for k, recall in enumerate(results):
     print("[*] RECALL@%d: %.4f" % (k, recall))
