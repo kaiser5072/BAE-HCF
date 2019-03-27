@@ -190,9 +190,9 @@ class Data(object):
         cut_idx = np.where(cut_list < 5)[0]
         print(cut_idx)
 
-        item_idx = np.setdiff1d(range(self.width), cut_idx)
+        item_idx = np.setdiff1d(range(self.height), cut_idx)
         
-        divider = np.random.uniform(0, 1, [self.height, np.size(item_idx, 0)])
+        divider = np.random.uniform(0, 1, [np.size(item_idx, 0), self.width])
         print(np.size(item_idx, 0))
         row_tr, col_tr, val_tr, cont_row_tr, cont_col_tr, cont_val_tr = [], [], [], [], [], []
         row_te, col_te, val_te, cont_row_te, cont_col_te, cont_val_te = [], [], [], [], [], []
@@ -204,7 +204,7 @@ class Data(object):
             mask = np.zeros_like(divider)
             mask[divider == 5 - i] = 1
             test_mask = np.zeros(pref.get_shape())
-            test_mask[:, item_idx] = mask
+            test_mask[item_idx, :] = mask
 
             train = pref.multiply(1 - test_mask)
             val   = pref.multiply(test_mask)
