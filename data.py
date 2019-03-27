@@ -186,7 +186,7 @@ class Data(object):
         pref = coo_matrix((rating, (row, column)), shape=(self.height, self.width))
         
         cut_list = pref.sum(axis=0)
-        print(cut_list[0])
+        print(cut_list.flatten())
         cut_idx = np.where(cut_list < 5)[0]
         print(cut_idx)
 
