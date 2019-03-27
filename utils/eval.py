@@ -2,7 +2,7 @@ import numpy as np
 
 from scipy.stats import rankdata
 
-def get_recall(target, preds, mask, n_recalls):
+def get_recall(target, preds, mask, n_recalls, gpu):
     preds  = np.transpose(preds)
     mask   = np.transpose(mask)
     target = np.transpose(target)
@@ -31,7 +31,7 @@ def get_recall(target, preds, mask, n_recalls):
     for k, recall in zip(n_recalls, recalls):
         print("[*] RECALL@%d: %.4f" % (k, recall))
 
-    f = open('results/results.txt', 'a')
+    f = open('results/results%d.txt' % gpu, 'a')
     for recall in recalls:
         f.write('%.4f ' % recall)
     f.write('\n')

@@ -81,6 +81,11 @@ def parse_args(init_vals, custom_parser=None):
                    required=True,
                    help='The number of units')
 
+    p.add_argument('-g', '--gpu', type=int,
+                   default=_default(init_vals, 'gpu'),
+                   required=_required(init_vals, 'gpu'),
+                   help='GPU number')
+
     FLAGS, unknown_args = p.parse_known_args()
     if len(unknown_args) > 0:
         for bad_arg in unknown_args:
@@ -112,6 +117,8 @@ def parse_args(init_vals, custom_parser=None):
     del FLAGS.dims
     vals['mode'] = FLAGS.mode
     del FLAGS.mode
+    vals['gpu'] = FLAGS.gpu
+    del FLAGS.gpu
 
 
     return vals, FLAGS

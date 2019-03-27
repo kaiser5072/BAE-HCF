@@ -11,6 +11,7 @@
     "confidence"    : 100,
     "drop_rate"     : 0.5,
     "n_folds"       : 5,
+    "gpu"           : 0,
     "dims"          : [500, 200],
     "data_dir"      : "./Input",
     "mode"          : "train",

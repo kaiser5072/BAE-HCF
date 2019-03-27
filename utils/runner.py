@@ -174,7 +174,7 @@ def predict(infer_func, params):
                 pbar.update(1)
 
 
-        recall = utils.get_recall(ratingTest, preds, mask, np.arange(50, 550, 50))
+        recall = utils.get_recall(ratingTest, preds, mask, np.arange(50, 550, 50), params['gpu'])
         print("\n [*] RECALL: %.4f" % recall)
 
     except KeyboardInterrupt:
