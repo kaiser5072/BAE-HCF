@@ -3,19 +3,11 @@ import numpy as np
 from scipy.stats import rankdata
 
 def get_recall(target, preds, mask, n_recalls):
-    # ratingTest[:, [1, 0]] = ratingTest[:, [0, 1]]
-
-
-    # temp = np.zeros((16980, 5551))
-    # temp[(ratingTest[:, 0], ratingTest[:, 1])] = 1
-    preds       = np.transpose(preds)
+    preds  = np.transpose(preds)
     mask   = np.transpose(mask)
-    target        = np.transpose(target)
+    target = np.transpose(target)
 
     print(np.sort(preds[0, :])[::-1][:100])
-    # temp      = np.asarray(ratingTest)
-    # preds     = np.asarray(preds)
-    # test_mask = np.asarray(test_mask)
 
     preds = preds * mask - 100 * (1-mask)
     non_zero_idx = np.sum(target, axis=1) != 0
@@ -38,6 +30,12 @@ def get_recall(target, preds, mask, n_recalls):
 
     for k, recall in zip(n_recalls, recalls):
         print("[*] RECALL@%d: %.4f" % (k, recall))
+
+    f = open('results.txt', 'a')
+    for recall in recalls:
+        f.write('%.4f ' % recall)
+    f.write('\n')
+    f.close()
 
     return recall
 
