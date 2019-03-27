@@ -184,7 +184,12 @@ class Data(object):
 
     def _split_train_val_for_warm(self, row, column, rating, item, feature, content):
         pref = coo_matrix((rating, (row, column)), shape=(self.height, self.width))
-        divider = np.random.uniform(0, 1, [self.height, self.width])
+
+        cut_list = pref.sum(axis=0)
+        cut_idx = np.where(cut_list < 5)[0]
+        item_idx = np.setdiff1d(range(self.width), cut_idx)
+        
+        divider = np.random.uniform(0, 1, [self.height, np.size(item_idx, 0)])
 
         row_tr, col_tr, val_tr, cont_row_tr, cont_col_tr, cont_val_tr = [], [], [], [], [], []
         row_te, col_te, val_te, cont_row_te, cont_col_te, cont_val_te = [], [], [], [], [], []
@@ -195,9 +200,11 @@ class Data(object):
             divider[divider < (i+1)*0.2] = 5 - i
             mask = np.zeros_like(divider)
             mask[divider == 5 - i] = 1
+            test_mask = np.zeros(pref.get_shape())
+            test_mask[:, item_idx] = mask
 
-            train = pref.multiply(1 - mask)
-            val   = pref.multiply(mask)
+            train = pref.multiply(1 - test_mask)
+            val   = pref.multiply(test_mask)
 
             row_tr.append(train.nonzero()[0])
             col_tr.append(train.nonzero()[1])
@@ -215,7 +222,7 @@ class Data(object):
             cont_col_te.append(feature)
             cont_val_te.append(content)
 
-            masks.append(mask)
+            masks.append(test_mask)
 
             self.height_tr.append(self.height)
             self.height_te.append(self.height)
