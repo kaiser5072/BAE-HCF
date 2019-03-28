@@ -11,6 +11,7 @@ def average(idx):
     result = np.asarray(result).astype(np.float32)
     results = np.average(result, axis=0)
 
+    print('\n')
     for k, recall in enumerate(results):
         print("[*] RECALL@%d: %.4f" % (k, recall))
 

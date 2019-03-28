@@ -186,14 +186,10 @@ class Data(object):
         pref = coo_matrix((rating, (row, column)), shape=(self.height, self.width))
         
         cut_list = np.sum(pref.toarray(), axis=1)
-        print(cut_list.flatten())
         cut_idx = np.where(cut_list < 5)[0]
-        print(cut_idx)
-
         item_idx = np.setdiff1d(range(self.height), cut_idx)
         
         divider = np.random.uniform(0, 1, [np.size(item_idx, 0), self.width])
-        print(np.size(item_idx, 0))
         row_tr, col_tr, val_tr, cont_row_tr, cont_col_tr, cont_val_tr = [], [], [], [], [], []
         row_te, col_te, val_te, cont_row_te, cont_col_te, cont_val_te = [], [], [], [], [], []
         self.height_tr, self.height_te = [], []
