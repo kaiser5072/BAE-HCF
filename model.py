@@ -81,7 +81,7 @@ class AE_CF(object):
 
             prev_dim = h.get_shape()[1]
 
-        h = tf.nn.l2_normalize(h, axis=1)
+        # h = tf.nn.l2_normalize(h, axis=1)
         with tf.variable_scope('layer%d'%self.n_layer):
             w = tf.get_variable('weight', shape=[h.get_shape()[1], self.dims[-1]],
                                 trainable=True,
