@@ -52,7 +52,7 @@ class AE_CF(object):
                                               dtype=self.dtype)
 
             if i == 1 and self.n_layer != 2:
-                s = tf.get_variable('weight_s', shape=[self.n_features, self.dims[i]],
+                s = tf.get_variable('sides', shape=[self.n_features, self.dims[i]],
                                                 trainable=True,
                                                 initializer=w_init,
                                                 dtype=self.dtype)
@@ -61,7 +61,7 @@ class AE_CF(object):
                 h = tf.nn.relu(h)
 
             elif self.n_layer == 2:
-                s = tf.get_variable('weight_s', shape=[self.n_features, self.dims[i]],
+                s = tf.get_variable('sides', shape=[self.n_features, self.dims[i]],
                                                 trainable=True,
                                                 initializer=w_init,
                                                 dtype=self.dtype)
@@ -81,6 +81,7 @@ class AE_CF(object):
 
             prev_dim = h.get_shape()[1]
 
+        h = tf.nn.l2_normalize(h, axis=1)
         with tf.variable_scope('layer%d'%self.n_layer):
             w = tf.get_variable('weight', shape=[h.get_shape()[1], self.dims[-1]],
                                 trainable=True,
