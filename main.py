@@ -68,18 +68,17 @@ def evaluate(args):
         BEA.destroy_graph()
 
 def predict(args):
-    if args['model_dir'] is not None:
-        meta_path = os.path.join(args['data_dir'], 'meta')
-        meta = cPickle.loads(open(meta_path).read())
+    meta_path = os.path.join(args['data_dir'], 'meta')
+    meta = cPickle.loads(open(meta_path).read())
 
-        args = _get_input(args)
-        BEA = model.AE_CF(args)
-        preds = utils.predict(BEA, args)
-        if args['AE_TYPE'] == 'item':
-            preds = np.transpose(preds)
+    args = _get_input(args)
+    BEA = model.AE_CF(args)
+    preds = utils.predict(BEA, args)
+    if args['AE_TYPE'] == 'item':
+        preds = np.transpose(preds)
 
-        utils.get_eval(preds, args['test_mode'], meta)
-        BEA.destroy_graph()
+    utils.get_eval(preds, args['test_mode'], meta)
+    BEA.destroy_graph()
 
 if args['mode'] == 'train':
     train(args)

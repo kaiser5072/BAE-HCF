@@ -53,9 +53,9 @@ class AE_CF(object):
 
             if i == 1 and self.n_layer != 2:
                 s = tf.get_variable('sides', shape=[self.n_features, self.dims[i]],
-                                                trainable=True,
-                                                initializer=w_init,
-                                                dtype=self.dtype)
+                                             trainable=True,
+                                             initializer=w_init,
+                                             dtype=self.dtype)
                 h = tf.sparse.matmul(h, w) + tf.sparse.matmul(sides, s) + b
                 h = tf.layers.batch_normalization(h, training=is_training)
                 h = tf.nn.relu(h)
@@ -113,13 +113,10 @@ class AE_CF(object):
 
         self.loss = tf.add(self.loss, 2 * self.l2_lambda * tf.reduce_sum(l2_losses), name='total_loss')
 
-        # reg_losses = tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES)
-        # self.loss = tf.add_n([self.loss] + reg_losses, name='total_loss')
-
     def optimization(self):
         opt = tf.train.AdamOptimizer(self.lr_init)
         train_op = opt.minimize(self.loss, global_step=tf.train.get_global_step(),
-                                             name='step_update')
+                                           name='step_update')
         update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
         self.train_op = tf.group(self.preload_op, self.gpucopy_op, train_op, update_ops)
 
