@@ -32,7 +32,7 @@ class AE_CF(object):
         self.n_layer = len(self.dims) - 1
 
     def builder(self, inputs, sides, drops_inputs, is_training):
-        w_init = tf.contrib.layers.variance_scaling_initializer()
+        w_init = tf.initializers.truncated_normal(stddev=0.1)
         b_init = tf.constant_initializer(0.)
         if is_training:
             h = drops_inputs
@@ -85,7 +85,7 @@ class AE_CF(object):
         with tf.variable_scope('layer%d'%self.n_layer):
             w = tf.get_variable('weight', shape=[h.get_shape()[1], self.dims[-1]],
                                 trainable=True,
-                                initializer=w_init,
+                                initializer=tf.contrib.layers.variance_scailing_initializer(),
                                 dtype=self.dtype)
 
             self.outputs = tf.matmul(h, w)
