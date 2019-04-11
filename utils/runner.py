@@ -157,7 +157,7 @@ def predict(infer_func, params):
         test_idx = h5py.File('cold_user_index.h5py', 'r')
     else:
         test_idx = h5py.File('cold_item_index.h5py', 'r')
-    item_idx = test_idx['user_idx']
+    item_idx = test_idx['idx']
 
     est = tf.estimator.Estimator(
         model_fn=infer_func._BAE_model_fn,
