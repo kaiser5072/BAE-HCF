@@ -19,26 +19,26 @@ class _LogSessionRunHook(tf.train.SessionRunHook):
         self.num_records = num_records
         self.display_every = display_every
     def after_create_session(self, session, coord):
-        print('\n|  Step  Epoch Step/sec  Loss TotalLoss  Time  |')
+        print('\n|  Step  Epoch Step/sec  Loss TotalLoss  Time  LR|')
         self.elapsed_secs = 0.
         self.count = 0
         self.t0 = time.time()
     def before_run(self, run_context):
         self.t1 = time.time()
         return tf.train.SessionRunArgs(
-            fetches=['step_update:0', 'loss:0', 'total_loss:0'])
+            fetches=['step_update:0', 'loss:0', 'total_loss:0', 'lr:0'])
     def after_run(self, run_context, run_values):
         self.elapsed_secs += time.time() - self.t1
         self.process_secs = time.time() - self.t0
         self.count += 1
-        global_step, loss, total_loss = run_values.results
+        global_step, loss, total_loss, lr = run_values.results
         print_step = global_step + 1
         if print_step == 1 or print_step % self.display_every == 0:
             dt = self.elapsed_secs / self.count
             img_per_sec = 1 / dt
             epoch = print_step * self.global_batch_size / self.num_records
-            print("|%6i %7.1f %5.1f %6.3f %7.3f %7.1f   |" %
-                  (print_step, epoch, img_per_sec, np.sqrt(loss), np.sqrt(total_loss), self.process_secs))
+            print("|%6i %7.1f %5.1f %6.3f %7.3f %7.1f   %6.6f|" %
+                  (print_step, epoch, img_per_sec, np.sqrt(loss), np.sqrt(total_loss), self.process_secs, lr))
             self.elapsed_secs = 0.
             self.count = 0
 

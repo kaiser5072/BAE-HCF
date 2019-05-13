@@ -117,7 +117,7 @@ class AE_CF(object):
         self.loss = tf.add(self.loss, 2 * self.l2_lambda * tf.reduce_sum(l2_losses), name='total_loss')
 
     def optimization(self):
-        opt = tf.train.AdamOptimizer(self.lr_init)
+        opt = tf.train.AdamOptimizer(self.lr)
         train_op = opt.minimize(self.loss, global_step=tf.train.get_global_step(),
                                            name='step_update')
         update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
@@ -134,6 +134,9 @@ class AE_CF(object):
         #     [40000, 80000],
         #     [self.init_lr, 0.1*self.init_lr, 0.001*self.init_lr],
         #     name='learning_rate')
+
+        self.lr = tf.train.exponential_decay(
+            self.lr_init, tf.train.get_global_step(), 10000, 0.96, staircase=True, name="lr")
 
         # TODO: Better way instead of tf.identity
 
