@@ -248,7 +248,7 @@ class Data(object):
 
             test_idx  = rand_idx[begin:end]
             train_idx = np.setdiff1d(range(n_data), test_idx)
-            self.height_tr.append(len(train_idx))
+            self.height_tr.append(len( train_idx))
             self.height_te.append(len(test_idx))
 
             train   = pref[train_idx].tocoo()
