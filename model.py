@@ -59,6 +59,7 @@ class AE_CF(object):
                 h = tf.sparse.matmul(h, w) + tf.sparse.matmul(sides, s) + b
                 h = tf.layers.batch_normalization(h, training=is_training)
                 h = tf.nn.relu(h)
+                h = tf.layers.dropout(h, training=is_training)
 
             elif self.n_layer == 2:
                 s = tf.get_variable('sides', shape=[self.n_features, self.dims[i]],
@@ -78,6 +79,8 @@ class AE_CF(object):
                 h = tf.matmul(h, w) + b
                 h = tf.layers.batch_normalization(h, training=is_training)
                 h = tf.nn.relu(h)
+                h = tf.layers.dropout(h, training=is_training)
+
 
             prev_dim = h.get_shape()[1]
 
