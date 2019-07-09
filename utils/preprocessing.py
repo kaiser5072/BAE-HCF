@@ -10,7 +10,7 @@ import os
 from scipy.sparse import coo_matrix
 from scipy.sparse import csr_matrix
 from multiprocessing import Pool
-from utils import get_logger, Option
+from .misc import get_logger, Option
 opt = Option('./config.json')
 
 
