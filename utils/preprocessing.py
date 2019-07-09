@@ -6,11 +6,11 @@ import shutil
 import fire
 import tqdm
 import os
+import misc
 
 from scipy.sparse import coo_matrix
 from scipy.sparse import csr_matrix
 from multiprocessing import Pool
-from . import misc
 
 opt = misc.Option('./config.json')
 
