@@ -10,8 +10,9 @@ import os
 from scipy.sparse import coo_matrix
 from scipy.sparse import csr_matrix
 from multiprocessing import Pool
-from .misc import get_logger, Option
-opt = Option('./config.json')
+from . import misc
+
+opt = misc.Option('./config.json')
 
 
 def parse_data(inputs):
@@ -63,7 +64,7 @@ def parse_data(inputs):
 
 class Data(object):
     def __init__(self):
-        self.logger = get_logger('data')
+        self.logger = misc.get_logger('data')
 
     def load_data(self, data_dir, AE_TYPE='item'):
         data = h5py.File(data_dir, 'r')
