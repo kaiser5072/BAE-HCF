@@ -161,20 +161,25 @@ def predict(infer_func, params):
         eval_result = est.predict(
             input_fn=input_func)
 
-        preds, ratingTest, mask = [], [], []
+        preds, ratingTest, mask, embd = [], [], [], []
         with tqdm.tqdm(total=height) as pbar:
             for pred in eval_result:
-                _pred = pred['preds']
+                _pred   = pred['preds']
                 _rating = pred['ratingTest']
-                _mask = pred['mask']
+                _mask   = pred['mask']
+                _embd   = pred['embd']
 
+                embd.append(_embd)
                 preds.append(_pred)
                 ratingTest.append(_rating)
                 mask.append(_mask)
+
                 pbar.update(1)
 
+        embd = np.asarray(embd)
+        np.savetxt('embd.tsv', embd, fmt='%.4f', delimiter='\t')
 
-        recall = utils.get_recall(ratingTest, preds, mask, np.arange(50, 550, 50), params['gpu'])
+        recall = utils.get_recall(ratingTest, preds, mask, np.arange(5, 55, 5), params['gpu'])
         print("\n [*] RECALL: %.4f" % recall)
 
     except KeyboardInterrupt:

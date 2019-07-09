@@ -78,6 +78,7 @@ class AE_CF(object):
             prev_dim = h.get_shape()[1]
 
         # h = tf.nn.l2_normalize(h, axis=1)
+        self.embd = h
         with tf.variable_scope('layer%d'%self.n_layer):
             w = tf.get_variable('weight', shape=[h.get_shape()[1], self.dims[-1]],
                                 trainable=True,
@@ -113,10 +114,9 @@ class AE_CF(object):
     def optimization(self):
         opt = tf.train.AdamOptimizer(self.lr_init)
         train_op = opt.minimize(self.loss, global_step=tf.train.get_global_step(),
-                                             name='step_update')
+                                           name='step_update')
         update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
         self.train_op = tf.group(self.preload_op, self.gpucopy_op, train_op, update_ops)
-
 
     def _BAE_model_fn(self, features, labels, mode, params):
         self.height        = params['height']
@@ -169,8 +169,9 @@ class AE_CF(object):
 
         if mode == tf.estimator.ModeKeys.PREDICT:
             predictions = {
-                'preds': self.outputs,
-                'mask': features['mask'],
+                'embd'  : self.embd,
+                'preds' : self.outputs,
+                'mask'  : features['mask'],
                 'ratingTest': tf.sparse.to_dense(features['labels'])
             }
             return tf.estimator.EstimatorSpec(mode, predictions=predictions)
