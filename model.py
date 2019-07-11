@@ -58,7 +58,7 @@ class AE_CF(object):
             if i == 1 and self.n_layer != 2:
                 h = tf.sparse.matmul(h, w) + tf.sparse.matmul(sides, s) + b
                 # h = tf.layers.batch_normalization(h, training=is_training)
-                h = tf.nn.relu(h)
+                h = tf.nn.tanh(h)
 
             elif self.n_layer == 2:
                 h = tf.sparse.matmul(h, w) + tf.sparse.matmul(sides, s) + b
@@ -73,13 +73,26 @@ class AE_CF(object):
             else:
                 h = tf.matmul(h, w) + b
                 # h = tf.layers.batch_normalization(h, training=is_training)
-                h = tf.nn.relu(h)
+                h = tf.nn.tanh(h)
 
             prev_dim = h.get_shape()[1]
 
         # h = tf.nn.l2_normalize(h, axis=1)
         self.embd = h
+
         with tf.variable_scope('layer%d'%self.n_layer):
+            w = tf.get_variable('weight', shape=[h.get_shape()[1], 500],
+                                trainable=True,
+                                initializer=w_init,
+                                dtype=self.dtype)
+            b = tf.get_variable('biases', shape=[500],
+                                trainable=True,
+                                initializer=b_init,
+                                dtype=self.dtype)
+            h = tf.matmul(h, w) + b
+            h = tf.nn.tanh(h)
+
+        with tf.variable_scope('layer%d'%self.n_layer+1):
             w = tf.get_variable('weight', shape=[h.get_shape()[1], self.dims[-1]],
                                 trainable=True,
                                 initializer=w_init,
