@@ -101,8 +101,7 @@ class AE_CF(object):
                                 trainable=True,
                                 initializer=b_init,
                                 dtype=self.dtype)
-            self.outputs = tf.matmul(h, w) +b
-            self.outputs = tf.nn.tanh(self.outputs)
+            self.outputs = tf.matmul(h, w)
 
         # log_softmax_var = tf.nn.log_softmax(self.outputs)
         # neg_ll = -tf.reduce_mean(tf.reduce_sum(
