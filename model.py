@@ -80,19 +80,19 @@ class AE_CF(object):
         # h = tf.nn.l2_normalize(h, axis=1)
         self.embd = h
 
-        with tf.variable_scope('layer%d'%self.n_layer):
-            w = tf.get_variable('weight', shape=[h.get_shape()[1], 500],
-                                trainable=True,
-                                initializer=w_init,
-                                dtype=self.dtype)
-            b = tf.get_variable('biases', shape=[500],
-                                trainable=True,
-                                initializer=b_init,
-                                dtype=self.dtype)
-            h = tf.matmul(h, w) + b
-            h = tf.nn.tanh(h)
+        # with tf.variable_scope('layer%d'%self.n_layer):
+        #     w = tf.get_variable('weight', shape=[h.get_shape()[1], 500],
+        #                         trainable=True,
+        #                         initializer=w_init,
+        #                         dtype=self.dtype)
+        #     b = tf.get_variable('biases', shape=[500],
+        #                         trainable=True,
+        #                         initializer=b_init,
+        #                         dtype=self.dtype)
+        #     h = tf.matmul(h, w) + b
+        #     h = tf.nn.tanh(h)
 
-        with tf.variable_scope('layer%d'%(self.n_layer+1)):
+        with tf.variable_scope('layer%d'%(self.n_layer)):
             w = tf.get_variable('weight', shape=[h.get_shape()[1], self.dims[-1]],
                                 trainable=True,
                                 initializer=w_init,
