@@ -92,7 +92,7 @@ class AE_CF(object):
             h = tf.matmul(h, w) + b
             h = tf.nn.tanh(h)
 
-        with tf.variable_scope('layer%d'%self.n_layer+1):
+        with tf.variable_scope('layer%d'%(self.n_layer+1)):
             w = tf.get_variable('weight', shape=[h.get_shape()[1], self.dims[-1]],
                                 trainable=True,
                                 initializer=w_init,
