@@ -97,8 +97,12 @@ class AE_CF(object):
                                 trainable=True,
                                 initializer=w_init,
                                 dtype=self.dtype)
-
-            self.outputs = tf.matmul(h, w)
+            b = tf.get_variable('biases', shape=[self.dims[-1]],
+                                trainable=True,
+                                initializer=b_init,
+                                dtype=self.dtype)
+            self.outputs = tf.matmul(h, w) +b
+            self.outputs = tf.nn.tanh(self.outputs)
 
         # log_softmax_var = tf.nn.log_softmax(self.outputs)
         # neg_ll = -tf.reduce_mean(tf.reduce_sum(
