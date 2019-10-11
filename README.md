@@ -35,3 +35,20 @@ For *citeulike-t* dataset
 - Cold start
 
 ```python ./utils/preprocessing.py make_db Input/citeulike/citeulike-t.h5py Input/citeulike-t/cold 'cold'```
+
+
+
+### Training for Warm start ###
+
+On *citeulike-a* dataset
+
+```shell
+python main.py --dims 500 200 --data_dir 'Input/citeulike-a/warm' -b 512 -e 500 --display_every 4000 --l2_lambda 0.00004 -r 0.5 -g 0 -f 0
+```
+
+On *citeulike-t* dataset
+
+
+
+### Training for Cold Start ###
+
