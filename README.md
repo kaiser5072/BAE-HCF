@@ -42,13 +42,15 @@ For *citeulike-t* dataset
 
 On *citeulike-a* dataset
 
-```shell
-python main.py --dims 500 200 --data_dir 'Input/citeulike-a/warm' -b 512 -e 500 --display_every 4000 --l2_lambda 0.00004 -r 0.5 -g 0 -f 0
-```
+```python main.py --dims 500 200 --data_dir 'Input/citeulike-a/warm' -b 512 -e 500 --display_every 4000 --l2_lambda 0.00004 -r 0.5 -g 0 -f 0```
 
 On *citeulike-t* dataset
 
-
+```python main.py --dims 500 200 --data_dir 'Input/citeulike-t/warm' -b 512 -e 500 --display_every 4000 --l2_lambda 0.00004 -r 0.5 -g 0 -f 0```
 
 ### Training for Cold Start ###
+
+
+
+### 5-fold cross-validation
 
