@@ -14,3 +14,25 @@ Python2.7, tensorflow-gpu >= 1.14.0, Numpy, Scipy
 
 ## Preparation tf.records format
 
+This code 
+
+- For *citeulike-a* dataset
+
+Warm start
+
+```python ./utils/preprocessing.py make_db Input/citeulike/citeulike-a.h5py Input/citeulike-a/warm 'warm'```
+
+Cold start
+
+```python ./utils/prerocessing.py make_db Input/citeulike/citeulike-a.h5py Input/citeulike-a/cold 'cold'```
+
+- For *citeulike-t* dataset
+
+Warm start
+
+```python ./utils/preprocessing.py make_db Input/citeulike/citeulike-t.h5py Input/citeulike-t/warm 'warm'```
+
+Cold start
+
+```python ./utils/preprocessing.py make_db Input/citeulike/citeulike-t.h5py Input/citeulike-t/cold 'cold'```
+
