@@ -79,12 +79,13 @@ Then, we convert the dataset into .tfrecord format.
 
 ### Citation
 
+If you use this model for your research, plase cite below paper:
+
 ```bibtex
 @inproceedings{basis-learning-ae,
   author = "Lee Kiwon and Jo Hyeonsoo and Kim Hyoji and Lee Yong H.",
   title = "Basis Learning Autoencoders for Hybrid Collaborative Filtering in Cold Start Setting",
   booktitle = "Proceedings of the IEEE 29th International Workshop on Machine Learning for Signal Processing (MLSP)",
-  pages = "",
   month = "Oct.",
   year = "2019"
 }
