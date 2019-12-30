@@ -35,19 +35,19 @@ First, we clean ukp given raw data, and save it with .h5py format.
 
 - Training set
 
-  ```python data.py make_db './Input/recsys2017_warm_h5py './Input/tfrecords```
+  ```python data.py make_db './Input/recsys2017_warm_h5py './Input/tfrecords/train```
 
 - Test set for warm start
 
-  ```python data.py make_db './Input/test_warm.h5py' './Input/tfrecords'```
+  ```python data.py make_db './Input/test_warm.h5py' './Input/tfrecords/warm'```
 
 - Test set for user cold start
 
-  ```python data.py make_db './Input/test_cold_user.h5py' './Input/tfrecords'```
+  ```python data.py make_db './Input/test_cold_user.h5py' './Input/tfrecords/cold_user'```
 
 - Test set for item cold start
 
-  ```python data.py make_db './Input/test_cold_item.h5py' './Input/tfrecords'```
+  ```python data.py make_db './Input/test_cold_item.h5py' './Input/tfrecords/cold_item'```
 
 </br>
 
