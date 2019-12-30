@@ -17,9 +17,9 @@ We use the datasets from recsys 2017 challenge.
 - Preference matrix consists of **1,064,237 users** and **495,601 jobs**
 - User contents information contains **830x1** vector for each user
 - Item contents information contains **2,737x1** vector for each item
-- Test data for warm start contains 124,960 users and 62,434 jobs
-- Test data for user cold start
-- Test data for item cold start
+- Test data for warm start contains **124,960 users** and **62,434 jobs**
+- Test data for user cold start contains **47,754 user** and **42,152 jobs**
+- Test data for item cold start contains **85,341 users** and **49,974 jobs**
 
 </br>
 
@@ -31,7 +31,9 @@ First, we clean ukp given raw data, and save it with .h5py format.
 
 ```python utils/preprocessing.py vectorize 'train'```
 
+</br>
 
+Then, we convert the dataset into .tfrecord format.
 
 - Training set
 
@@ -55,11 +57,11 @@ First, we clean ukp given raw data, and save it with .h5py format.
 
 - User-based Autoencoders
 
-  ```python main.py --data_dir './Input/train' --dims 100 200 --AE_TYPE 'user' --batch_size 128``` 
+  ```python main.py --data_dir './Input/train' --dims 100 200 --mode 'train' --AE_TYPE 'user' --batch_size 128``` 
 
 - Item-based Autoencoders
 
-  ```python main.py --data_dir './Input/train' --dims 300 200 --AE_TYPE 'item' --batch_size 128```
+  ```python main.py --data_dir './Input/train' --dims 300 200 --mode 'train' --AE_TYPE 'item' --batch_size 128```
 
   </br>
 
@@ -68,3 +70,12 @@ First, we clean ukp given raw data, and save it with .h5py format.
 - Warm start
 - User cold start
 - Item cold start
+
+</br>
+
+### Reference
+
+</br>
+
+### Citation
+
