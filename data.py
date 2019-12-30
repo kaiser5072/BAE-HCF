@@ -14,13 +14,13 @@ opt = Option('./config.json')
 
 
 def parse_data(inputs):
-    cidx, begin, end, data, n_items_height, n_items_width, n_users_height, n_users_width, n_contents_items, n_contents_users, div, out_dir, types = inputs
+    cidx, begin, end, data, n_items_height, n_items_width, n_users_height, n_users_width, n_contents_items, n_contents_users, out_dir, types = inputs
     item_row_tr, item_col_tr, item_ids, item_feature, item_contents, \
     user_row_tr, user_col_tr, user_ids, user_feature, user_contents, \
     item_pref_tr, user_pref_tr = data
 
     data = Data()
-    train_path = os.path.join(out_dir, '%s.%s.%s.tfrecords' % (types, div, cidx))
+    train_path = os.path.join(out_dir, '%s.%s.tfrecords' % (types, cidx))
     train_writer = tf.python_io.TFRecordWriter(train_path)
     num_train, num_val = 0, 0
     if types == 'item':
@@ -54,7 +54,7 @@ class Data(object):
     def __init__(self):
         self.logger = get_logger('data')
 
-    def load_data(self, data_dir, div):
+    def load_data(self, data_dir):
         data = h5py.File(data_dir, 'r')
 
 
@@ -100,13 +100,13 @@ class Data(object):
             yield column_t, value_t, feature_t, contents_t
 
 
-    def make_db(self, data_dir, out_dir, div):
+    def make_db(self, data_dir, out_dir):
         if os.path.exists(out_dir):
             shutil.rmtree(out_dir)
 
         os.makedirs(out_dir)
 
-        data = self.load_data(data_dir, div)
+        data = self.load_data(data_dir)
         item_chunk_offsets = self._split_data(opt.chunk_size, self.n_items_height)
         user_chunk_offsets = self._split_data(opt.chunk_size, self.n_users_height)
         item_num_chunks = len(item_chunk_offsets)
@@ -122,7 +122,7 @@ class Data(object):
                                                         self.n_users_height, self.n_users_width,
                                                         self.n_contents_items,
                                                         self.n_contents_users,
-                                                        div, out_dir, 'item')
+                                                        out_dir, 'item')
                                                         for cidx, (begin, end)
                                                         in enumerate(item_chunk_offsets)]).get(999999999)
 
@@ -131,7 +131,7 @@ class Data(object):
                                                         self.n_users_height, self.n_users_width,
                                                         self.n_contents_items,
                                                         self.n_contents_users,
-                                                        div, out_dir, 'user')
+                                                        out_dir, 'user')
                                                         for cidx, (begin, end)
                                                         in enumerate(user_chunk_offsets)]).get(999999999)
 
@@ -199,7 +199,6 @@ class Data(object):
 
         ## Training data
         user_dict, item_dict = self.remove_duplicate()
-
 
         self.item_content, self.item_feature, self.item_value, item_content_ids, item_feature_ids, item_content_value = \
             self.remove_contents(item_feature, item_dict)
