@@ -53,7 +53,15 @@ First, we clean ukp given raw data, and save it with .h5py format.
 
 ### Training
 
+- User-based Autoencoders
 
+  ```python main.py --data_dir './Input/train' --dims 100 200 --AE_TYPE 'user' --batch_size 128``` 
+
+- Item-based Autoencoders
+
+  ```python main.py --data_dir './Input/train' --dims 300 200 --AE_TYPE 'item' --batch_size 128```
+
+  </br>
 
 ### Test
 
