@@ -70,14 +70,14 @@ def _parse_and_preprocess_record(record, width, n_features, mode):
 
 def data_set(data_dir, batch_size, prefetch_size, width, n_features, mode, AE_type, is_repeat):
 
-    if mode == 'train' and AE_type == 'user':
-        data_path = os.path.join(data_dir, 'user.*.tfrecords')
-    elif mode == 'train' and AE_type == 'item':
-        data_path = os.path.join(data_dir, 'item.*.tfrecords')
-    elif mode == 'predict' and AE_type == 'user':
-        data_path = os.path.join(data_dir, 'user.*.tfrecords')
-    else:
-        data_path = os.path.join(data_dir, 'item.*.tfrecords')
+    # if mode == 'train' and AE_type == 'user':
+    data_path = os.path.join(data_dir, '{}.*.tfrecords'.format(AE_type))
+    # elif mode == 'train' and AE_type == 'item':
+    #     data_path = os.path.join(data_dir, 'item.*.tfrecords')
+    # elif mode == 'predict' and AE_type == 'user':
+    #     data_path = os.path.join(data_dir, 'user.*.tfrecords')
+    # else:
+    #     data_path = os.path.join(data_dir, 'item.*.tfrecords')
 
     filenames = tf.data.Dataset.list_files(data_path)
 
