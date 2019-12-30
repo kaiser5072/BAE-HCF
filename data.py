@@ -101,8 +101,8 @@ class Data(object):
 
 
     def make_db(self, data_dir, out_dir):
-        # if os.path.exists(out_dir):
-        #     shutil.rmtree(out_dir)
+        if os.path.exists(out_dir):
+            shutil.rmtree(out_dir)
 
         os.makedirs(out_dir)
 
